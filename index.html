@@ -111,6 +111,23 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.l7go{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}
+.l7go .btn{font-size:20px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 10px}
+.l7go .btn small{font-size:13px;font-weight:700;opacity:.8}
+.tdur{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+.tdbtn{flex:1;min-width:110px;border-radius:18px;border:3px solid #e5dccb;background:#fff;padding:14px 10px;font-size:20px;display:flex;flex-direction:column;align-items:center}
+.tdbtn b{font-size:40px;line-height:1}
+.tdbtn.on{border-color:#f59e0b;background:#fff7e0;box-shadow:0 4px 0 #f59e0b}
+.tcount{font-size:140px;font-weight:900;color:#d97706;line-height:1.1;animation:l7bounce 1s ease-in-out infinite}
+.trow{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.tring{--p:1;width:170px;height:170px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#16a34a calc(var(--p)*360deg),#e7e5e4 0);transition:background .2s}
+.tring.low{background:conic-gradient(#dc2626 calc(var(--p)*360deg),#e7e5e4 0);animation:l7pulse 1s infinite;--glow:rgba(220,38,38,.4)}
+.tring>div{width:136px;height:136px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tsec{font-size:58px;font-weight:900;line-height:1}
+.tring.low .tsec{color:#dc2626}
+.trec{font-size:22px;font-weight:900;color:#dc2626;display:flex;align-items:center;gap:8px}
+.tdot{width:16px;height:16px;border-radius:50%;background:#dc2626;animation:l7blink 1s infinite}
+@keyframes l7blink{50%{opacity:.2}}
 .l7grid{display:grid;grid-template-columns:250px minmax(0,1fr) 250px;gap:12px;margin-top:14px;align-items:start}
 .l7side{background:#fff;border-radius:18px;padding:10px;border:3px solid #e5dccb;transition:.2s}
 .l7side:not(.on) .l7cats,.l7side:not(.on) .l7bank,.l7side:not(.on) .l7who{opacity:.45}
@@ -1843,7 +1860,10 @@ function viewL7(){
         <div class="l7conv" id="dlg"></div>
         <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="undo" style="padding:6px 12px;font-size:14px">↩️ 上一步 Undo</button><button class="btn btn-ghost" id="clr" style="padding:6px 12px;font-size:14px;margin-left:auto">🗑️ 全部清除</button></div>
         <div id="chk" style="margin-top:10px"></div>
-        <button class="btn btn-sun" id="go" style="width:100%;margin-top:12px;font-size:20px">🎙️ 開始測驗 Start the test ➜</button>
+        <div class="l7go">
+          <button class="btn btn-sun" id="goT">⏱️ 計時對話 <span class="en">Timed dialogue</span><small>30／60／90 秒，一起錄整段</small></button>
+          <button class="btn btn-ghost" id="go">🎙️ 一句一句錄 <span class="en">Line by line</span><small>每句分開錄</small></button>
+        </div>
       </div>
       ${side('B')}
     </div>`;
@@ -1891,13 +1911,101 @@ function viewL7(){
     $('#chk').innerHTML=`<div class="checks">${c.rows.map(r=>`<span class="ck2 ${r.ok?'ok':''}">${r.ok?'✅':'⬜'} ${esc(r.zh)}${r.n?` (${r.v}/${r.n})`:''}<span class="ck2en">${esc(r.en||'')}</span></span>`).join('')}</div>`;
   }
   function renderAll(){ renderDlg(); renderSide('A'); renderSide('B'); ['A','B'].forEach(w=>{ const h=$('#h'+w).parentElement; h.classList.toggle('l7headon',S.nextWho===w); let t=h.querySelector('.l7tag'); if(S.nextWho===w){ if(!t){ t=document.createElement('span'); t.className='l7tag'; h.appendChild(t);} t.textContent='🎤 輪到我'; } else if(t) t.remove(); }); }
-  $('#go').onclick=()=>{
-    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
-    if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
-    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')+(c.missingEn&&c.missingEn.length?'\nNot yet: '+c.missingEn.join(', '):''),4000); return; }
-    runTest(S, S.lines.slice(), names());
+  const ready=()=>{
+    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return false; }
+    if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return false; }
+    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')+(c.missingEn&&c.missingEn.length?'\nNot yet: '+c.missingEn.join(', '):''),4000); return false; }
+    return true;
   };
+  $('#go').onclick=()=>{ if(ready()) runTest(S, S.lines.slice(), names()); };
+  $('#goT').onclick=()=>{ if(ready()) runTimed(S, S.lines.slice(), names()); };
   renderAll();
+}
+
+
+/* ---------- 計時對話：選 30/60/90 秒，按開始後同時計時＋錄下整段對話 ---------- */
+const TIMER_OPTS=[30,60,90];
+function timedScore(lines, said){
+  const t=norm(said||''); if(!t) return 0;
+  const keys=lines.map(l=>lineKeys(l));
+  let hit=0, tot=0;
+  keys.forEach((ks,i)=>{ const fixed=norm(fixHomo(said, ks.join(''))); ks.forEach(k=>{ tot++; if(fixed.includes(norm(k))) hit++; }); });
+  return tot? Math.round(100*hit/tot) : 0;
+}
+function runTimed(S, lines, names){
+  const partnerUser={name:S.partner, cls:state.user.cls, teacher:state.user.teacher};
+  let dur = TIMER_OPTS.includes(S.dur)? S.dur : 60;
+  const kwOf=l=>{ const b=BLK[l.b]; return kwText(b,l)+(b.hasS?'＋'+SP[l.s].hz:''); };
+  const script=()=>lines.map((l,i)=>{ const b=BLK[l.b]; return `<div class="l7line l7-${l.who}" style="grid-row:${i+1}"><div class="l7bub ${BCAT[b.cat].cls}"><div class="l7top"><span class="l7n">${i+1}</span><span class="hint l7c">${BCAT[b.cat].e} ${BCAT[b.cat].zh}</span></div><div class="l7txt"><span class="kwonly">${esc(kwText(b,l))}</span>${b.hasS?` <span class="hint">${SP[l.s].e} ${esc(SP[l.s].hz)}</span>`:''}</div></div></div>`; }).join('');
+  function setup(){
+    app.innerHTML = `
+      <button class="back" id="bk">← 回去改對話 Back</button>
+      <div class="card">
+        <h2 style="font-size:26px;font-weight:900">⏱️ 計時對話 <span class="en" style="font-size:17px">Timed dialogue</span></h2>
+        <div class="hint" style="margin-top:4px">選好時間，按「開始」。計時開始後會<b>同時錄下你們兩個人的對話</b>。時間到就自動停止。 <span class="en">Pick a time and press Start. Your whole conversation is recorded until time is up.</span></div>
+        <div class="tdur">${TIMER_OPTS.map(x=>`<button class="tdbtn ${x===dur?'on':''}" data-d="${x}"><b>${x}</b> 秒<span class="en">${x} sec</span></button>`).join('')}</div>
+        <button class="btn btn-sun" id="start" style="width:100%;font-size:24px;margin-top:12px">▶️ 開始 Start（${dur} 秒）</button>
+        <div class="l7head" style="margin-top:14px"><div class="spk-bg-A"><span class="spk spk-A">A</span> <b>${esc(names.A)}</b></div><div class="spk-bg-B"><span class="spk spk-B">B</span> <b>${esc(names.B)}</b></div></div>
+        <div class="l7conv" style="min-height:0;max-height:none">${script()}</div>
+      </div>`;
+    $('#bk').onclick=()=>viewL7();
+    app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ dur=+b.dataset.d; S.dur=dur; store.set(l7Key(),S); setup(); });
+    $('#start').onclick=countdown;
+  }
+  function countdown(){
+    let n=3;
+    app.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div class="hint" style="font-size:20px">準備好了嗎？ Get ready…</div><div class="tcount" id="cd">3</div><div class="hint">A ${esc(names.A)} 先說 <span class="en">A starts</span></div></div>`;
+    const tick=()=>{ n--; if(!document.getElementById('cd')) return; if(n<=0) return record(); $('#cd').textContent=n; setTimeout(tick,1000); };
+    setTimeout(tick,1000);
+  }
+  async function record(){
+    const t0=Date.now(), total=dur*1000;
+    app.innerHTML = `
+      <div class="card">
+        <div class="trow">
+          <div class="tring" id="ring" style="--p:1"><div><div class="tsec" id="sec">${dur}</div><div class="hint">秒 sec</div></div></div>
+          <div style="flex:1;min-width:220px">
+            <div class="trec"><span class="tdot"></span> 錄音中… <span class="en">Recording</span></div>
+            <div class="heard" style="margin-top:8px"><span class="lbl">我聽到 I heard:</span><span class="txt" id="live">…</span></div>
+            <button class="btn btn-ghost" id="stop" style="margin-top:10px">⏹ 說完了，提早結束 <span class="en">Finish early</span></button>
+          </div>
+        </div>
+        <div class="l7head" style="margin-top:14px"><div class="spk-bg-A"><span class="spk spk-A">A</span> <b>${esc(names.A)}</b></div><div class="spk-bg-B"><span class="spk spk-B">B</span> <b>${esc(names.B)}</b></div></div>
+        <div class="l7conv" style="min-height:0;max-height:none">${script()}</div>
+      </div>`;
+    const iv=setInterval(()=>{ const left=Math.max(0,total-(Date.now()-t0)); const sec=Math.ceil(left/1000);
+      const el=$('#sec'); if(!el){ clearInterval(iv); return; } el.textContent=sec; $('#ring').style.setProperty('--p',left/total); $('#ring').classList.toggle('low',sec<=10); },200);
+    $('#stop').onclick=()=>{ current && current(); };
+    let res;
+    try{ res=await listen({continuous:true, maxMs: total, onInterim:t=>{ const l=$('#live'); if(l) l.textContent=t; }}); }
+    catch(e){ clearInterval(iv); app.innerHTML=`<div class="card"><div class="warn">🎙️ 沒有麥克風權限。請按網址列的🔒允許麥克風，再試一次。 <span class="en">Please allow the microphone.</span></div><button class="btn btn-sun" id="again" style="margin-top:12px">再試一次 Try again</button></div>`; $('#again').onclick=setup; return; }
+    clearInterval(iv);
+    const used=Math.min(dur, Math.round((Date.now()-t0)/1000));
+    finish(res, used);
+  }
+  async function finish(res, used){
+    const said=res.transcript||'';
+    const sc = res.srOk && said ? timedScore(lines, said) : null;
+    const testId='T'+Date.now().toString(36);
+    app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:50px">⏳</div><div class="hint" style="font-size:18px">正在把錄音送給老師… <span class="en">Sending to your teacher…</span></div></div>`;
+    for (const who of ['A','B']){
+      const text=`測驗${testId}｜同伴：${names[who==='A'?'B':'A']}｜${who}｜計時${dur}秒（說了${used}秒）\n`+lines.map(l=>`${l.who}（${names[l.who]}）［${kwOf(l)}］：（見整段錄音）`).join('\n');
+      await saveAttempt({level:'L7 測驗', item:'L7-test', target:text, transcript:said, score:sc, blob:res.blob, mime:res.mime, diag:res.diag, asUser: who==='A'?null:partnerUser});
+    }
+    store.set(l7Key(), Object.assign({}, S, {lines:[]}));
+    const url=res.blob?URL.createObjectURL(res.blob):'';
+    app.innerHTML = `
+      <div class="card" style="text-align:center">
+        <div style="font-size:60px">📨</div>
+        <h2 style="font-size:28px;font-weight:900">完成！ Done!</h2>
+        <div class="hint" style="font-size:16px;margin-top:6px">你們說了 <b>${used}</b> 秒，錄音已經送給老師。 <span class="en">You spoke for ${used} seconds. Your recording was sent to your teacher.</span></div>
+        ${url?`<audio controls src="${url}" style="width:100%;margin-top:14px"></audio>`:''}
+        <div class="heard" style="text-align:left;margin-top:12px"><span class="lbl">我聽到 I heard:</span><span class="txt">${esc(said)||'（沒有辨識到文字，老師會聽錄音）'}</span></div>
+        <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="home">🏠 回首頁</button><button class="btn btn-sun" id="again">🔁 再做一次</button></div>
+      </div>`;
+    $('#home').onclick=()=>go('home'); $('#again').onclick=()=>{ S.lines=lines.slice(); store.set(l7Key(),S); viewL7(); };
+  }
+  setup();
 }
 
 function runTest(S, lines, names){
@@ -1961,7 +2069,8 @@ function testSubmissions(rows){
     const lines=String(r.target).split('\n').slice(1);
     const T=teacherOf(r), key=T+'|'+r.cls+'|'+nameKey(r.name);
     const rec=rows.filter(x=>x.item==='L7-line' && String(x.target).startsWith('測驗'+m[1]+'｜') && nameKey(x.name)===nameKey(r.name));
-    subs.push({id:m[1], key, name:cleanName(r.name), cls:r.cls, teacher:T, partner:m[2], role:m[3], time:+r.time||+r.t, auto:(r.score===''||r.score==null)?null:+r.score, lines, rec});
+    const tm=String(r.target||'').split('\n')[0].match(/｜計時(\d+)秒(?:（說了(\d+)秒）)?/);
+    subs.push({id:m[1], key, name:cleanName(r.name), cls:r.cls, teacher:T, partner:m[2], role:m[3], time:+r.time||+r.t, auto:(r.score===''||r.score==null)?null:+r.score, lines, rec, timed: tm?{dur:+tm[1], used:tm[2]?+tm[2]:null}:null, full:r.fileId||'', said:r.transcript||''});
   });
   return subs.sort((a,b)=>b.time-a.time);
 }
@@ -2338,6 +2447,8 @@ function viewTeacher(arg){
         return `<div class="card" style="margin-bottom:14px">
           <div class="row" style="justify-content:space-between"><div><b style="font-size:20px">${esc(sb.name)}</b> <span class="hint">${esc(sb.teacher)} ${esc(sb.cls)} · 同伴：${esc(sb.partner)} · ${new Date(sb.time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
             <div class="row">${'<span class="hint">自動分數</span> '+(sb.auto==null?'<span class="pill p-none">—</span>':`<span class="pill ${sb.auto>=85?'p-good':sb.auto>=60?'p-mid':'p-low'}">${sb.auto}</span>`)} ${g?`<span class="pill p-good">老師 ${g.total}/16</span>`:'<span class="pill p-low">待批改</span>'}</div></div>
+          ${sb.timed?`<div class="warn" style="margin-top:10px;background:#f0fdf4;border-color:#86efac">⏱️ 計時對話 ${sb.timed.dur} 秒${sb.timed.used!=null?`（說了 ${sb.timed.used} 秒）`:''}　${sb.full?`<button class="btn btn-sun" style="padding:6px 14px;font-size:16px" data-f="${esc(sb.full)}">▶️</button> 整段錄音（兩個人一起）`:'（沒有錄音檔）'}
+            <div style="margin-top:6px"><span class="hint">辨識到的文字：</span>${esc(sb.said)||'<span class="hint">（無）</span>'}</div><div class="hint" style="margin-top:4px">自動分數＝對話用到幾成關鍵字（兩個人同一個分數）；請聽錄音分別給 A、B 評分。</div></div>`:''}
           <table style="margin-top:10px"><thead><tr><th>#</th><th>關鍵字</th><th>說的話</th><th>錄音</th></tr></thead><tbody>
           ${sb.lines.map((ln,j)=>{ const mm=ln.match(/^([AB])（(.*?)）［(.*?)］：(.*)$/); const who=mm?mm[1]:''; const mine=who===sb.role;
              const rec=mine? sb.rec.find(x=>String(x.target).includes('第'+(j+1)+'句')) : null;
