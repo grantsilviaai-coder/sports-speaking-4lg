@@ -695,7 +695,7 @@ function ruby(tk){
     return `<ruby>${esc(h)}<rt>${esc(p)}</rt></ruby>`;
   }).join('');
 }
-function toast(msg,ms=2200){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.add('hidden'),ms)}
+function toast(msg,ms=2200){const t=$('#toast');t.textContent=msg;t.style.whiteSpace='pre-line';t.classList.remove('hidden');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.add('hidden'),ms)}
 function applyPrefs(){
   document.body.classList.toggle('no-py',!state.prefs.py);
   document.body.classList.toggle('no-en',!state.prefs.en);
@@ -1649,7 +1649,7 @@ function viewL6(){
   $('#go').onclick=()=>{
     const ls=S.lines[tier].filter(l=>l.b);
     if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn')?.focus(); return; }
-    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')); return; }
+    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')+(c.missingEn&&c.missingEn.length?'\nNot yet: '+c.missingEn.join(', '):''),4000); return; }
     practiceL6(S, ls, names());
   };
 
@@ -1683,7 +1683,7 @@ function viewL6(){
     if (tier==='beg'){ const miss=L.map((l,i)=>l.b?null:`第${i+1}句`).filter(Boolean); return {ok:!miss.length, missing:miss, rows:[]}; }
     const cnt=k=>ls.filter(l=>BLK[l.b].cat===k).length;
     const rows=CHECKS[tier].map(([k,n,zh,en])=>{ const v = k==='lines'?ls.length : k==='both'?(ls.some(l=>l.who==='A')&&ls.some(l=>l.who==='B')?1:0) : cnt(k); return {ok:v>=n, zh, en, v, n:k==='both'?null:n}; });
-    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), rows};
+    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), missingEn:rows.filter(r=>!r.ok).map(r=>r.en), rows};
   }
   function renderDlg(){
     const nm=names();
@@ -1875,7 +1875,7 @@ function viewL7(){
   function checkState(){
     const ls=S.lines, cnt=k=>ls.filter(l=>BLK[l.b].cat===k).length;
     const rows=TEST_CHECK.map(([k,n,zh,en])=>{ const v=k==='lines'?ls.length : k==='both'?(ls.some(l=>l.who==='A')&&ls.some(l=>l.who==='B')?1:0) : cnt(k); return {ok:v>=n, zh, en, v, n:k==='both'?null:n}; });
-    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), rows};
+    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), missingEn:rows.filter(r=>!r.ok).map(r=>r.en), rows};
   }
   function renderDlg(){
     const L=S.lines;
@@ -1894,7 +1894,7 @@ function viewL7(){
   $('#go').onclick=()=>{
     if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
     if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
-    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')); return; }
+    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')+(c.missingEn&&c.missingEn.length?'\nNot yet: '+c.missingEn.join(', '):''),4000); return; }
     runTest(S, S.lines.slice(), names());
   };
   renderAll();
