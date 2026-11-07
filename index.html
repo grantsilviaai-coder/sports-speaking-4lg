@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>運動口說練習 Sports Speaking Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<script>
+/* ============================================================
+   ★ 老師設定區 Teacher settings — 只要改這裡 ★
+   ============================================================ */
+const CONFIG = {
+  // 貼上 Google Apps Script「網頁應用程式」網址（.../exec）。
+  // 留空 = 只存在這台電腦（適合一台電腦＋投影的上課方式）。
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbynt7mfVrxQeIhT_CJoI8qNAJTTK30g11x5oHak_a8cN7mBYkAv8-O2xjHjxHbupagbDA/exec',
+  // 老師後台密碼（要和 Code.gs 裡的 TEACHER_PIN 一樣）
+  TEACHER_PIN: '4268',
+  // 班級選項（可改；留空陣列 [] 就不顯示班級）
+  CLASSES: ['4LG-A', '4LG-B'],
+  // 老師與班級：id 用在專屬網址（例如 …github.io/sports-speaking-4lg/?t=jiang）
+  TEACHERS: [
+    { id: 'jiang', name: '江老師', classes: ['4LG-A'] },
+    { id: 'wang',  name: '王老師', classes: ['4LG-B'] }
+  ],
+  // 舊資料（還沒有記錄老師的作答）算在這位老師名下
+  LEGACY_TEACHER: '江老師',
+  // 舊班級名稱（4A/4B/4C）自動換成各老師的新班級
+  LEGACY_CLASSES: ['4A', '4B', '4C', ''],
+  // 後台分析不顯示的名字（測試用）
+  EXCLUDE_NAMES: ['測試學生', 's']
+};
+</script>
+<style>
+:root{
+  --bg:#fff8ec; --ink:#2b2a33; --muted:#6b6876; --card:#ffffff;
+  --sun:#ffb703; --orange:#fb8500; --sky:#219ebc; --navy:#023047; --mint:#2a9d8f; --rose:#e76f51; --grass:#8ac926;
+  --line:#efe3cf; --shadow:0 4px 0 rgba(43,42,51,.12);
+  --r:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito','Noto Sans TC',system-ui,sans-serif;}
+body{min-height:100vh}
+button{font:inherit;cursor:pointer;border:none}
+input,select{font:inherit}
+.hidden{display:none!important}
+
+/* ---- top bar ---- */
+.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px;flex-wrap:wrap}
+.top .brand{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.top .brand small{font-family:Nunito;font-weight:600;opacity:.75;font-size:13px}
+.top .sp{flex:1}
+.chip{background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.chip.off{opacity:.45;text-decoration:line-through}
+.who{font-weight:800}
+.sync{font-size:12px;opacity:.85}
+
+main{max-width:1000px;margin:0 auto;padding:22px 16px 80px}
+
+/* ---- ruby / toggles ---- */
+ruby{ruby-position:over}
+rt{font-family:'Nunito',sans-serif;font-size:.42em;color:var(--sky);font-weight:700;letter-spacing:.02em}
+body.no-py rt{visibility:hidden}
+body.no-en .en{display:none!important}
+.en{font-family:'Nunito',sans-serif;color:var(--muted);font-weight:600}
+
+/* ---- generic ---- */
+h1,h2,h3{margin:0}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:2px solid var(--line);padding:20px}
+.btn{border-radius:16px;padding:12px 20px;font-weight:800;font-size:17px;box-shadow:var(--shadow);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn-sun{background:var(--sun);color:var(--navy)}
+.btn-sky{background:var(--sky);color:#fff}
+.btn-mint{background:var(--mint);color:#fff}
+.btn-ghost{background:#fff;color:var(--navy);border:2px solid var(--line)}
+.btn-rose{background:var(--rose);color:#fff}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.back{background:none;color:var(--sky);font-weight:800;font-size:16px;padding:6px 0;margin-bottom:10px}
+
+/* ---- login ---- */
+.login{max-width:460px;margin:30px auto;text-align:center}
+.login .big{font-size:64px;line-height:1}
+.login h1{font-size:30px;font-weight:900;margin:10px 0 2px}
+.login label{display:block;text-align:left;font-weight:800;margin:16px 0 6px}
+.login input,.login select{width:100%;padding:14px 16px;border-radius:14px;border:2px solid var(--line);font-size:20px;background:#fffdf8}
+.login input:focus{outline:3px solid var(--sun);border-color:var(--sun)}
+.tpick{display:flex;gap:10px;flex-wrap:wrap}
+.tbtn{flex:1;min-width:120px;background:#fffdf8;border:2px solid var(--line);border-radius:14px;padding:12px;font-size:20px;font-weight:900;color:var(--navy)}
+.tbtn.on{border-color:var(--orange);background:#fff1d6;outline:3px solid var(--sun)}
+.tfixed{margin-top:16px;background:#fff1d6;border-radius:14px;padding:12px;font-size:20px;text-align:left}
+.teacher-link{margin-top:22px;background:none;color:var(--muted);font-size:14px;text-decoration:underline}
+
+/* ---- home ---- */
+.hello{font-size:26px;font-weight:900;margin-bottom:4px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px}
+.level{text-align:left;border-radius:24px;padding:20px;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.15);position:relative;min-height:190px;display:flex;flex-direction:column;gap:6px}
+.level:active{transform:translateY(4px);box-shadow:none}
+.level .num{font-family:Nunito;font-weight:800;font-size:14px;opacity:.9;letter-spacing:.06em}
+.level .ico{font-size:44px}
+.level .t{font-size:24px;font-weight:900}
+.level .d{font-size:14px;opacity:.95}
+.level .prog{margin-top:auto;font-weight:800;font-size:15px;background:rgba(255,255,255,.22);border-radius:999px;padding:4px 12px;align-self:flex-start}
+.l1{background:linear-gradient(135deg,#fb8500,#ffb703)}
+.l2{background:linear-gradient(135deg,#219ebc,#56c3de)}
+.l3{background:linear-gradient(135deg,#2a9d8f,#6cc5a0)}
+.l4{background:linear-gradient(135deg,#e76f51,#f4a261)}
+.l5{background:linear-gradient(135deg,#5b3cc4,#9b7be0)}
+.l6{background:linear-gradient(135deg,#0b7a75,#3fb8af)}
+.l7{background:linear-gradient(135deg,#9d174d,#e05a8a)}
+.rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
+.rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
+.rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.l7grid{display:grid;grid-template-columns:250px minmax(0,1fr) 250px;gap:12px;margin-top:14px;align-items:start}
+.l7side{background:#fff;border-radius:18px;padding:10px;border:3px solid #e5dccb;transition:.2s}
+.l7side:not(.on) .l7cats,.l7side:not(.on) .l7bank,.l7side:not(.on) .l7who{opacity:.45}
+.l7side.on{box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.l7side.side-A.on{border-color:#1d4ed8}.l7side.side-B.on{border-color:#d97706}
+.l7who{border-radius:12px;padding:6px 10px;font-size:18px;display:flex;align-items:center;gap:8px}
+.l7now{display:flex;align-items:center;gap:8px;margin:10px 0;padding:10px;border-radius:16px;color:#fff;animation:l7pulse 1.4s ease-in-out infinite}
+.l7now.now-A{background:#1d4ed8;--glow:rgba(29,78,216,.45)}.l7now.now-B{background:#d97706;--glow:rgba(217,119,6,.45)}
+.l7mic{font-size:32px;line-height:1;animation:l7bounce 1s ease-in-out infinite}
+.l7big{font-size:22px;font-weight:900;line-height:1.1;white-space:nowrap}
+.l7en{font-size:14px;font-weight:900;letter-spacing:.12em;opacity:.9}
+.l7arrow{margin-left:auto;font-size:24px;animation:l7bounce 1s ease-in-out infinite}
+@keyframes l7pulse{0%,100%{box-shadow:0 0 0 0 var(--glow)}50%{box-shadow:0 0 0 10px rgba(0,0,0,0)}}
+@keyframes l7bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.l7headon{outline:3px solid currentColor;font-weight:900}
+.l7head>div:first-child.l7headon{color:#1d4ed8}.l7head>div:last-child.l7headon{color:#d97706}
+.l7tag{font-size:13px;font-weight:900;background:currentColor;border-radius:999px;padding:2px 8px}
+.l7tag{color:#fff;background:none}
+.l7head>div:first-child .l7tag{background:#1d4ed8}.l7head>div:last-child .l7tag{background:#d97706}
+@media (prefers-reduced-motion:reduce){.l7now,.l7mic,.l7arrow{animation:none}}
+.l7wait{font-weight:800;font-size:16px;margin:10px 0 6px;padding:10px 12px;border-radius:16px;background:#f5f0e6;color:#78716c}
+.l7more{display:block;width:100%;font-size:17px;font-weight:900;color:#fff;border-radius:14px;padding:10px 12px;margin-bottom:8px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.side-A .l7more{background:#3b82f6}.side-B .l7more{background:#f59e0b}
+.l7more .en{display:block;font-size:12px;color:#fff;opacity:.9}
+.l7cats{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.l7cats .tab{font-size:14px;padding:6px 9px}
+.l7cats .tab.sug{outline:3px dashed #16a34a;outline-offset:1px}
+.l7cats .tab small{font-size:11px;color:#15803d;font-weight:900}.l7cats .tab.on small{color:#fff}
+.l7bank{max-height:52vh}
+.l7bank .blk-add{font-size:17px}
+.l7bank .blk-add:disabled{cursor:not-allowed}
+.l7mid{min-height:420px;display:flex;flex-direction:column}
+.l7head{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.l7head>div{border-radius:12px;padding:6px 10px;font-size:17px;display:flex;align-items:center;gap:8px}
+.l7head>div:last-child{justify-content:flex-end}
+.l7conv{flex:1;display:grid;grid-template-columns:1fr 1fr;column-gap:10px;row-gap:8px;align-content:start;min-height:340px;max-height:60vh;overflow:auto;margin-top:8px;padding:10px 4px;border-radius:14px;
+  background:linear-gradient(90deg,#eff6ff 0,#eff6ff calc(50% - 1px),#e5dccb calc(50% - 1px),#e5dccb calc(50% + 1px),#fffbeb calc(50% + 1px))}
+.l7line.l7-A{grid-column:1}.l7line.l7-B{grid-column:2}
+.l7bub{border-radius:14px;border:2px solid var(--c);background:var(--bg);padding:6px 10px}
+.l7-A .l7bub{border-top-left-radius:4px}.l7-B .l7bub{border-top-right-radius:4px}
+.l7top{display:flex;align-items:center;gap:6px}
+.l7n{font-size:12px;font-weight:900;color:#78716c}
+.l7c{font-size:12px}
+.l7act{margin-left:auto;display:flex;gap:4px}
+.l7act button{background:#fff;border-radius:8px;padding:0 6px;font-size:14px;line-height:1.6}
+.l7txt{line-height:1.5;margin-top:2px}
+.l7txt .kwonly{font-size:21px}
+.l7empty{text-align:center;color:#78716c;padding:40px 10px;font-size:16px}
+@media (max-width:1000px){.l7grid{grid-template-columns:1fr 1fr}.l7mid{grid-column:1/3;grid-row:1}}
+@media (max-width:620px){.l7grid{grid-template-columns:1fr}.l7mid{grid-column:1}}
+.l6grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-top:14px;align-items:start}
+@media (max-width:900px){.l6grid{grid-template-columns:1fr}}
+.who-a,.who-b{font-weight:900;font-size:18px;display:inline-flex;align-items:center;gap:6px}
+.who-a{color:#1d4ed8}.who-b{color:#b45309}
+.who-b input{font:inherit;font-size:17px;padding:6px 10px;border-radius:10px;border:2px solid #f5c77a;width:170px}
+.bc-g{--c:#94a3b8;--bg:#f1f5f9}.bc-q{--c:#3b82f6;--bg:#eaf2ff}.bc-a{--c:#22a06b;--bg:#e9f8f0}.bc-r{--c:#e0a100;--bg:#fff7db}.bc-e{--c:#8b5cf6;--bg:#f3edff}.bc-i{--c:#f07b2e;--bg:#fff0e5}
+.tab.cat{border-color:var(--c)} .tab.cat.on{background:var(--c);border-color:var(--c);color:#fff}
+.bank{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;padding-right:4px}
+.blk{display:flex;align-items:stretch;border-radius:14px;border:2px solid var(--c);background:var(--bg);overflow:hidden}
+.blk-add{flex:1;text-align:left;background:none;padding:8px 12px;font-size:20px;font-weight:800;line-height:1.8;color:var(--ink)}
+.blk-add .en{display:block;font-size:13px;line-height:1.2}
+.blk-say{background:var(--c);color:#fff;font-size:20px;padding:0 14px}
+.dlg{display:flex;flex-direction:column;gap:8px;margin-top:10px;min-height:120px}
+.dline{display:flex;align-items:center;gap:10px;border-radius:14px;border:2px solid var(--c,#e5dccb);background:var(--bg,#fff);padding:6px 10px}
+.dline.empty{border-style:dashed;background:#fff;cursor:pointer}
+.dline.focus{outline:3px solid var(--sun)}
+.dline .ph{font-weight:800;color:var(--c);font-size:17px}
+.dtxt{flex:1;font-size:21px;font-weight:800;line-height:1.85}
+.dact{display:flex;gap:4px}
+.dact button{background:#fff;border:2px solid var(--line);border-radius:10px;padding:4px 9px;font-size:16px}
+.spk{flex:none;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;height:44px;border-radius:12px;font-weight:900;color:#fff;font-size:18px;line-height:1;cursor:default}
+.spk small{font-size:10px;font-weight:700;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.spk-A{background:#1d4ed8}.spk-B{background:#d97706}
+.spk[data-flip]{cursor:pointer}
+.kwonly{font-size:22px;font-weight:900;letter-spacing:.04em}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.ck2{background:#f8f6f0;border-radius:10px;padding:4px 10px;font-weight:800;font-size:14px}
+.ck2.ok{background:#e3f5d2}
+.ck2en{display:block;font-size:12px;font-weight:700;color:#57534e;padding-left:22px}
+.turn{border-radius:16px;padding:12px 16px;font-size:22px;display:flex;align-items:center;gap:12px}
+.spk-bg-A{background:#e8efff}.spk-bg-B{background:#fff1dc}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:60;padding:20px}
+.mbox{max-width:700px;width:100%;max-height:85vh;overflow:auto}
+.passage{display:flex;flex-direction:column;gap:12px}
+.para{display:flex;gap:12px;background:#fffdf8;border:2px solid var(--line);border-radius:16px;padding:12px 16px}
+.pnum{flex:none;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:Nunito}
+.ptxt{font-size:24px;font-weight:700;line-height:2}
+.para .en{font-size:14px;margin-top:2px}
+.rd .speak,.rd>div{margin-top:6px}
+.qt{display:inline-block;border-radius:999px;padding:4px 12px;font-weight:900;font-size:15px}
+.qt-find{background:#e3f2fd;color:#0b5c8a}.qt-think{background:#fff1c7;color:#8a5a00}.qt-you{background:#efe7ff;color:#5b3cc4}
+details.peek{margin-top:12px;background:#f8f6f0;border-radius:14px;padding:8px 14px}
+details.peek summary{cursor:pointer;font-weight:800;color:var(--sky)}
+details.peek .ptxt{font-size:20px}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.tab{background:#fff;border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:800;color:var(--navy)}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ---- level 1 vocab ---- */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:18px}
+.vmini{background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 6px;text-align:center;box-shadow:var(--shadow)}
+.vmini.on{border-color:var(--orange);outline:3px solid var(--sun)}
+.vmini .e{font-size:30px}
+.vmini .h{font-weight:900;font-size:16px}
+.vmini .s{font-size:13px;min-height:16px}
+.focus{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center}
+.focus .pic{font-size:120px;text-align:center;background:#fff4dc;border-radius:24px;padding:10px;line-height:1.3}
+.focus .word{font-size:64px;font-weight:900;line-height:1.5}
+.focus .word rt{font-size:.38em}
+.focus .en{font-size:22px}
+
+/* ---- speak area ---- */
+.speak{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px}
+.mic{width:96px;height:96px;border-radius:50%;background:var(--rose);color:#fff;font-size:44px;box-shadow:0 6px 0 #b4492f;display:inline-flex;align-items:center;justify-content:center}
+.mic:active{transform:translateY(4px);box-shadow:none}
+.mic.rec{background:#d62828;animation:pulse 1s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(214,40,40,.5)}100%{box-shadow:0 0 0 22px rgba(214,40,40,0)}}
+.heard{font-size:22px;font-weight:700;min-height:34px;color:var(--navy)}
+.heard .lbl{font-size:14px;color:var(--muted);font-weight:800;display:block}
+.result{font-size:20px;font-weight:900;margin-top:8px;min-height:30px}
+.stars{font-size:30px;letter-spacing:2px}
+.playme{background:none;color:var(--sky);font-weight:800;text-decoration:underline;font-size:15px}
+.hint{color:var(--muted);font-size:14px;font-weight:700}
+
+/* ---- level 2 patterns ---- */
+.q{font-size:34px;font-weight:900;line-height:1.7}
+.cue{display:flex;gap:14px;align-items:center;background:#eef8fb;border-radius:18px;padding:12px 16px;margin:12px 0;flex-wrap:wrap}
+.cue .e{font-size:56px}
+.cue .h{font-size:24px;font-weight:900}
+.frame{font-size:30px;font-weight:900;line-height:1.7;color:var(--mint)}
+.blank{display:inline-block;min-width:90px;border-bottom:4px solid var(--mint);margin:0 4px}
+.answer{font-size:28px;font-weight:900;line-height:1.7;background:#f1fbf3;border-radius:14px;padding:6px 14px;margin-top:8px}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:16px;gap:10px}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;background:#e5dccb}
+.dot.done{background:var(--grass)}
+.dot.cur{outline:3px solid var(--navy)}
+
+/* ---- level 3 chat ---- */
+.chat{display:flex;flex-direction:column;gap:12px;max-height:56vh;overflow:auto;padding:6px}
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:88%}
+.msg .av{font-size:40px;line-height:1}
+.msg .b{background:#fff;border:2px solid var(--line);border-radius:20px 20px 20px 6px;padding:10px 14px;font-size:24px;font-weight:700;line-height:1.75}
+.msg .b .en{display:block;font-size:14px;line-height:1.3}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .b{background:#e6f6ff;border-color:#bfe3f2;border-radius:20px 20px 6px 20px}
+.msg.sys .b{background:#fff6e0;font-size:18px}
+.chatbar{display:flex;gap:16px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.hintbox{flex:1;min-width:240px;background:#f1fbf3;border-radius:16px;padding:10px 14px;font-size:22px;font-weight:800;line-height:1.7}
+.dash2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.dash2{grid-template-columns:1fr}}
+.dh{font-size:19px;font-weight:900;margin-bottom:8px}
+.needrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;border:2px solid var(--line);margin-bottom:8px;cursor:pointer;background:#fffdf8}
+.needrow:hover{border-color:var(--sun)}
+.tag{display:inline-block;background:#fde0d8;color:#8a2f17;border-radius:10px;padding:4px 10px;margin:3px 4px 3px 0;font-weight:800;font-size:14px}
+.tag .hint{color:#8a2f17;opacity:.8}
+.weakrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.chipbtn{background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px;margin:3px;font-weight:800;color:var(--navy)}
+.chipbtn:hover{border-color:var(--sky)}
+table.heat th{font-size:12px;white-space:nowrap}
+table.heat td{text-align:center;font-weight:800;font-size:14px}
+table.heat td.click{text-align:left;cursor:pointer;white-space:nowrap}
+.hc.h-g{background:#cdeccb}.hc.h-m{background:#fff1c7}.hc.h-l{background:#f8c4b4}
+.avgrow td{border-top:3px solid var(--navy)}
+.miss{color:#d62828;text-decoration:underline wavy #f4a3a3;font-weight:900}
+label.ck{display:block;padding:4px 0;font-weight:700}
+.card.asg{margin-top:14px;border-color:#c9b6f2;background:#faf7ff}
+.asglist{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.asgitem{background:#fff;border:2px solid #ddd3f5;border-radius:14px;padding:8px 12px;font-weight:800;font-size:16px;color:var(--navy);text-align:left}
+.asgitem.done{background:#f1fbf3;border-color:#b9e3b2}
+.bcbank{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:16px;background:#f7f3ff;border:2px dashed #ddd3f5}
+.bcbank .lbl{width:100%;font-size:13px;font-weight:800;color:#6b4fb3}
+.bcbank.hl{background:#efe7ff;border-color:#9b7be0;border-style:solid}
+.bc{background:#fff;border:2px solid #ddd3f5;border-radius:999px;padding:4px 12px;font-size:18px;font-weight:800;color:var(--navy);line-height:1.8}
+.bc:hover{border-color:#9b7be0}
+.hintbox .lbl{font-size:13px;color:var(--mint);display:block;line-height:1.2}
+
+/* ---- level 4 ---- */
+.frames{display:flex;flex-direction:column;gap:8px}
+.fr{display:flex;gap:12px;align-items:flex-start;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 14px;font-size:22px;font-weight:800;line-height:1.75}
+.fr .ck{font-size:22px;width:28px;flex:none;margin-top:6px}
+.fr.ok{border-color:var(--grass);background:#f4fbe8}
+.fr .en{display:block;font-size:14px;line-height:1.2}
+.timer{font-family:Nunito;font-weight:800;font-size:22px;color:var(--rose)}
+
+/* ---- teacher ---- */
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:15px;vertical-align:middle}
+th{background:#fff1d6;font-weight:900}
+tr.click{cursor:pointer}
+tr.click:hover{background:#fffaf0}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-weight:800;font-size:13px}
+.p-good{background:#e3f5d2;color:#3d6b12}.p-mid{background:#fff1c7;color:#8a5a00}.p-low{background:#fde0d8;color:#a33a1f}.p-none{background:#eee;color:#888}
+.kpis{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.kpi{background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 16px;min-width:130px}
+.kpi b{display:block;font-size:28px;font-family:Nunito}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:14px;font-weight:800;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.warn{background:#fff1c7;border:2px solid #f5d77a;border-radius:14px;padding:10px 14px;font-weight:700;margin-bottom:14px}
+
+@media (max-width:640px){
+  .focus{grid-template-columns:1fr}
+  .focus .pic{font-size:90px}
+  .focus .word{font-size:48px}
+  .q{font-size:26px}.frame{font-size:24px}.answer{font-size:22px}
+  .msg .b{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand" id="brand">🏅 運動口說練習 <small>Sports Speaking</small></div>
+  <div class="sp"></div>
+  <button class="chip" id="tgPy" title="顯示/隱藏拼音">拼音 Pinyin</button>
+  <button class="chip" id="tgEn" title="顯示/隱藏英文">English</button>
+  <button class="chip" id="tgSlow" title="慢速朗讀">🐢 慢速 Slow</button>
+  <span class="chip hidden" id="whoChip"><span class="who" id="whoName"></span><span class="sync" id="syncState"></span></span>
+  <button class="chip hidden" id="btnSwitch">換人 Switch</button>
+</div>
+
+<main id="app"></main>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA — 依據 4LG 第一課〈運動〉、第二課〈運動員〉
+   ============================================================ */
+const SPORTS = [
+  {id:'lanqiu',   hz:'打籃球',     py:'dǎ lánqiú',      en:'play basketball',  e:'🏀', v:['打','dǎ'], kw:['籃球','藍球']},
+  {id:'gaoerfu',  hz:'打高爾夫球', py:"dǎ gāo'ěrfūqiú", en:'play golf',        e:'⛳', v:['打','dǎ'], kw:['高爾夫']},
+  {id:'ganlan',   hz:'打橄欖球',   py:'dǎ gǎnlǎnqiú',   en:'play American football', e:'🏈', v:['打','dǎ'], kw:['橄欖球','美式足球']},
+  {id:'bangqiu',  hz:'打棒球',     py:'dǎ bàngqiú',     en:'play baseball',    e:'⚾', v:['打','dǎ'], kw:['棒球']},
+  {id:'wangqiu',  hz:'打網球',     py:'dǎ wǎngqiú',     en:'play tennis',      e:'🎾', v:['打','dǎ'], kw:['網球']},
+  {id:'zuqiu',    hz:'踢足球',     py:'tī zúqiú',       en:'play soccer',      e:'⚽', v:['踢','tī'], kw:['足球']},
+  {id:'pingpang', hz:'打乒乓球',   py:'dǎ pīngpāngqiú', en:'play ping-pong',   e:'🏓', v:['打','dǎ'], kw:['乒乓','桌球']},
+  {id:'paobu',    hz:'跑步',       py:'pǎobù',          en:'run',              e:'🏃', v:['跑','pǎo'], kw:['跑步']},
+  {id:'yumao',    hz:'打羽毛球',   py:'dǎ yǔmáoqiú',    en:'play badminton',   e:'🏸', v:['打','dǎ'], kw:['羽毛球','羽球']},
+  {id:'jiaotache',hz:'騎腳踏車',   py:'qí jiǎotàchē',   en:'ride a bike',      e:'🚴', v:['騎','qí'], kw:['腳踏車','騎車','自行車','單車']},
+  {id:'paiqiu',   hz:'打排球',     py:'dǎ páiqiú',      en:'play volleyball',  e:'🏐', v:['打','dǎ'], kw:['排球']},
+  {id:'huaban',   hz:'玩滑板',     py:'wán huábǎn',     en:'skateboard',       e:'🛹', v:['玩','wán'], kw:['滑板']},
+  {id:'baoling',  hz:'打保齡球',   py:'dǎ bǎolíngqiú',  en:'go bowling',       e:'🎳', v:['打','dǎ'], kw:['保齡球']},
+  {id:'ticao',    hz:'做體操',     py:'zuò tǐcāo',      en:'do gymnastics',    e:'🤸', v:['做','zuò'], kw:['體操']},
+  {id:'youyong',  hz:'游泳',       py:'yóuyǒng',        en:'swim',             e:'🏊', v:['游','yóu'], kw:['游泳']},
+  {id:'chonglang',hz:'衝浪',       py:'chōnglàng',      en:'surf',             e:'🏄', v:['衝','chōng'], kw:['衝浪']},
+  {id:'tiaoyuan', hz:'跳遠',       py:'tiàoyuǎn',       en:'do the long jump', e:'🦘', v:['跳','tiào'], kw:['跳遠']},
+  {id:'tiaogao',  hz:'跳高',       py:'tiàogāo',        en:'do the high jump', e:'🏅', v:['跳','tiào'], kw:['跳高']},
+  {id:'pashan',   hz:'爬山',       py:'páshān',         en:'go hiking',        e:'⛰️', v:['爬','pá'], kw:['爬山']}
+];
+const SP = Object.fromEntries(SPORTS.map(s=>[s.id,s]));
+
+const FEEL = [
+  {id:'juede',  hz:'覺得',   py:'juéde',     en:'to feel / to think', e:'🤔'},
+  {id:'qingsong',hz:'輕鬆',  py:'qīngsōng',  en:'easy, relaxing',     e:'😌'},
+  {id:'jiandan',hz:'簡單',   py:'jiǎndān',   en:'simple, easy',       e:'👌'},
+  {id:'nan',    hz:'難',     py:'nán',       en:'difficult',          e:'😣'},
+  {id:'youqu',  hz:'有趣',   py:'yǒuqù',     en:'fun, interesting',   e:'😄'},
+  {id:'youyisi',hz:'有意思', py:'yǒu yìsi',  en:'interesting',        e:'🤩'},
+  {id:'buchuo', hz:'還不錯', py:'hái búcuò', en:'pretty good',        e:'👍'},
+  {id:'lihai',  hz:'厲害',   py:'lìhai',     en:'awesome, skillful',  e:'💪'}
+];
+const ATHLETE = [
+  {id:'ydy',   hz:'運動員', py:'yùndòngyuán', en:'athlete',         e:'🏅'},
+  {id:'xs',    hz:'選手',   py:'xuǎnshǒu',    en:'player, contestant', e:'🎽'},
+  {id:'ym',    hz:'有名',   py:'yǒumíng',     en:'famous',          e:'🌟'},
+  {id:'lx',    hz:'練習',   py:'liànxí',      en:'to practice',     e:'🔁'},
+  {id:'nl',    hz:'努力',   py:'nǔlì',        en:'to work hard',    e:'💦'},
+  {id:'cj',    hz:'參加',   py:'cānjiā',      en:'to join, take part', e:'🙋'},
+  {id:'xd',    hz:'校隊',   py:'xiàoduì',     en:'school team',     e:'🏫'},
+  {id:'ks',    hz:'開始',   py:'kāishǐ',      en:'to start',        e:'🚦'},
+  {id:'zh',    hz:'壯',     py:'zhuàng',      en:'strong, sturdy',  e:'🏋️'},
+  {id:'hz',    hz:'鬍子',   py:'húzi',        en:'beard',           e:'🧔'}
+];
+const REACT = [
+  {id:'o',      hz:'哦',         py:'ó',               en:'Oh!',                    e:'😮'},
+  {id:'shio',   hz:'是喔',       py:'shì o',           en:'Oh, really? / I see.',   e:'🙂'},
+  {id:'zhende', hz:'真的嗎',     py:'zhēnde ma',       en:'Really?',                e:'😲'},
+  {id:'woyeshi',hz:'我也是',     py:'wǒ yě shì',       en:'Me too!',                e:'🙋'},
+  {id:'yiyang', hz:'我跟你一樣', py:'wǒ gēn nǐ yíyàng', en:"I'm the same as you.",  e:'🤝'},
+  {id:'buyiyang',hz:'我跟你不一樣',py:'wǒ gēn nǐ bù yíyàng', en:"I'm different from you.", e:'🙅'},
+  {id:'yuanlai',hz:'原來如此',   py:'yuánlái rúcǐ',    en:'I see! / So that’s why.', e:'💡'},
+  {id:'taihao', hz:'太好了',     py:'tài hǎo le',      en:'Great!',                 e:'🎉'}
+];
+const VOCAB_SETS = [
+  {id:'sports', name:'運動 Sports', items:SPORTS},
+  {id:'react',  name:'回應 Responses', items:REACT},
+  {id:'feel',   name:'感覺 Feelings', items:FEEL},
+  {id:'athlete',name:'運動員 Athletes (L2)', items:ATHLETE}
+];
+
+/* tokens: [漢字, pinyin] */
+const W=(h,p)=>[h,p];
+const C=W('，',','), D=W('。','.'), Q=W('？','?'), X=W('！','!');
+const st = s=>W(s.hz,s.py);
+const stObj = s=>{ // object part of a sport phrase (籃球 from 打籃球)
+  if (s.hz.length>2 && s.hz.startsWith(s.v[0])) return W(s.hz.slice(1), s.py.split(' ').slice(1).join(' '));
+  return W(s.hz,s.py);
+};
+const S_txt = tk=>tk.map(t=>t[0]).join('');
+
+const DEG_CAN = {
+  henhui:{tk:[W('很會','hěn huì')], en:'very good at', e:'😎', label:W('很會','hěn huì')},
+  hui:{tk:[W('會','huì')], en:'can', e:'🙂', label:W('會','huì')},
+  butai:{tk:[W('不太會','bú tài huì')], en:'not very good at', e:'😐', label:W('不太會','bú tài huì')},
+  buhui:{tk:[W('不會','bú huì')], en:'cannot', e:'🙁', label:W('不會','bú huì')}
+};
+const DEG_WELL = {
+  bucuo:{tk:[W('還不錯','hái búcuò')], en:'pretty well', e:'👍'},
+  henhao:{tk:[W('很好','hěn hǎo')], en:'very well', e:'😃'},
+  lihai:{tk:[W('很厲害','hěn lìhai')], en:'really awesomely', e:'💪'},
+  kuai:{tk:[W('很快','hěn kuài')], en:'very fast', e:'💨'}
+};
+const FEEL_ADJ = {
+  youqu:{tk:[W('很','hěn'),W('有趣','yǒuqù')], en:'is fun', e:'😄'},
+  nan:{tk:[W('有一點','yǒu yìdiǎn'),W('難','nán')], en:'is a little hard', e:'😣'},
+  qingsong:{tk:[W('很','hěn'),W('輕鬆','qīngsōng')], en:'is easy and relaxing', e:'😌'},
+  yisi:{tk:[W('很','hěn'),W('有意思','yǒu yìsi')], en:'is interesting', e:'🤩'}
+};
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function ing(en){ // "play tennis" -> "playing tennis"
+  const [v,...rest]=en.split(' ');
+  const m={play:'playing',swim:'swimming',run:'running',ride:'riding',go:'going',do:'doing',surf:'surfing',skateboard:'skateboarding'};
+  return [(m[v]||v+'ing'),...rest].join(' ');
+}
+
+/* ---------- Level 2: sentence-pattern items ---------- */
+function buildPatterns(){
+  const P=[];
+  // ❶ 喜歡什麼運動
+  const like = {id:'like', name:'❶ 喜歡什麼運動', items:[]};
+  ['lanqiu','youyong','zuqiu'].forEach(id=>{const s=SP[id];
+    like.items.push({id:'like-'+id, q:[W('你','nǐ'),W('喜歡','xǐhuan'),W('什麼','shénme'),W('運動','yùndòng'),Q], qen:'What sport do you like?',
+      cue:{e:s.e, tk:[st(s)], en:s.en}, frame:[W('我','wǒ'),W('喜歡','xǐhuan'),'_',D],
+      a:[W('我','wǒ'),W('喜歡','xǐhuan'),st(s),D], aen:`I like ${ing(s.en)}.`});
+  });
+  {const a=SP.paobu,b=SP.youyong;
+    like.items.push({id:'like-two', q:[W('他','tā'),W('喜歡','xǐhuan'),W('什麼','shénme'),W('運動','yùndòng'),Q], qen:'What sport does he like?',
+      cue:{e:'👦 '+a.e+' '+b.e, tk:[st(a),W('、','、'),st(b)], en:a.en+', '+b.en}, frame:[W('他','tā'),W('喜歡','xǐhuan'),'_',C,W('也','yě'),W('喜歡','xǐhuan'),'_',D],
+      a:[W('他','tā'),W('喜歡','xǐhuan'),st(a),C,W('也','yě'),W('喜歡','xǐhuan'),st(b),D], aen:`He likes running, and he also likes swimming.`});}
+  P.push(like);
+
+  // ❷ 會不會
+  const can = {id:'can', name:'❷ 你會…嗎？', items:[]};
+  [['chonglang','butai'],['jiaotache','henhui'],['ticao','buhui']].forEach(([id,d])=>{const s=SP[id],g=DEG_CAN[d];
+    can.items.push({id:'can-'+id, q:[W('你','nǐ'),W('會','huì'),st(s),W('嗎','ma'),Q], qen:`Can you ${s.en}?`,
+      cue:{e:s.e+' '+g.e, tk:[g.label], en:g.en}, frame:[W('我','wǒ'),'_',st(s),D],
+      a:[W('我','wǒ'),...g.tk,st(s),D], aen:`I ${g.en==='can'?'can':g.en==='cannot'?'cannot':'am '+g.en} ${s.en}.`});
+  });
+  P.push(can);
+
+  // ❸ V得怎麼樣
+  const well = {id:'well', name:'❸ …得怎麼樣？', items:[]};
+  [['youyong','bucuo'],['wangqiu','lihai'],['paobu','kuai']].forEach(([id,d])=>{const s=SP[id],g=DEG_WELL[d];
+    const vde=W(s.v[0]+'得', s.v[1]+' de');
+    well.items.push({id:'well-'+id, q:[W('你','nǐ'),st(s),vde,W('怎麼樣','zěnmeyàng'),Q], qen:`How well do you ${s.en}?`,
+      cue:{e:s.e+' '+g.e, tk:g.tk, en:g.en}, frame:[W('我','wǒ'),st(s),vde,'_',D],
+      a:[W('我','wǒ'),st(s),vde,...g.tk,D], aen:`I ${s.en} ${g.en}.`});
+  });
+  P.push(well);
+
+  // ❹ 覺得
+  const feel = {id:'feel', name:'❹ 我覺得…', items:[]};
+  [['wangqiu','nan'],['huaban','yisi'],['paobu','qingsong']].forEach(([id,d])=>{const s=SP[id],g=FEEL_ADJ[d];
+    feel.items.push({id:'feel-'+id, q:[W('你','nǐ'),W('覺得','juéde'),st(s),W('怎麼樣','zěnmeyàng'),Q], qen:`What do you think of ${ing(s.en)}?`,
+      cue:{e:s.e+' '+g.e, tk:g.tk, en:g.en}, frame:[W('我','wǒ'),W('覺得','juéde'),st(s),'_',D],
+      a:[W('我','wǒ'),W('覺得','juéde'),st(s),...g.tk,D], aen:`I think ${ing(s.en)} ${g.en}.`});
+  });
+  P.push(feel);
+
+  // ❺ 因為
+  const why = {id:'why', name:'❺ 為什麼？因為…', items:[]};
+  [['lanqiu','youqu'],['pashan','qingsong']].forEach(([id,d])=>{const s=SP[id],g=FEEL_ADJ[d];
+    why.items.push({id:'why-'+id, q:[W('你','nǐ'),W('為什麼','wèishénme'),W('喜歡','xǐhuan'),st(s),Q], qen:`Why do you like ${ing(s.en)}?`,
+      cue:{e:s.e+' '+g.e, tk:g.tk, en:g.en}, frame:[W('我','wǒ'),W('喜歡','xǐhuan'),st(s),C,W('因為','yīnwèi'),st(s),'_',D],
+      a:[W('我','wǒ'),W('喜歡','xǐhuan'),st(s),C,W('因為','yīnwèi'),st(s),...g.tk,D], aen:`I like ${ing(s.en)} because it ${g.en.replace('is ','is ')}.`});
+  });
+  P.push(why);
+
+  // ❻ 邀請 一起
+  const inv = {id:'invite', name:'❻ 邀請朋友', items:[]};
+  ['zuqiu','pingpang'].forEach(id=>{const s=SP[id];
+    inv.items.push({id:'inv-'+id, q:[W('邀請','yāoqǐng'),W('朋友','péngyou'),W('一起','yìqǐ'),st(s),X], qen:`Invite your friend to ${s.en} together!`,
+      cue:{e:'🧑‍🤝‍🧑 '+s.e, tk:[W('一起','yìqǐ'),st(s)], en:'together'}, frame:[W('我們','wǒmen'),W('一起','yìqǐ'),W('去','qù'),'_',C,W('好不好','hǎo bù hǎo'),Q],
+      a:[W('我們','wǒmen'),W('一起','yìqǐ'),W('去','qù'),st(s),C,W('好不好','hǎo bù hǎo'),Q], aen:`Let's go ${ing(s.en)} together, OK?`});
+  });
+  P.push(inv);
+
+  // ❼ 都 (L2)
+  const dou = {id:'dou', name:'❼ 都 (L2)', items:[]};
+  [['妹妹','mèimei','👧','my younger sister','yumao'],['哥哥','gēge','👦','my older brother','bangqiu']].forEach(([h,p,e,en,id])=>{const s=SP[id];
+    dou.items.push({id:'dou-'+id, q:[W('你','nǐ'),W('和','hé'),W(h,p),W('喜歡','xǐhuan'),W('什麼','shénme'),W('運動','yùndòng'),Q], qen:`What sport do you and ${en} like?`,
+      cue:{e:'🙋 '+e+' ❤️ '+s.e, tk:[W('都','dōu'),st(s)], en:'both'}, frame:[W('我','wǒ'),W('和','hé'),W(h,p),'_',W('喜歡','xǐhuan'),'_',D],
+      a:[W('我','wǒ'),W('和','hé'),W(h,p),W('都','dōu'),W('喜歡','xǐhuan'),st(s),D], aen:`${cap(en)} and I both like ${ing(s.en)}.`});
+  });
+  P.push(dou);
+
+  // ❽ 一樣 (L2)
+  const yy = {id:'yiyang', name:'❽ 一樣 (L2)', items:[]};
+  [['哥哥','gēge','my older brother','高','gāo','tall','🙋📏👦'],['他','tā','him','厲害','lìhai','awesome','🙋💪👦']].forEach(([h,p,en,ah,ap,aen,e],i)=>{
+    yy.items.push({id:'yy-'+i, q:[W('用','yòng'),W('「一樣」','「yíyàng」'),W('說一說','shuō yì shuō'),X], qen:'Say it with 一樣 (the same).',
+      cue:{e, tk:[W(ah,ap)], en:aen}, frame:[W('我','wǒ'),W('和','hé'),W(h,p),'_',D],
+      a:[W('我','wǒ'),W('和','hé'),W(h,p),W('一樣','yíyàng'),W(ah,ap),D], aen:`I am as ${aen} as ${en}.`});
+  });
+  P.push(yy);
+  return P;
+}
+const PATTERNS = buildPatterns();
+
+/* ---------- Level 4 topics ---------- */
+const TOPICS = [
+  {id:'sport', name:'我最喜歡的運動 (L1)', e:'🏀', en:'My favorite sport',
+   frames:[
+     {tk:[W('我','wǒ'),W('最','zuì'),W('喜歡','xǐhuan'),'_',D], en:'I like ___ the most.', re:/喜歡/},
+     {tk:[W('因為','yīnwèi'),'_',W('很','hěn'),W('有趣','yǒuqù'),D], en:'Because ___ is fun.', re:/因為/},
+     {tk:[W('我','wǒ'),W('每個星期','měi ge xīngqī'),'_',W('都','dōu'),W('去','qù'),'_',D], en:'Every ___ I go ___.', re:/星期|每天|週/},
+     {tk:[W('我','wǒ'),'_',W('得','de'),'_',D], en:'I ___ (how well).', re:/得/},
+     {tk:[W('我','wǒ'),W('會','huì'),'_',C,W('也','yě'),W('想','xiǎng'),W('學','xué'),'_',D], en:'I can ___, and I also want to learn ___.', re:/想學|會/}
+   ]},
+  {id:'athlete', name:'我最喜歡的運動員 (L2)', e:'🏅', en:'My favorite athlete',
+   frames:[
+     {tk:[W('我','wǒ'),W('最','zuì'),W('喜歡','xǐhuan'),W('的','de'),W('運動員','yùndòngyuán'),W('是','shì'),'_',D], en:'My favorite athlete is ___.', re:/運動員/},
+     {tk:[W('他','tā'),W('是','shì'),W('很','hěn'),W('有名','yǒumíng'),W('的','de'),'_',W('選手','xuǎnshǒu'),D], en:'He/She is a famous ___ player.', re:/選手|有名/},
+     {tk:[W('他','tā'),W('長得','zhǎng de'),W('又','yòu'),'_',W('又','yòu'),'_',D], en:'He/She is both ___ and ___.', re:/長得|又.+又/},
+     {tk:[W('他','tā'),'_',W('得','de'),W('很','hěn'),'_',D], en:'He/She ___ very ___.', re:/得/},
+     {tk:[W('我','wǒ'),W('每天','měitiān'),W('努力','nǔlì'),W('練習','liànxí'),C,W('希望','xīwàng'),W('我','wǒ'),W('和','hé'),W('他','tā'),W('一樣','yíyàng'),W('厲害','lìhai'),X], en:'I practice hard every day and hope to be as awesome as him/her!', re:/一樣|努力|練習/}
+   ]}
+];
+
+/* ---------- Level 5: 進階挑戰 (reading + thinking) ----------
+   P('漢字|pinyin 漢字|pinyin ，') : tokens separated by spaces; a token without "|" is punctuation. */
+function P(str){ return str.trim().split(/\s+/).map(t=>{ const i=t.indexOf('|'); return i<0 ? W(t,t) : W(t.slice(0,i), t.slice(i+1).replace(/_/g,' ')); }); }
+
+const L5 = [
+ { id:'A', name:'籃球比賽', e:'🏀', kind:'短文 Story', en:'The Basketball Game',
+   words:[
+     ['比賽','bǐsài','competition, game','🏆'],['緊張','jǐnzhāng','nervous','😰'],['對手','duìshǒu','opponent','🆚'],
+     ['輸','shū','to lose','😞'],['贏','yíng','to win','🥇'],['隊友','duìyǒu','teammate','🤝'],
+     ['受傷','shòushāng','to get hurt','🤕'],['教練','jiàoliàn','coach','🧑‍🏫'],['放棄','fàngqì','to give up','🏳️'],
+     ['加油','jiāyóu','Go for it! / to cheer','📣'],['傳球','chuánqiú','to pass the ball','🔄'],['流汗','liúhàn','to sweat','💦'],
+     ['糟糕','zāogāo','terrible, too bad','😖']],
+   paras:[
+     {tk:P('這個|zhè_ge 星期六|xīng_qī_liù ， 小天|Xiǎo_tiān 的|de 籃球|lán_qiú 校隊|xiào_duì 參加了|cān_jiā_le 學校|xué_xiào 的|de 籃球|lán_qiú 比賽|bǐ_sài 。 比賽|bǐ_sài 以前|yǐ_qián ， 小天|Xiǎo_tiān 很|hěn 緊張|jǐn_zhāng ， 因為|yīn_wèi 這|zhè 是|shì 他|tā 第一次|dì_yī_cì 參加|cān_jiā 比賽|bǐ_sài 。'),
+      en:"This Saturday, Xiaotian's school basketball team took part in a school basketball competition. Before the game Xiaotian was very nervous, because it was his first competition."},
+     {tk:P('比賽|bǐ_sài 開始了|kāi_shǐ_le ， 對手|duì_shǒu 的|de 球員|qiú_yuán 又|yòu 高|gāo 又|yòu 壯|zhuàng ， 跑得|pǎo_de 也|yě 很|hěn 快|kuài 。 上半場|shàng_bàn_chǎng ， 小天|Xiǎo_tiān 的|de 球隊|qiú_duì 輸了|shū_le 十|shí 分|fēn 。 更|gèng 糟糕|zāo_gāo 的|de 是|shì ， 隊友|duì_yǒu 大明|Dà_míng 的|de 腳|jiǎo 受傷了|shòu_shāng_le ， 不能|bù_néng 再|zài 打球|dǎ_qiú 了|le 。'),
+      en:"The game began. The other team's players were tall and strong, and they ran fast too. In the first half, Xiaotian's team was behind by ten points. Even worse, his teammate Daming hurt his foot and couldn't play anymore."},
+     {tk:P('休息|xiū_xi 的|de 時候|shí_hou ， 教練|jiào_liàn 對|duì 大家|dà_jiā 說|shuō ： 「 不要|bú_yào 放棄|fàng_qì ！ 我們|wǒ_men 一起|yì_qǐ 加油|jiā_yóu ！ 」 下半場|xià_bàn_chǎng ， 小天|Xiǎo_tiān 和|hé 隊友們|duì_yǒu_men 努力|nǔ_lì 跑|pǎo 、 努力|nǔ_lì 傳球|chuán_qiú ， 大家|dà_jiā 都|dōu 流了|liú_le 很多|hěn_duō 汗|hàn 。'),
+      en:'At the break, the coach told everyone, "Don\'t give up! Let\'s go for it together!" In the second half, Xiaotian and his teammates ran hard and passed hard, and everyone sweated a lot.'},
+     {tk:P('最後|zuì_hòu ， 小天|Xiǎo_tiān 的|de 球隊|qiú_duì 用|yòng 四十五|sì_shí_wǔ 比|bǐ 四十二|sì_shí_èr 贏了|yíng_le 比賽|bǐ_sài ！ 大明|Dà_míng 坐在|zuò_zài 旁邊|páng_biān 大聲|dà_shēng 說|shuō ： 「 你們|nǐ_men 太|tài 厲害|lì_hai 了|le ！ 」 小天|Xiǎo_tiān 覺得|jué_de ， 打籃球|dǎ_lán_qiú 不只|bù_zhǐ 是|shì 為了|wèi_le 贏|yíng ， 和|hé 隊友|duì_yǒu 一起|yì_qǐ 努力|nǔ_lì 最|zuì 快樂|kuài_lè 。'),
+      en:'In the end, Xiaotian\'s team won 45 to 42! Daming, sitting on the side, shouted, "You\'re amazing!" Xiaotian felt that basketball isn\'t only about winning — working hard together with teammates is the happiest part.'}
+   ],
+   qs:[
+     {type:'find', p:1, q:P('小天|Xiǎo_tiān 參加了|cān_jiā_le 什麼|shén_me 比賽|bǐ_sài ？'), en:'What competition did Xiaotian take part in?', kw:[['籃球','藍球']],
+      model:P('小天|Xiǎo_tiān 參加了|cān_jiā_le 學校|xué_xiào 的|de 籃球|lán_qiú 比賽|bǐ_sài 。')},
+     {type:'find', p:1, q:P('比賽|bǐ_sài 以前|yǐ_qián ， 小天|Xiǎo_tiān 覺得|jué_de 怎麼樣|zěn_me_yàng ？ 為什麼|wèi_shén_me ？'), en:'How did Xiaotian feel before the game? Why?', kw:[['緊張'],['第一次','一次']],
+      model:P('他|tā 很|hěn 緊張|jǐn_zhāng ， 因為|yīn_wèi 這|zhè 是|shì 他|tā 第一次|dì_yī_cì 參加|cān_jiā 比賽|bǐ_sài 。')},
+     {type:'find', p:2, q:P('上半場|shàng_bàn_chǎng ， 小天|Xiǎo_tiān 的|de 球隊|qiú_duì 贏了|yíng_le 還是|hái_shi 輸了|shū_le ？'), en:"In the first half, did Xiaotian's team win or lose?", kw:[['輸']],
+      model:P('小天|Xiǎo_tiān 的|de 球隊|qiú_duì 輸了|shū_le 十|shí 分|fēn 。')},
+     {type:'think', p:'2、4', q:P('為什麼|wèi_shén_me 大明|Dà_míng 坐在|zuò_zài 旁邊|páng_biān ， 沒有|méi_yǒu 打球|dǎ_qiú ？'), en:'Why was Daming sitting on the side instead of playing?', kw:[['受傷','腳','痛']],
+      model:P('因為|yīn_wèi 他|tā 的|de 腳|jiǎo 受傷了|shòu_shāng_le 。')},
+     {type:'think', p:'3、4', q:P('你|nǐ 覺得|jué_de 小天|Xiǎo_tiān 的|de 球隊|qiú_duì 為什麼|wèi_shén_me 最後|zuì_hòu 贏了|yíng_le ？'), en:"Why do you think Xiaotian's team won in the end?", kw:[['努力','加油','放棄','一起','教練','鼓勵','傳球'],['因為','所以']],
+      model:P('因為|yīn_wèi 教練|jiào_liàn 叫|jiào 大家|dà_jiā 不要|bú_yào 放棄|fàng_qì ， 大家|dà_jiā 一起|yì_qǐ 努力|nǔ_lì 跑|pǎo 、 努力|nǔ_lì 傳球|chuán_qiú 。')},
+     {type:'you', q:P('如果|rú_guǒ 你|nǐ 的|de 隊友|duì_yǒu 受傷了|shòu_shāng_le ， 你|nǐ 會|huì 對|duì 他|tā 說|shuō 什麼|shén_me ？'), en:'If your teammate got hurt, what would you say to him/her?', kw:[['加油','沒關係','休息','還好','醫生','不要','別','放心','照顧','擔心','幫','痛']],
+      model:P('我|wǒ 會|huì 說|shuō ： 「 你|nǐ 還好|hái_hǎo 嗎|ma ？ 你|nǐ 好好|hǎo_hǎo 休息|xiū_xi ， 我們|wǒ_men 會|huì 幫|bāng 你|nǐ 加油|jiā_yóu ！ 」')}
+   ]},
+
+ { id:'B', name:'參加社團', e:'⚽', kind:'對話 Dialogue', en:'Joining a Club', dialog:true,
+   words:[
+     ['社團','shètuán','club','🎽'],['報名','bàomíng','to sign up','📝'],['涼快','liángkuai','nice and cool','🌬️'],
+     ['而且','érqiě','and also, moreover','➕'],['身體','shēntǐ','body, health','🧍'],['比','bǐ','(more) than','⚖️'],
+     ['比較','bǐjiào','comparatively, more','📊'],['操場','cāochǎng','sports field','🏟️'],['怕','pà','to be afraid of','😨'],
+     ['曬太陽','shài tàiyáng','to be in the sun','☀️'],['感覺','gǎnjué','feeling','💭'],['舒服','shūfu','comfortable','😊'],
+     ['幫…加油','bāng … jiāyóu','to cheer for someone','📣']],
+   paras:[
+     {who:'安安', av:'👦', tk:P('美美|Měi_měi ， 學校|xué_xiào 的|de 運動|yùn_dòng 社團|shè_tuán 開始|kāi_shǐ 報名|bào_míng 了|le ， 你|nǐ 想|xiǎng 參加|cān_jiā 什麼|shén_me 社團|shè_tuán ？'), en:'Meimei, sign-ups for the school sports clubs have started. Which club do you want to join?'},
+     {who:'美美', av:'👧', tk:P('我|wǒ 想|xiǎng 參加|cān_jiā 游泳社|yóu_yǒng_shè 。 夏天|xià_tiān 游泳|yóu_yǒng 很|hěn 涼快|liáng_kuai ， 而且|ér_qiě 游泳|yóu_yǒng 對|duì 身體|shēn_tǐ 很|hěn 好|hǎo 。 你|nǐ 呢|ne ？'), en:"I want to join the swim club. Swimming is nice and cool in summer, and it's good for your body. What about you?"},
+     {who:'安安', av:'👦', tk:P('我|wǒ 想|xiǎng 參加|cān_jiā 足球社|zú_qiú_shè 。 我|wǒ 覺得|jué_de 踢足球|tī_zú_qiú 比|bǐ 游泳|yóu_yǒng 有意思|yǒu_yì_si ， 因為|yīn_wèi 可以|kě_yǐ 和|hé 很多|hěn_duō 朋友|péng_you 一起|yì_qǐ 玩|wán 。'), en:'I want to join the soccer club. I think soccer is more interesting than swimming, because I can play with lots of friends.'},
+     {who:'美美', av:'👧', tk:P('可是|kě_shì 足球社|zú_qiú_shè 每天|měi_tiān 下午|xià_wǔ 都|dōu 要|yào 在|zài 操場|cāo_chǎng 練習|liàn_xí ， 太陽|tài_yáng 很|hěn 大|dà ， 我|wǒ 怕|pà 曬太陽|shài_tài_yáng 。'), en:"But the soccer club practices on the field every afternoon. The sun is strong, and I don't like being in the sun."},
+     {who:'安安', av:'👦', tk:P('我|wǒ 不怕|bú_pà 曬太陽|shài_tài_yáng ！ 流汗|liú_hàn 的|de 感覺|gǎn_jué 很|hěn 舒服|shū_fu 。 而且|ér_qiě 我|wǒ 想|xiǎng 和|hé 我|wǒ 哥哥|gē_ge 一樣|yí_yàng ， 參加|cān_jiā 足球|zú_qiú 校隊|xiào_duì 。'), en:"I'm not afraid of the sun! Sweating feels good. And I want to join the school soccer team, just like my brother."},
+     {who:'美美', av:'👧', tk:P('好吧|hǎo_ba ！ 那|nà 我們|wǒ_men 都|dōu 要|yào 好好|hǎo_hǎo 練習|liàn_xí 。 你|nǐ 比賽|bǐ_sài 的|de 時候|shí_hou ， 我|wǒ 去|qù 幫|bāng 你|nǐ 加油|jiā_yóu ！'), en:"OK! Then we both need to practice hard. When you have a game, I'll come cheer for you!"},
+     {who:'安安', av:'👦', tk:P('太好了|tài_hǎo_le ！ 你|nǐ 游泳|yóu_yǒng 比賽|bǐ_sài 的|de 時候|shí_hou ， 我|wǒ 也|yě 去|qù 幫|bāng 你|nǐ 加油|jiā_yóu ！'), en:"Great! When you have a swimming race, I'll come cheer for you too!"}
+   ],
+   qs:[
+     {type:'find', p:2, q:P('美美|Měi_měi 想|xiǎng 參加|cān_jiā 什麼|shén_me 社團|shè_tuán ？'), en:'Which club does Meimei want to join?', kw:[['游泳']],
+      model:P('美美|Měi_měi 想|xiǎng 參加|cān_jiā 游泳社|yóu_yǒng_shè 。')},
+     {type:'find', p:2, q:P('美美|Měi_měi 為什麼|wèi_shén_me 喜歡|xǐ_huan 游泳|yóu_yǒng ？'), en:'Why does Meimei like swimming?', kw:[['涼快','身體','健康','涼']],
+      model:P('因為|yīn_wèi 夏天|xià_tiān 游泳|yóu_yǒng 很|hěn 涼快|liáng_kuai ， 而且|ér_qiě 對|duì 身體|shēn_tǐ 很|hěn 好|hǎo 。')},
+     {type:'think', p:4, q:P('美美|Měi_měi 為什麼|wèi_shén_me 不想|bù_xiǎng 參加|cān_jiā 足球社|zú_qiú_shè ？'), en:"Why doesn't Meimei want to join the soccer club?", kw:[['太陽','曬','熱']],
+      model:P('因為|yīn_wèi 足球社|zú_qiú_shè 在|zài 操場|cāo_chǎng 練習|liàn_xí ， 太陽|tài_yáng 很|hěn 大|dà ， 她|tā 怕|pà 曬太陽|shài_tài_yáng 。')},
+     {type:'think', p:'4、5', q:P('安安|Ān_an 和|hé 美美|Měi_měi ， 誰|shéi 比較|bǐ_jiào 不怕|bú_pà 熱|rè ？ 你|nǐ 怎麼|zěn_me 知道|zhī_dào ？'), en:'Who is less afraid of the heat, Anan or Meimei? How do you know?', kw:[['安安','他'],['不怕','流汗','舒服']],
+      model:P('安安|Ān_an 比較|bǐ_jiào 不怕|bú_pà 熱|rè ， 因為|yīn_wèi 他|tā 說|shuō 他|tā 不怕|bú_pà 曬太陽|shài_tài_yáng ， 流汗|liú_hàn 很|hěn 舒服|shū_fu 。')},
+     {type:'think', p:'6、7', q:P('對方|duì_fāng 比賽|bǐ_sài 的|de 時候|shí_hou ， 他們|tā_men 會|huì 做|zuò 什麼|shén_me ？'), en:"What will they do when the other one has a competition?", kw:[['加油']],
+      model:P('他們|tā_men 會|huì 去|qù 幫|bāng 對方|duì_fāng 加油|jiā_yóu 。')},
+     {type:'you', q:P('你|nǐ 想|xiǎng 參加|cān_jiā 游泳社|yóu_yǒng_shè 還是|hái_shi 足球社|zú_qiú_shè ？ 為什麼|wèi_shén_me ？'), en:'Would you rather join the swim club or the soccer club? Why?', kw:[['游泳','足球','社'],['因為','而且','覺得']],
+      model:P('我|wǒ 想|xiǎng 參加|cān_jiā 游泳社|yóu_yǒng_shè ， 因為|yīn_wèi 游泳|yóu_yǒng 很|hěn 涼快|liáng_kuai ， 而且|ér_qiě 對|duì 身體|shēn_tǐ 很|hěn 好|hǎo 。')}
+   ]},
+
+ { id:'C', name:'不放棄的游泳選手', e:'🏊', kind:'短文 Story', en:"The Swimmer Who Didn't Give Up",
+   words:[
+     ['相信','xiāngxìn','to believe','🙏'],['怕水','pà shuǐ','afraid of water','💧'],['一開始','yì kāishǐ','at first','🚦'],
+     ['越來越','yuèláiyuè','more and more','📈'],['肩膀','jiānbǎng','shoulder','🦾'],['失望','shīwàng','disappointed','😔'],
+     ['強壯','qiángzhuàng','strong','🏋️'],['全國','quánguó','national, whole country','🗺️'],['第一名','dì yī míng','first place','🥇'],
+     ['堅持','jiānchí','to keep going, persist','🔥'],['夢想','mèngxiǎng','dream','🌈'],['實現','shíxiàn','to come true','✨'],
+     ['佩服','pèifú','to admire','👏']],
+   paras:[
+     {tk:P('林小魚|Lín_Xiǎo_yú 是|shì 一位|yí_wèi 有名|yǒu_míng 的|de 游泳|yóu_yǒng 選手|xuǎn_shǒu 。 你|nǐ 可能|kě_néng 不|bù 相信|xiāng_xìn ， 她|tā 小時候|xiǎo_shí_hou 很|hěn 怕|pà 水|shuǐ ， 連|lián 洗臉|xǐ_liǎn 都|dōu 不|bù 喜歡|xǐ_huan ！'),
+      en:"Lin Xiaoyu is a famous swimmer. You might not believe it, but when she was little she was very afraid of water — she didn't even like washing her face!"},
+     {tk:P('七歲|qī_suì 的|de 時候|shí_hou ， 媽媽|mā_ma 帶|dài 她|tā 去|qù 游泳池|yóu_yǒng_chí 學|xué 游泳|yóu_yǒng 。 一開始|yì_kāi_shǐ ， 她|tā 每天|měi_tiān 都|dōu 哭|kū ， 可是|kě_shì 她|tā 沒有|méi_yǒu 放棄|fàng_qì 。 她|tā 每天|měi_tiān 早上|zǎo_shang 五點|wǔ_diǎn 就|jiù 起床|qǐ_chuáng 練習|liàn_xí ， 慢慢地|màn_màn_de ， 她|tā 游得|yóu_de 越來越|yuè_lái_yuè 快|kuài 。'),
+      en:'When she was seven, her mom took her to the pool to learn to swim. At first she cried every day, but she didn\'t give up. She got up at five every morning to practice, and little by little she swam faster and faster.'},
+     {tk:P('十五歲|shí_wǔ_suì 那年|nà_nián ， 小魚|Xiǎo_yú 的|de 肩膀|jiān_bǎng 受傷了|shòu_shāng_le ， 醫生|yī_shēng 說|shuō 她|tā 要|yào 休息|xiū_xi 三個月|sān_ge_yuè 。 那時候|nà_shí_hou 她|tā 很|hěn 失望|shī_wàng ， 可是|kě_shì 她|tā 還是|hái_shi 每天|měi_tiān 做|zuò 運動|yùn_dòng ， 讓|ràng 身體|shēn_tǐ 變得|biàn_de 更|gèng 強壯|qiáng_zhuàng 。'),
+      en:'The year she turned fifteen, Xiaoyu hurt her shoulder. The doctor said she had to rest for three months. She was very disappointed, but she still exercised every day to make her body even stronger.'},
+     {tk:P('去年|qù_nián ， 小魚|Xiǎo_yú 參加了|cān_jiā_le 全國|quán_guó 游泳|yóu_yǒng 比賽|bǐ_sài ， 得到了|dé_dào_le 第一名|dì_yī_míng ！ 她|tā 說|shuō ： 「 只要|zhǐ_yào 堅持|jiān_chí ， 夢想|mèng_xiǎng 就|jiù 會|huì 實現|shí_xiàn 。 」 大家|dà_jiā 都|dōu 很|hěn 佩服|pèi_fú 她|tā 。'),
+      en:'Last year Xiaoyu entered the national swimming competition and won first place! She said, "As long as you keep going, your dream will come true." Everyone admires her.'}
+   ],
+   qs:[
+     {type:'find', p:1, q:P('小魚|Xiǎo_yú 小時候|xiǎo_shí_hou 怕|pà 什麼|shén_me ？'), en:'What was Xiaoyu afraid of when she was little?', kw:[['水']],
+      model:P('她|tā 小時候|xiǎo_shí_hou 很|hěn 怕|pà 水|shuǐ 。')},
+     {type:'find', p:2, q:P('小魚|Xiǎo_yú 每天|měi_tiān 早上|zǎo_shang 幾點|jǐ_diǎn 起床|qǐ_chuáng 練習|liàn_xí ？'), en:'What time did Xiaoyu get up every morning to practice?', kw:[['五點','5點','5:00','五']],
+      model:P('她|tā 每天|měi_tiān 早上|zǎo_shang 五點|wǔ_diǎn 起床|qǐ_chuáng 練習|liàn_xí 。')},
+     {type:'find', p:3, q:P('肩膀|jiān_bǎng 受傷|shòu_shāng 以後|yǐ_hòu ， 醫生|yī_shēng 說|shuō 什麼|shén_me ？'), en:'After she hurt her shoulder, what did the doctor say?', kw:[['休息'],['三個月','3個月','三','3']],
+      model:P('醫生|yī_shēng 說|shuō 她|tā 要|yào 休息|xiū_xi 三個月|sān_ge_yuè 。')},
+     {type:'think', p:3, q:P('受傷|shòu_shāng 的|de 時候|shí_hou ， 小魚|Xiǎo_yú 有沒有|yǒu_méi_yǒu 放棄|fàng_qì ？ 你|nǐ 怎麼|zěn_me 知道|zhī_dào ？'), en:'When she was hurt, did Xiaoyu give up? How do you know?', kw:[['沒有','沒','不'],['運動','練習','強壯']],
+      model:P('她|tā 沒有|méi_yǒu 放棄|fàng_qì ， 因為|yīn_wèi 她|tā 還是|hái_shi 每天|měi_tiān 做|zuò 運動|yùn_dòng 。')},
+     {type:'think', p:4, q:P('「 只要|zhǐ_yào 堅持|jiān_chí ， 夢想|mèng_xiǎng 就|jiù 會|huì 實現|shí_xiàn 」 是|shì 什麼|shén_me 意思|yì_si ？'), en:'What does "As long as you keep going, your dream will come true" mean?', kw:[['努力','放棄','一直','堅持','練習']],
+      model:P('意思|yì_si 是|shì ， 如果|rú_guǒ 我們|wǒ_men 一直|yì_zhí 努力|nǔ_lì 、 不|bú 放棄|fàng_qì ， 就|jiù 可以|kě_yǐ 做到|zuò_dào 想|xiǎng 做|zuò 的|de 事|shì 。')},
+     {type:'you', q:P('你|nǐ 的|de 夢想|mèng_xiǎng 是|shì 什麼|shén_me ？ 你|nǐ 要|yào 怎麼|zěn_me 堅持|jiān_chí ？'), en:'What is your dream? How will you keep going?', kw:[['夢想','想','希望'],['每天','練習','努力','堅持']],
+      model:P('我|wǒ 的|de 夢想|mèng_xiǎng 是|shì 當|dāng 籃球|lán_qiú 選手|xuǎn_shǒu ， 我|wǒ 要|yào 每天|měi_tiān 努力|nǔ_lì 練習|liàn_xí 。')}
+   ]}
+];
+const QTYPE = {
+  find:{label:'🔍 找答案', en:'Find it in the text', cls:'qt-find'},
+  think:{label:'🤔 想一想', en:'Think about it', cls:'qt-think'},
+  you:{label:'💬 說說看', en:'Your own answer', cls:'qt-you'}
+};
+function scoreQ(q, said){
+  said = fixHomo(said, S_txt(q.model)+q.kw.flat().join(''));
+  const t=norm(said); if(!t) return 0;
+  const hits=q.kw.filter(g=>g.some(a=>t.includes(norm(a)))).length;
+  let sc=Math.round(100*hits/q.kw.length);
+  if (q.type==='you' && [...t].length<6) sc=Math.min(sc,60);
+  if ([...t].length<2) sc=Math.min(sc,30);
+  return sc;
+}
+
+/* ---------- 老師／名字 ---------- */
+function cleanName(n){ return String(n||'').normalize('NFKC').trim().replace(/\s+/g,' ').replace(/([\u3400-\u9fff])\s+(?=[\u3400-\u9fff])/g,'$1').replace(/[「」『』'＇"“”]+/g,'').trim(); }
+function nameKey(n){ return cleanName(n).toLowerCase(); }
+function teacherOf(r){ return String(r.teacher||'') || CONFIG.LEGACY_TEACHER || ''; }
+function normCls(r){ if(!r) return r; const c=String(r.cls==null?'':r.cls); if((CONFIG.LEGACY_CLASSES||[]).includes(c)){ const t=(CONFIG.TEACHERS||[]).find(x=>x.name===teacherOf(r)); if(t&&t.classes.length===1) r.cls=t.classes[0]; } return r; }
+function migrateCls(u){ try{ ['sp_prog_','sp_ts_','sp_l6_','sp_l7_'].forEach(p=>{ const nk=p+(u.teacher||'')+'_'+(u.cls||'')+'_'+u.name; if(localStorage.getItem(nk)!=null) return; for(const oc of (CONFIG.LEGACY_CLASSES||[])){ const ok=p+(u.teacher||'')+'_'+oc+'_'+u.name; const v=localStorage.getItem(ok); if(v!=null){ localStorage.setItem(nk,v); break; } } }); }catch(e){} }
+function normAll(a){ (a||[]).forEach(normCls); return a||[]; }
+function teacherById(id){ return (CONFIG.TEACHERS||[]).find(t=>t.id===id || t.name===id) || null; }
+function urlTeacher(){ try{ return teacherById(new URLSearchParams(location.search).get('t')||''); }catch(e){ return null } }
+function classesOf(tname){ const t=(CONFIG.TEACHERS||[]).find(x=>x.name===tname); return t? t.classes : (CONFIG.CLASSES||[]); }
+/* ============================================================
+   STATE & UTILITIES
+   ============================================================ */
+const $ = s=>document.querySelector(s);
+const app = $('#app');
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const state = {
+  user: store.get('sp_user', null),
+  prefs: Object.assign({py:true,en:true,slow:false}, store.get('sp_prefs',{})),
+  teacher:false
+};
+if (state.user && (CONFIG.LEGACY_CLASSES||[]).includes(String(state.user.cls||''))){ normCls(state.user); migrateCls(state.user); store.set('sp_user',state.user); }
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ruby(tk){
+  return tk.map(t=>{
+    if (t==='_') return '<span class="blank"></span>';
+    const [h,p]=t;
+    if (!p || !/[一-鿿]/.test(h)) return esc(h);
+    // multi-char words share one rt; split per syllable when counts match for nicer alignment
+    const chars=[...h].filter(c=>/[一-鿿]/.test(c));
+    const syl=p.replace(/'/g,' ').split(/\s+/).filter(Boolean);
+    if (chars.length===[...h].length && chars.length===syl.length) return `<ruby>${chars.map((c,i)=>c+'<rt>'+esc(syl[i])+'</rt>').join('')}</ruby>`;
+    return `<ruby>${esc(h)}<rt>${esc(p)}</rt></ruby>`;
+  }).join('');
+}
+function toast(msg,ms=2200){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.add('hidden'),ms)}
+function applyPrefs(){
+  document.body.classList.toggle('no-py',!state.prefs.py);
+  document.body.classList.toggle('no-en',!state.prefs.en);
+  $('#tgPy').classList.toggle('off',!state.prefs.py);
+  $('#tgEn').classList.toggle('off',!state.prefs.en);
+  $('#tgSlow').classList.toggle('off',!state.prefs.slow);
+  store.set('sp_prefs',state.prefs);
+}
+$('#tgPy').onclick=()=>{state.prefs.py=!state.prefs.py;applyPrefs()};
+$('#tgEn').onclick=()=>{state.prefs.en=!state.prefs.en;applyPrefs()};
+$('#tgSlow').onclick=()=>{state.prefs.slow=!state.prefs.slow;applyPrefs()};
+$('#brand').onclick=()=>{ if(state.teacher) return; state.user?go('home'):go('login') };
+$('#btnSwitch').onclick=()=>{ stopAll(); state.user=null; store.set('sp_user',null); go('login') };
+
+/* ---------- text-to-speech ---------- */
+let zhVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  zhVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_]HK/i.test(v.lang)&&false) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+let ttsBusy=false;
+function say(text){
+  return new Promise(res=>{
+    if(!('speechSynthesis' in window)) return res();
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text.replace(/_/g,''));
+    u.lang='zh-TW'; if(zhVoice) u.voice=zhVoice;
+    u.rate = state.prefs.slow?0.6:0.9;
+    ttsBusy=true;
+    const done=()=>{ ttsBusy=false; res(); };
+    u.onend=done; u.onerror=done;
+    speechSynthesis.speak(u);
+  });
+}
+
+/* ---------- microphone + speech recognition ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let micStream=null, current=null;
+const VIRTUAL_MIC = /eshare|sharing audio|virtual|stereo mix|立體聲混音|cable|voicemeeter|obs|loopback|teams audio|zoom audio/i;
+let micLabel='';
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const DEVICE = IS_IOS ? (/iPhone/.test(navigator.userAgent)?'iPhone':'iPad') : /CrOS/.test(navigator.userAgent)?'Chromebook' : /Android/.test(navigator.userAgent)?'Android' : /Windows/.test(navigator.userAgent)?'Windows' : /Mac/.test(navigator.userAgent)?'Mac' : 'other';
+const BROWSER = /CriOS|Chrome/.test(navigator.userAgent)?'Chrome' : /Safari/.test(navigator.userAgent)?'Safari' : /Firefox|FxiOS/.test(navigator.userAgent)?'Firefox' : 'other';
+/** 每次都開一個新的麥克風，用完就關掉（iPad 上重複使用舊的麥克風，播放朗讀後會變成沒有聲音） */
+async function getMic(){
+  const base={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
+  let s = await navigator.mediaDevices.getUserMedia({audio:base});
+  micLabel = s.getAudioTracks()[0]?.label || '';
+  if (VIRTUAL_MIC.test(micLabel)){
+    try{
+      const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput' && d.label && !VIRTUAL_MIC.test(d.label) && !/^communications/i.test(d.label));
+      const pick = devs.find(d=>/^default/i.test(d.label)) || devs[0];
+      if (pick){
+        const s2 = await navigator.mediaDevices.getUserMedia({audio:{...base, deviceId:{exact:pick.deviceId}}});
+        s.getTracks().forEach(t=>t.stop());
+        s = s2; micLabel = pick.label; state.virtualMic = true;
+      }
+    }catch(e){}
+  }
+  micStream = s;
+  return s;
+}
+function releaseMic(s){ try{ (s||micStream)?.getTracks().forEach(t=>t.stop()) }catch(e){} if(!s || s===micStream) micStream=null; }
+let actx=null;
+function audioCtx(){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume(); }catch(e){ actx=null } return actx; }
+/** 測 3 秒音量，回傳 0~1 的最大值 */
+async function micPeak(ms=3000, onLevel){
+  const s=await getMic(); const ac=audioCtx();
+  let peak=0;
+  try{
+    const src=ac.createMediaStreamSource(s), an=ac.createAnalyser(); src.connect(an);
+    const buf=new Float32Array(an.fftSize); const t0=Date.now();
+    while(Date.now()-t0<ms){ an.getFloatTimeDomainData(buf); let cur=0; for(const v of buf) cur=Math.max(cur,Math.abs(v)); peak=Math.max(peak,cur); onLevel&&onLevel(cur); await new Promise(r=>setTimeout(r,60)); }
+    src.disconnect();
+  } finally { releaseMic(s); }
+  return peak;
+}
+const MIC_FIX_HTML = `<b>語音辨識可能用到了錯誤的麥克風。</b>請在 Chrome 網址列輸入 <code>chrome://settings/content/microphone</code>，在最上面的下拉選單選「真正的麥克風」（例如 <i>Microphone Array</i> 或耳機麥克風），<b>不要選 EShare / Sharing Audio</b>，然後重新整理這個網頁。
+<span class="en">Speech recognition may be using the wrong mic. Open chrome://settings/content/microphone, pick your real microphone (not EShare/Sharing Audio), then reload.</span>`;
+function pickMime(){
+  if (!window.MediaRecorder) return '';
+  for (const m of ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']) if (MediaRecorder.isTypeSupported?.(m)) return m;
+  return '';
+}
+function stopAll(){ try{speechSynthesis.cancel()}catch(e){} if(current) current(); }
+/** 連續失敗時切換「相容模式」：只用語音辨識，不同時錄音（iPad 上兩個一起用比較容易搶不到麥克風） */
+state.srOnly = false; let srFailStreak = 0;
+/** listen({continuous, maxMs, onInterim}) → {transcript, blob, mime, srOk, err, peak, diag} */
+async function listen(opts={}){
+  stopAll();
+  // 等朗讀結束，讓 iPad 把聲音切回「錄音」狀態
+  const t0=Date.now(); while((ttsBusy || (window.speechSynthesis && speechSynthesis.speaking)) && Date.now()-t0<4000) await new Promise(r=>setTimeout(r,100));
+  try{ speechSynthesis.cancel() }catch(e){}
+  if (IS_IOS) await new Promise(r=>setTimeout(r,350));
+
+  const useRec = !!window.MediaRecorder && !(state.srOnly && SR);
+  let stream=null, recorder=null, chunks=[], mime='', peak=0, meterStop=null;
+  if (useRec || !SR){
+    stream = await getMic();
+    mime = pickMime();
+    try{
+      recorder = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream);
+      recorder.ondataavailable=e=>{ if(e.data && e.data.size) chunks.push(e.data) };
+      recorder.start(250);
+    }catch(e){ recorder=null }
+    // 量音量：知道學生有沒有出聲
+    try{
+      const ac=audioCtx(), src=ac.createMediaStreamSource(stream), an=ac.createAnalyser(); src.connect(an);
+      const buf=new Float32Array(an.fftSize); let on=true;
+      (function tick(){ if(!on) return; an.getFloatTimeDomainData(buf); for(const v of buf){ const a=Math.abs(v); if(a>peak) peak=a; } setTimeout(tick,80); })();
+      meterStop=()=>{ on=false; try{src.disconnect()}catch(e){} };
+    }catch(e){}
+  }
+  return new Promise(resolve=>{
+    let finalText='', interim='', active=true, sr=null, timer, err='';
+    const finish=()=>{
+      if(!active) return; active=false; current=null; clearTimeout(timer);
+      try{ sr && sr.abort ? sr.stop() : sr && sr.stop() }catch(e){}
+      const done=()=>{
+        meterStop && meterStop(); if(stream) releaseMic(stream);
+        const transcript=(finalText+interim).trim();
+        const blob = chunks.length ? new Blob(chunks,{type:(recorder&&recorder.mimeType)||mime||'audio/webm'}) : null;
+        // 學生有出聲、但辨識沒有結果 → 算一次辨識失敗
+        if (SR){
+          if (transcript) srFailStreak=0;
+          else if (err==='audio-capture' || err==='network' || (stream && peak>0.05)) srFailStreak++;
+          if (srFailStreak>=2 && !state.srOnly && IS_IOS){ state.srOnly=true; srFailStreak=0; toast('已切換到 iPad 相容模式 Compatibility mode on',3000); }
+        }
+        const diag=[DEVICE,BROWSER, state.srOnly?'srOnly':'', err?('err:'+err):'', stream?('peak:'+peak.toFixed(2)):''].filter(Boolean).join(' ');
+        resolve({transcript, blob, mime:(recorder&&recorder.mimeType)||mime||'audio/webm', srOk:!!SR, err, peak: stream?peak:null, diag});
+      };
+      if (recorder && recorder.state!=='inactive'){ recorder.onstop=done; try{ recorder.stop() }catch(e){ done() } } else done();
+    };
+    current=finish;
+    if (SR){
+      const startSR=()=>{
+        sr=new SR(); sr.lang='zh-TW'; sr.interimResults=true; sr.continuous=!!opts.continuous; sr.maxAlternatives=1;
+        sr.onresult=e=>{ interim=''; for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i]; if(r.isFinal) finalText+=r[0].transcript; else interim+=r[0].transcript;} opts.onInterim && opts.onInterim(finalText+interim) };
+        sr.onerror=e=>{ err=e.error||'error'; if(err==='not-allowed'||err==='service-not-allowed'){ toast('語音辨識被封鎖了 Speech recognition blocked'); } };
+        sr.onend=()=>{ if(!active) return;
+          if(opts.continuous && err!=='not-allowed' && err!=='service-not-allowed'){ if(finalText||interim){ finalText+=interim; interim=''; } setTimeout(()=>{ if(active){ try{ startSR() }catch(e){ finish() } } },150); }
+          else setTimeout(finish,300) };
+        try{ sr.start() }catch(e){ err='start-failed'; setTimeout(finish,300) }
+      };
+      startSR();
+    }
+    timer=setTimeout(finish, opts.maxMs || 12000);
+  });
+}
+
+/* ---------- scoring ---------- */
+function norm(s){
+  return String(s||'')
+    .replace(/[\s，。！？、,.!?；;：:「」『』"'…~～\-（）()]/g,'')
+    .replace(/[她它妳祂]/g,c=>({她:'他',它:'他',妳:'你',祂:'他'}[c]))
+    .replace(/藍球/g,'籃球').replace(/騎車/g,'騎腳踏車').replace(/桌球/g,'乒乓球').replace(/羽球/g,'羽毛球');
+}
+function lcs(a,b){
+  a=[...a]; b=[...b]; const m=a.length,n=b.length; if(!m||!n) return 0;
+  let prev=new Array(n+1).fill(0);
+  for(let i=1;i<=m;i++){const cur=new Array(n+1).fill(0); for(let j=1;j<=n;j++){cur[j]=a[i-1]===b[j-1]?prev[j-1]+1:Math.max(prev[j],cur[j-1])} prev=cur}
+  return prev[n];
+}
+/* 同音字接受表：辨識常把「發音完全一樣」的字聽成別的字（例如 難→男）。
+   只在目標句裡有正確的詞時才替換；聲調不同的（例如 打→大）不算對。 */
+const HOMO = {
+  '難':['男','南','楠'], '有趣':['有去'], '輕鬆':['青松'], '厲害':['利害','歷害','立害'], '覺得':['覺的','決的'],
+  '跑步':['跑不'], '做體操':['作體操','坐體操'], '打網球':['打往球'], '打排球':['打牌球'], '玩滑板':['玩華板','完滑板','玩划板'],
+  '騎腳踏車':['其腳踏車','奇腳踏車','齊腳踏車'], '跳高':['跳糕'], '衝浪':['沖浪'], '選手':['選首'], '有名':['有明'],
+  '參加':['參家','餐加'], '是喔':['是哦','是噢','事喔'], '哦':['喔','噢'], '我也是':['我也事','我也式'],
+  '贏':['營','迎','盈'], '輸':['書','叔','舒'], '教練':['叫練','教鍊','叫鍊'], '傳球':['船球'], '游泳':['游涌'],
+  '真的嗎':['真得嗎','真的嘛'], '社團':['社糰'], '報名':['抱名'], '舒服':['舒福']
+};
+function fixHomo(said, target){
+  let s=String(said||''); const t=String(target||'');
+  for (const [c,alts] of Object.entries(HOMO)) if (t.includes(c)) alts.forEach(a=>{ s=s.split(a).join(c) });
+  return s;
+}
+function scoreText(said,target){
+  said = fixHomo(said, target);
+  const s=norm(said), t=norm(target);
+  if(!s||!t) return 0;
+  const l=lcs(s,t);
+  const recall=l/[...t].length, precision=l/[...s].length;
+  return Math.round(100*Math.min(1, recall*0.85 + precision*0.15));
+}
+function starsFor(sc){ if(sc==null) return ''; return sc>=85?'⭐⭐⭐':sc>=60?'⭐⭐':sc>=30?'⭐':'' }
+function praise(sc){
+  if(sc==null) return '錄好了！老師會聽你的錄音。 <span class="en">Recorded! Your teacher will listen.</span>';
+  if(sc>=85) return '太棒了！ <span class="en">Excellent!</span>';
+  if(sc>=60) return '很好！ <span class="en">Good job!</span>';
+  if(sc>=30) return '加油！再試一次。 <span class="en">Nice try! Once more.</span>';
+  return '我沒聽清楚，再說一次。 <span class="en">I didn’t catch that. Try again.</span>';
+}
+function detectSport(text){ const t=norm(text); return SPORTS.find(s=>s.kw.some(k=>t.includes(norm(k)))) || null; }
+
+/* ---------- progress (best score per item, per student, this device) ---------- */
+function progKey(){ return 'sp_prog_'+(state.user?.teacher||'')+'_'+(state.user?.cls||'')+'_'+(state.user?.name||'') }
+function getProg(){ return store.get(progKey(),{}) }
+function setBest(item,sc){ const p=getProg(); if(sc!=null && (p[item]==null || sc>p[item])) p[item]=sc; else if(sc==null && p[item]==null) p[item]=-1; store.set(progKey(),p) }
+
+/* ============================================================
+   DATA LAYER — Google Sheet (remote) or this device (local)
+   ============================================================ */
+const REMOTE = !!CONFIG.SCRIPT_URL;
+const idb = {
+  db:null,
+  open(){ return this.db ? Promise.resolve(this.db) : new Promise((res,rej)=>{ const r=indexedDB.open('sp_audio',1); r.onupgradeneeded=()=>r.result.createObjectStore('a'); r.onsuccess=()=>{this.db=r.result;res(this.db)}; r.onerror=()=>rej(r.error) }) },
+  async put(k,v){ const db=await this.open(); return new Promise((res,rej)=>{const tx=db.transaction('a','readwrite'); tx.objectStore('a').put(v,k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error)}) },
+  async get(k){ const db=await this.open(); return new Promise((res,rej)=>{const r=db.transaction('a').objectStore('a').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error)}) }
+};
+function blobToB64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(String(fr.result).split(',')[1]||''); fr.readAsDataURL(blob) }) }
+let pending = store.get('sp_pending',[]);
+function setSync(txt){ $('#syncState').textContent = txt ? ' · '+txt : '' }
+async function postRecord(rec){
+  const r = await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rec)});
+  const j = await r.json(); if(!j.ok) throw new Error(j.error||'upload failed'); return j;
+}
+async function flushPending(){
+  if(!REMOTE || !pending.length) return;
+  const left=[];
+  for(const rec of pending){ try{ await postRecord(rec) }catch(e){ left.push(rec) } }
+  pending=left; store.set('sp_pending',pending.slice(-30));
+  setSync(pending.length? `⏳ ${pending.length} 筆未上傳` : '☁️ 已上傳');
+}
+setInterval(flushPending, 20000);
+
+async function saveAttempt({level,item,target,transcript,score,blob,mime,diag,noProgress,asUser}){
+  const U=asUser||state.user; if(asUser) noProgress=true;
+  const base={action:'submit', name:U.name, cls:U.cls||'', teacher:U.teacher||'', level, item, target, transcript, score: score==null?'':score, t:Date.now(), diag: diag||''};
+  if(!noProgress && !(score==null && !blob)) setBest(item, score);
+  if(!noProgress){ const tk='sp_ts_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; const ts=store.get(tk,{}); ts[item]=Date.now(); store.set(tk,ts); }
+  if (REMOTE){
+    setSync('⏳ 上傳中…');
+    const rec = Object.assign({}, base, blob? {audio: await blobToB64(blob), mime}: {});
+    try{ await postRecord(rec); setSync('☁️ 已上傳'); }
+    catch(e){ pending.push(rec); store.set('sp_pending',pending.slice(-30)); setSync(`⏳ ${pending.length} 筆未上傳`); }
+  } else {
+    const id='a'+Date.now()+Math.random().toString(36).slice(2,6);
+    if (blob){ try{ await idb.put(id,blob) }catch(e){} }
+    const all=store.get('sp_records',[]); all.push(Object.assign({}, base, {time:Date.now(), fileId: blob?id:''}));
+    store.set('sp_records', all.slice(-3000));
+    setSync('💾 已存在這台電腦');
+  }
+}
+async function loadRecords(){
+  if (REMOTE){
+    const r=await fetch(`${CONFIG.SCRIPT_URL}?action=list&pin=${encodeURIComponent(CONFIG.TEACHER_PIN)}`);
+    const j=await r.json(); if(!j.ok) throw new Error(j.error); return normAll(j.rows);
+  }
+  return store.get('sp_records',[]);
+}
+async function loadAudio(fileId){
+  if (REMOTE){
+    const r=await fetch(`${CONFIG.SCRIPT_URL}?action=audio&id=${encodeURIComponent(fileId)}&pin=${encodeURIComponent(CONFIG.TEACHER_PIN)}`);
+    const j=await r.json(); if(!j.ok) throw new Error(j.error);
+    const bin=atob(j.audio), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+    return new Blob([u8],{type:j.mime||'audio/webm'});
+  }
+  return idb.get(fileId);
+}
+
+/* ============================================================
+   SHARED SPEAK WIDGET
+   ============================================================ */
+/**
+ * mountSpeak(el, {target, level, item, continuous, maxMs, onDone(score, transcript)})
+ */
+function mountSpeak(el, o){
+  el.innerHTML = `
+    <div class="row" style="gap:18px">
+      <button class="mic" title="按一下開始說 Tap to speak">🎤</button>
+      <div style="flex:1;min-width:220px">
+        <div class="heard"><span class="lbl">我聽到 I heard:</span><span class="txt">—</span></div>
+        <div class="result"></div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <span class="hint stat">按 🎤 說說看，說完再按一次停止。 <span class="en">Tap 🎤, speak, tap again to stop.</span></span>
+      <button class="playme hidden">▶️ 聽我的錄音 Play my voice</button>
+    </div>`;
+  const mic=el.querySelector('.mic'), txt=el.querySelector('.txt'), result=el.querySelector('.result'), stat=el.querySelector('.stat'), play=el.querySelector('.playme');
+  let busy=false, lastBlob=null;
+  if(!SR) stat.innerHTML='這個瀏覽器不能自動辨識，但可以錄音給老師聽。建議用 Chrome。 <span class="en">Use Chrome for auto-scoring.</span>';
+  play.onclick=()=>{ if(lastBlob){ const a=new Audio(URL.createObjectURL(lastBlob)); a.play().catch(()=>{}) } };
+  mic.onclick=async()=>{
+    if (busy){ current && current(); return; }
+    busy=true; mic.classList.add('rec'); mic.textContent='⏹'; txt.textContent='…'; result.innerHTML='';
+    let res;
+    try{
+      res = await listen({continuous:o.continuous, maxMs:o.maxMs, onInterim:t=>{ txt.textContent=t; o.onInterim && o.onInterim(t) }});
+    }catch(e){
+      busy=false; mic.classList.remove('rec'); mic.textContent='🎤';
+      result.innerHTML='🎙️ 沒有麥克風權限。請按網址列的🔒允許麥克風。 <span class="en">Please allow the microphone.</span>';
+      return;
+    }
+    busy=false; mic.classList.remove('rec'); mic.textContent='🎤';
+    lastBlob=res.blob; play.classList.toggle('hidden',!lastBlob);
+    txt.textContent = res.transcript || (res.srOk?'（沒有聽到 nothing heard）':'（已錄音 recorded）');
+    if (res.srOk && !res.transcript){
+      const spoke = res.peak!=null && res.peak>0.05;
+      result.innerHTML = (spoke
+          ? '🤔 有聽到你的聲音，但是沒有辨識出來。再說一次，說清楚一點。 <span class="en">I heard you but couldn’t recognize it. Try again, a bit slower.</span>'
+          : '🤔 沒聽到聲音。請靠近麥克風大聲一點再說一次。 <span class="en">No sound heard — speak louder, closer to the mic.</span>') +
+        (state.virtualMic ? `<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>` : '');
+      // 有錄到聲音的就存下來（不給分），老師可以聽錄音
+      if (res.blob && spoke) saveAttempt({level:o.level, item:o.item, target:o.targetLabel||o.target, transcript:'', score:null, blob:res.blob, mime:res.mime, diag:res.diag, asUser:o.asUser});
+      else saveAttempt({level:o.level, item:o.item, target:o.targetLabel||o.target, transcript:'', score:null, blob:null, mime:res.mime, diag:res.diag, noProgress:true, asUser:o.asUser});
+      return;
+    }
+    let sc = null;
+    if (res.srOk){ sc = o.score ? o.score(res.transcript) : scoreText(res.transcript, o.target); }
+    if (!res.blob && !res.transcript) { result.innerHTML=praise(0); return; }
+    result.innerHTML = `<span class="stars">${starsFor(sc)}</span> ${sc!=null?sc+' 分 · ':''}${praise(sc)}`;
+    saveAttempt({level:o.level, item:o.item, target:o.targetLabel||o.target, transcript:res.transcript, score:sc, blob:res.blob, mime:res.mime, diag:res.diag, asUser:o.asUser});
+    o.onDone && o.onDone(sc, res.transcript);
+  };
+  return el;
+}
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+function go(view, arg){
+  stopAll();
+  if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
+  state.teacher = view==='teacher';
+  const showUser = !!state.user && !state.teacher && view!=='login';
+  $('#whoChip').classList.toggle('hidden',!showUser);
+  $('#btnSwitch').classList.toggle('hidden',!showUser);
+  if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+state.user.name;
+  window.scrollTo(0,0);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, teacher:viewTeacher, pin:viewPin})[view](arg);
+}
+
+function viewLogin(){
+  const T=CONFIG.TEACHERS||[], fixed=urlTeacher();
+  const lastT = fixed ? fixed.name : (state.lastTeacher || (T[0]&&T[0].name) || '');
+  app.innerHTML = `
+  <div class="card login">
+    <div class="big">🏀⚽🏊</div>
+    <h1>運動口說練習</h1>
+    <div class="en">Sports Speaking Practice · Grade 4</div>
+    <form id="f">
+      ${T.length?(fixed
+        ? `<div class="tfixed">🧑‍🏫 <b>${esc(fixed.name)}</b>的班級 <span class="en">Your teacher</span><input type="hidden" id="tc" value="${esc(fixed.name)}"></div>`
+        : `<label>你的老師是誰？ <span class="en">Who is your teacher?</span></label>
+           <div class="tpick">${T.map(t=>`<button type="button" class="tbtn ${t.name===lastT?'on':''}" data-t="${esc(t.name)}">🧑‍🏫 ${esc(t.name)}</button>`).join('')}</div>
+           <input type="hidden" id="tc" value="${esc(lastT)}">`):''}
+      <label>班級 <span class="en">Class</span></label>
+      <select id="cl"></select>
+      <label>你叫什麼名字？ <span class="en">What’s your name?</span></label>
+      <input id="nm" maxlength="20" autocomplete="off" placeholder="例如 Example：王小明 / Amy" required>
+      <div class="hint" style="text-align:left;margin-top:4px">每次都要用一樣的名字喔！ <span class="en">Use the same name every time.</span></div>
+      <div style="margin-top:22px"><button class="btn btn-sun" style="width:100%;font-size:22px">開始 Start ➜</button></div>
+    </form>
+    <button class="teacher-link" id="tl">🧑‍🏫 老師後台 Teacher</button>
+  </div>`;
+  const fillCls=()=>{ const cl=classesOf($('#tc')?.value||''); $('#cl').innerHTML=cl.map(c=>`<option>${esc(c)}</option>`).join(''); if(state.lastCls && cl.includes(state.lastCls)) $('#cl').value=state.lastCls; };
+  fillCls();
+  app.querySelectorAll('.tbtn').forEach(b=>b.onclick=()=>{ app.querySelectorAll('.tbtn').forEach(x=>x.classList.toggle('on',x===b)); $('#tc').value=b.dataset.t; fillCls(); });
+  $('#f').onsubmit=e=>{
+    e.preventDefault();
+    const name=cleanName($('#nm').value); if(!name) return;
+    const teacher=$('#tc')?.value||'';
+    if (T.length && !teacher){ toast('請先選老師 Choose your teacher'); return; }
+    state.user={name, cls: $('#cl').value, teacher}; state.lastCls=state.user.cls; state.lastTeacher=teacher;
+    store.set('sp_user',state.user); migrateCls(state.user);
+    go('home');
+  };
+  $('#tl').onclick=()=>go('pin');
+  setTimeout(()=>$('#nm')?.focus(),50);
+}
+
+function countLevel(prefix, ids){
+  const p=getProg(); let done=0, stars=0;
+  ids.forEach(id=>{ const v=p[id]; if(v!=null){done++; stars+= v<0?1:(v>=85?3:v>=60?2:v>=30?1:0)} });
+  return {done,total:ids.length,stars};
+}
+function l1Ids(){ return VOCAB_SETS.flatMap(s=>s.items.map(i=>'L1-'+s.id+'-'+i.id)) }
+function l2Ids(){ return PATTERNS.flatMap(p=>p.items.map(i=>'L2-'+i.id)) }
+
+function viewHome(){
+  const a=countLevel('L1',l1Ids()), b=countLevel('L2',l2Ids()), c=countLevel('L3',DIALOG.map((_,i)=>'L3-'+i)), d=countLevel('L4',TOPICS.map(t=>'L4-'+t.id)), e5=countLevel('L5',l5Ids());
+  app.innerHTML = `
+    <div class="hello">${esc(state.user.name)}，你好！👋</div>
+    <div class="en">Choose a level. 選一個關卡開始練習！</div>
+    ${REMOTE?'':'<div class="warn" style="margin-top:12px">💾 目前成績和錄音只存在這台電腦。 <span class="en">Results are saved on this device only.</span></div>'}
+    <div class="card" style="margin-top:14px;padding:14px 18px">
+      <div class="row" style="justify-content:space-between">
+        <div><b>🎤 先測試麥克風 Mic check</b> <span class="hint">按下去，說「你好」。 <span class="en">Tap and say “你好”.</span></span></div>
+        <button class="btn btn-ghost" id="mt">開始測試 Test</button>
+      </div>
+      <div id="mtBarWrap" class="hidden" style="margin-top:10px;height:16px;background:#eee;border-radius:999px;overflow:hidden"><div id="mtBar" style="height:100%;width:0;background:var(--grass);transition:width .06s"></div></div>
+      <div id="mtMsg" style="margin-top:8px;font-weight:700"></div>
+    </div>
+    <div id="asgCard"></div>
+    <div class="levels">
+      <button class="level l1" data-v="l1"><span class="num">LEVEL 1</span><span class="ico">🔤</span><span class="t">詞語暖身</span><span class="d">聽一聽、說一說運動詞語<br><span class="en" style="color:#fff">Listen & say the words</span></span><span class="prog">✅ ${a.done}/${a.total}</span></button>
+      <button class="level l2" data-v="l2"><span class="num">LEVEL 2</span><span class="ico">🧩</span><span class="t">句型練習</span><span class="d">用句型回答問題<br><span class="en" style="color:#fff">Answer with sentence patterns</span></span><span class="prog">✅ ${b.done}/${b.total}</span></button>
+      <button class="level l3" data-v="l3"><span class="num">LEVEL 3</span><span class="ico">💬</span><span class="t">和文文聊天</span><span class="d">一問一答，練習對話<br><span class="en" style="color:#fff">Chat with Wenwen</span></span><span class="prog">✅ ${c.done}/${c.total}</span></button>
+      <button class="level l4" data-v="l4"><span class="num">LEVEL 4</span><span class="ico">🎤</span><span class="t">我來說一說</span><span class="d">說一段話介紹運動或運動員<br><span class="en" style="color:#fff">Give a short talk</span></span><span class="prog">✅ ${d.done}/${d.total}</span></button>
+      <button class="level l5" data-v="l5"><span class="num">LEVEL 5 · 進階</span><span class="ico">🚀</span><span class="t">進階挑戰</span><span class="d">讀短文和對話，用說的回答問題<br><span class="en" style="color:#fff">Read, think & answer</span></span><span class="prog">✅ ${e5.done}/${e5.total}</span></button>
+      <button class="level l6" data-v="l6"><span class="num">LEVEL 6 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
+      <button class="level l7" data-v="l7"><span class="num">LEVEL 7 · 最後測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
+    </div>`;
+  app.querySelectorAll('.level').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  myAssigns().then(list=>{
+    const el=$('#asgCard'); if(!el || !list.length) return;
+    const C=catalog(), ts=store.get('sp_ts_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name,{});
+    const items=[]; list.forEach(a=>a.items.forEach(id=>{ if(!items.find(x=>x.id===id)) items.push({id, t:+a.time}) }));
+    const done=items.filter(x=>ts[x.id]>=x.t).length;
+    el.innerHTML=`<div class="card asg"><div class="row" style="justify-content:space-between"><b style="font-size:20px">📌 老師要你練習的題目 <span class="en">Practice assigned by your teacher</span></b><span class="pill ${done===items.length?'p-good':'p-mid'}">${done}/${items.length} 完成</span></div>
+      <div class="asglist">${items.map(x=>`<button class="asgitem ${ts[x.id]>=x.t?'done':''}" data-id="${esc(x.id)}">${ts[x.id]>=x.t?'✅':'⬜'} ${esc(C[x.id]?.label?.replace(/^文文：/,'')||x.id)} <span class="hint">${esc(x.id.split('-')[0])}</span></button>`).join('')}</div></div>`;
+    el.querySelectorAll('.asgitem').forEach(b=>b.onclick=()=>openItem(b.dataset.id));
+  });
+  $('#mt').onclick=async()=>{
+    const msg=$('#mtMsg'); $('#mtBarWrap').classList.remove('hidden'); msg.textContent='聽聽看… Listening…';
+    let peak;
+    try{ peak=await micPeak(3000, v=>{ $('#mtBar').style.width=Math.min(100,v*300)+'%' }) }
+    catch(e){ msg.innerHTML='🎙️ 沒有麥克風權限。請按網址列左邊的圖示，允許使用麥克風。 <span class="en">Please allow the microphone.</span>'; return; }
+    const name = esc(micLabel||'');
+    if (peak < 0.02) msg.innerHTML = `❌ 沒有收到聲音（${name}）。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
+    else if (state.virtualMic) msg.innerHTML = `⚠️ 錄音正常（${name}），但 Chrome 預設的麥克風是 EShare，語音辨識可能聽不到。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
+    else msg.innerHTML = `✅ 麥克風正常！ <span class="en">Your mic works!</span> <span class="hint">（${name}）</span>`;
+  };
+}
+
+/* ---------- LEVEL 1 ---------- */
+function viewL1(arg){
+  const setIdx = arg?.set ?? 0, set = VOCAB_SETS[setIdx];
+  let idx = arg?.i ?? 0;
+  const prog = getProg();
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🔤 詞語暖身 <span class="en" style="font-size:18px">Word Warm-up</span></h2>
+    <div class="tabs">${VOCAB_SETS.map((s,i)=>`<button class="tab ${i===setIdx?'on':''}" data-i="${i}">${esc(s.name)}</button>`).join('')}</div>
+    <div class="vgrid">${set.items.map((w,i)=>{const sc=prog['L1-'+set.id+'-'+w.id];return `<button class="vmini ${i===idx?'on':''}" data-i="${i}"><div class="e">${w.e}</div><div class="h">${esc(w.hz)}</div><div class="s">${sc==null?'':sc<0?'🎙️':starsFor(sc)||'·'}</div></button>`}).join('')}</div>
+    <div class="card" id="fc"></div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go('l1',{set:+b.dataset.i,i:0}));
+  app.querySelectorAll('.vmini').forEach(b=>b.onclick=()=>go('l1',{set:setIdx,i:+b.dataset.i}));
+  const w=set.items[idx];
+  $('#fc').innerHTML = `
+    <div class="focus">
+      <div class="pic">${w.e}</div>
+      <div>
+        <div class="word">${ruby([W(w.hz,w.py)])}</div>
+        <div class="en">${esc(w.en)}</div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-sky" id="lis">🔊 聽 Listen</button>
+          <button class="btn btn-ghost" id="nx">下一個 Next ➜</button>
+        </div>
+      </div>
+    </div>
+    <div class="speak" id="spk"></div>`;
+  $('#lis').onclick=()=>say(w.hz);
+  $('#nx').onclick=()=>{ if(idx<set.items.length-1) go('l1',{set:setIdx,i:idx+1}); else if(setIdx<VOCAB_SETS.length-1) go('l1',{set:setIdx+1,i:0}); else { toast('全部完成！All done! 🎉'); go('home') } };
+  mountSpeak($('#spk'),{target:w.hz, level:'L1 詞語', item:'L1-'+set.id+'-'+w.id, maxMs:7000, onDone:()=>{ const m=app.querySelectorAll('.vmini')[idx]; const sc=getProg()['L1-'+set.id+'-'+w.id]; if(m) m.querySelector('.s').textContent = sc<0?'🎙️':(starsFor(sc)||'·') }});
+  setTimeout(()=>say(w.hz),250);
+}
+
+/* ---------- LEVEL 2 ---------- */
+function viewL2(arg){
+  const pIdx=arg?.p??0, pat=PATTERNS[pIdx]; let idx=arg?.i??0;
+  const it=pat.items[idx], prog=getProg();
+  const qText=S_txt(it.q), aText=S_txt(it.a);
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🧩 句型練習 <span class="en" style="font-size:18px">Sentence Patterns</span></h2>
+    <div class="tabs">${PATTERNS.map((p,i)=>`<button class="tab ${i===pIdx?'on':''}" data-i="${i}">${esc(p.name)}</button>`).join('')}</div>
+    <div class="card">
+      <div class="row" style="align-items:flex-start;justify-content:space-between">
+        <div><div class="q">${ruby(it.q)}</div><div class="en" style="font-size:18px">${esc(it.qen)}</div></div>
+        <button class="btn btn-sky" id="lisQ">🔊 聽問題</button>
+      </div>
+      <div class="cue"><span class="e">${it.cue.e}</span><span><span class="h">${ruby(it.cue.tk)}</span><br><span class="en">${esc(it.cue.en)}</span></span></div>
+      <div class="hint">用這個句型回答 Answer with this pattern:</div>
+      <div class="frame">${ruby(it.frame)}</div>
+      <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="showA">💡 看答案 Show answer</button></div>
+      <div class="answer hidden" id="ans">${ruby(it.a)}<div class="en" style="font-size:16px">${esc(it.aen)}</div></div>
+      <div class="speak" id="spk"></div>
+      <div class="pager">
+        <button class="btn btn-ghost" id="pv">← 上一題</button>
+        <div class="dots">${pat.items.map((x,i)=>`<span class="dot ${prog['L2-'+x.id]!=null?'done':''} ${i===idx?'cur':''}"></span>`).join('')}</div>
+        <button class="btn btn-sun" id="nx">下一題 ➜</button>
+      </div>
+    </div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go('l2',{p:+b.dataset.i,i:0}));
+  $('#lisQ').onclick=()=>say(qText);
+  $('#showA').onclick=()=>{ $('#ans').classList.toggle('hidden'); if(!$('#ans').classList.contains('hidden')) say(aText) };
+  $('#pv').onclick=()=>{ if(idx>0) go('l2',{p:pIdx,i:idx-1}); else if(pIdx>0) go('l2',{p:pIdx-1,i:PATTERNS[pIdx-1].items.length-1}) };
+  $('#nx').onclick=()=>{ if(idx<pat.items.length-1) go('l2',{p:pIdx,i:idx+1}); else if(pIdx<PATTERNS.length-1) go('l2',{p:pIdx+1,i:0}); else { toast('全部完成！All done! 🎉'); go('home') } };
+  mountSpeak($('#spk'),{target:aText, level:'L2 句型', item:'L2-'+it.id, maxMs:12000, onDone:()=>{ const d=app.querySelectorAll('.dot')[idx]; d && d.classList.add('done') }});
+  setTimeout(()=>say(qText),250);
+}
+
+/* ---------- LEVEL 3: chat with 文文 ---------- */
+/* 文文的設定：最喜歡游泳、每個星期六去游泳、不太會打網球。
+   kind:'react' 的回合 = 文文分享一件事，學生練習「回應」(back-channel)。 */
+const BC_RE = /哦|喔|噢|真的|我也是|一樣|原來|是嗎|太好|好棒|厲害|對|哇|好啊/;
+const BACKCHANNEL = [W('哦','ó'),W('是喔','shì o'),W('真的嗎','zhēnde ma'),W('我也是','wǒ yě shì'),W('我跟你一樣','wǒ gēn nǐ yíyàng'),W('我跟你不一樣','wǒ gēn nǐ bù yíyàng'),W('原來如此','yuánlái rúcǐ'),W('太好了','tài hǎo le')];
+const OR = W(' / ','');
+const same = c=>c.sport.id==='youyong';
+const DIALOG = [
+  { bot:c=>[W('你好','nǐ hǎo'),C,W('我','wǒ'),W('是','shì'),W('文文','Wénwen'),C,W('你','nǐ'),W('叫','jiào'),W('什麼','shénme'),W('名字','míngzi'),Q], en:()=>"Hi, I'm Wenwen. What's your name?",
+    hint:c=>[W('我','wǒ'),W('叫','jiào'),'_',D], check:t=>/叫|是|名字/.test(t)||norm(t).length>=2,
+    reply:c=>[W('哦','ó'),C,W('你好','nǐ hǎo'),X,W('很','hěn'),W('高興','gāoxìng'),W('認識','rènshi'),W('你','nǐ'),X], ren:'Oh, hi! Nice to meet you!' },
+
+  { bot:c=>[W('你','nǐ'),W('喜歡','xǐhuan'),W('什麼','shénme'),W('運動','yùndòng'),Q], en:()=>'What sport do you like?',
+    hint:c=>[W('我','wǒ'),W('喜歡','xǐhuan'),'_',D], check:(t,c)=>{ const s=detectSport(t); if(s) c.sport=s; return /喜歡/.test(t)||!!s },
+    reply:c=> same(c)
+      ? [W('真的嗎','zhēnde ma'),Q,W('我也是','wǒ yě shì'),X,W('我','wǒ'),W('跟','gēn'),W('你','nǐ'),W('一樣','yíyàng'),C,W('也','yě'),W('喜歡','xǐhuan'),W('游泳','yóuyǒng'),X]
+      : [W('是喔','shì o'),X,W('我','wǒ'),W('跟','gēn'),W('你','nǐ'),W('不一樣','bù yíyàng'),C,W('我','wǒ'),W('喜歡','xǐhuan'),W('游泳','yóuyǒng'),D],
+    ren:c=> same(c) ? "Really? Me too! I'm the same as you — I like swimming too!" : "Oh, really? I'm different from you. I like swimming." },
+
+  { kind:'react', bot:c=>[W('我','wǒ'),W('每個星期六','měi ge xīngqīliù'),W('都','dōu'),W('去','qù'),W('游泳池','yóuyǒngchí'),W('游泳','yóuyǒng'),D], en:()=>'I go to the swimming pool every Saturday.',
+    hint:c=> same(c) ? [W('我也是','wǒ yě shì'),X,OR,W('我跟你一樣','wǒ gēn nǐ yíyàng'),X,OR,W('真的嗎','zhēnde ma'),Q] : [W('真的嗎','zhēnde ma'),Q,OR,W('是喔','shì o'),X,OR,W('我也是','wǒ yě shì'),X],
+    good:['真的','是喔','是哦','哦','喔','我也是','一樣','好棒','好厲害','很厲害','很好'],
+    bad:['太好了','原來如此','沒關係'],
+    tip:c=>[W('文文','Wénwen'),W('在','zài'),W('說','shuō'),W('她','tā'),W('常常','chángcháng'),W('做','zuò'),W('的','de'),W('事','shì'),C,W('你','nǐ'),W('可以','kěyǐ'),W('說','shuō'),W('「真的嗎？」','「zhēnde ma?」'),W('或','huò'),W('「我也是！」','「wǒ yě shì!」'),D],
+    tipEn:'Wenwen is telling you something she often does. Try "Really?" or "Me too!"',
+    reply:(c,said)=> /我也是|一樣/.test(norm(said||'')) && !/不一樣/.test(norm(said||''))
+      ? [W('哇','wa'),C,W('我們','wǒmen'),W('一樣','yíyàng'),X]
+      : [W('對啊','duì a'),X,W('游泳','yóuyǒng'),W('很','hěn'),W('好玩','hǎowán'),X],
+    ren:(c,said)=> /我也是|一樣/.test(norm(said||'')) && !/不一樣/.test(norm(said||'')) ? "Wow, we're the same!" : 'Yeah! Swimming is fun!' },
+
+  { bot:c=>[W('你','nǐ'),W('為什麼','wèishénme'),W('喜歡','xǐhuan'),st(c.sport),Q], en:c=>`Why do you like ${ing(c.sport.en)}?`,
+    hint:c=>[W('因為','yīnwèi'),st(c.sport),W('很','hěn'),'_',D], check:t=>/因為|有趣|好玩|輕鬆|簡單|有意思|喜歡/.test(t),
+    reply:c=>[W('哦','ó'),C,W('原來如此','yuánlái rúcǐ'),X], ren:'Oh, I see!' },
+
+  { bot:c=>[W('你','nǐ'),st(c.sport),W(c.sport.v[0]+'得',c.sport.v[1]+' de'),W('怎麼樣','zěnmeyàng'),Q], en:c=>`How well do you ${c.sport.en}?`,
+    hint:c=>[W('我','wǒ'),st(c.sport),W(c.sport.v[0]+'得',c.sport.v[1]+' de'),'_',W('（還不錯 / 很好 / 很厲害）','')], check:t=>/得|不錯|很好|厲害|很快|不好|普通/.test(t),
+    reply:c=>[W('真的嗎','zhēnde ma'),Q,W('你','nǐ'),W('好','hǎo'),W('厲害','lìhai'),X], ren:"Really? You're awesome!" },
+
+  { kind:'react', bot:c=>[W('我','wǒ'),W('游泳','yóuyǒng'),W('游得','yóu de'),W('很快','hěn kuài'),C,W('可是','kěshì'),W('我','wǒ'),W('打網球','dǎ wǎngqiú'),W('打得','dǎ de'),W('不好','bù hǎo'),D], en:()=>"I swim fast, but I'm not good at tennis.",
+    hint:c=>[W('真的嗎','zhēnde ma'),Q,OR,W('沒關係','méi guānxi'),X,OR,W('我跟你一樣','wǒ gēn nǐ yíyàng'),X,OR,W('我跟你不一樣','wǒ gēn nǐ bù yíyàng'),D],
+    good:['真的','是喔','是哦','哦','喔','一樣','我也是','我也不','沒關係','教你','厲害','好快','很快'],
+    bad:['太好了','原來如此'],
+    tip:c=>[W('文文','Wénwen'),W('說','shuō'),W('她','tā'),W('打網球','dǎ wǎngqiú'),W('打得','dǎ de'),W('不好','bù hǎo'),C,W('說','shuō'),W('「太好了」','「tài hǎo le」'),W('她','tā'),W('會','huì'),W('難過','nánguò'),W('喔','o'),X,W('可以','kěyǐ'),W('說','shuō'),W('「真的嗎？」','「zhēnde ma?」'),W('或','huò'),W('「沒關係！」','「méi guānxi!」'),D],
+    tipEn:'Wenwen says she is not good at tennis — "Great!" might make her sad. Try "Really?" or "That\'s OK!"',
+    reply:(c,said)=>{ const t=norm(said||'');
+      if (/沒關係|教你/.test(t)) return [W('謝謝','xièxie'),W('你','nǐ'),X,W('你','nǐ'),W('人','rén'),W('真','zhēn'),W('好','hǎo'),X];
+      if (/一樣|我也是|我也不/.test(t) && !/不一樣/.test(t)) return [W('是喔','shì o'),X,W('那','nà'),W('我們','wǒmen'),W('一起','yìqǐ'),W('練習','liànxí'),W('吧','ba'),X];
+      return [W('對啊','duì a'),C,W('我','wǒ'),W('覺得','juéde'),W('打網球','dǎ wǎngqiú'),W('有一點','yǒu yìdiǎn'),W('難','nán'),D]; },
+    ren:(c,said)=>{ const t=norm(said||''); if (/沒關係|教你/.test(t)) return "Thank you! You're so nice!"; if (/一樣|我也是|我也不/.test(t) && !/不一樣/.test(t)) return "Oh really? Then let's practice together!"; return 'Yeah, I think tennis is a little hard.'; } },
+
+  { bot:c=>[W('你','nǐ'),W('會','huì'),st(c.other),W('嗎','ma'),Q], en:c=>`Can you ${c.other.en}?`,
+    hint:c=>[W('我','wǒ'),W('會','huì'),st(c.other),D,OR,W('我','wǒ'),W('不會','bú huì'),st(c.other),D], check:(t,c)=>{ c.cant=/不會|不太會/.test(t); return /會/.test(t) },
+    reply:c=> c.cant?[W('是喔','shì o'),C,W('沒關係','méi guānxi'),X,W('我','wǒ'),W('可以','kěyǐ'),W('教','jiāo'),W('你','nǐ'),X]:[W('真的嗎','zhēnde ma'),Q,W('太棒了','tài bàng le'),X], ren:c=>c.cant?"I see. That's OK! I can teach you!":'Really? Awesome!' },
+
+  { bot:c=> same(c)
+      ? [W('我們','wǒmen'),W('一起','yìqǐ'),W('去','qù'),W('游泳','yóuyǒng'),C,W('好不好','hǎo bù hǎo'),Q]
+      : [W('我','wǒ'),W('不太會','bú tài huì'),st(c.sport),C,W('你','nǐ'),W('教','jiāo'),W('我','wǒ'),W('好不好','hǎo bù hǎo'),Q],
+    en:c=> same(c) ? "Let's go swimming together, OK?" : `I'm not very good at ${ing(c.sport.en)}. Can you teach me?`,
+    hint:c=> same(c) ? [W('好啊','hǎo a'),X,W('我們','wǒmen'),W('一起','yìqǐ'),W('去','qù'),W('游泳','yóuyǒng'),D] : [W('好啊','hǎo a'),X,W('我','wǒ'),W('教','jiāo'),W('你','nǐ'),st(c.sport),D],
+    check:t=>/好|教|可以|沒問題/.test(t),
+    reply:c=>[W('太好了','tài hǎo le'),X,W('謝謝','xièxie'),W('你','nǐ'),X], ren:'Great! Thank you!' },
+
+  { bot:c=>[W('你','nǐ'),W('每個星期','měi ge xīngqī'),W('幾','jǐ'),W('去','qù'),st(c.sport),Q], en:c=>`Which day of the week do you go ${ing(c.sport.en)}?`,
+    hint:c=>[W('每個星期','měi ge xīngqī'),'_',C,W('我','wǒ'),W('都','dōu'),W('去','qù'),st(c.sport),D], check:(t,c)=>{ c.sat=/六|週末|周末/.test(t); return /星期|禮拜|週|每天|周/.test(t) },
+    reply:c=> c.sat
+      ? [W('我也是','wǒ yě shì'),X,W('我','wǒ'),W('跟','gēn'),W('你','nǐ'),W('一樣','yíyàng'),C,W('星期六','xīngqīliù'),W('去','qù'),X]
+      : [W('是喔','shì o'),X,W('我','wǒ'),W('跟','gēn'),W('你','nǐ'),W('不一樣','bù yíyàng'),C,W('我','wǒ'),W('星期六','xīngqīliù'),W('去','qù'),D],
+    ren:c=> c.sat ? "Me too! Same as you — I go on Saturdays!" : "Oh, really? I'm different from you. I go on Saturdays." },
+
+  { kind:'react', bot:c=>[W('明天','míngtiān'),W('是','shì'),W('星期六','xīngqīliù'),C,W('我','wǒ'),W('哥哥','gēge'),W('也','yě'),W('要','yào'),W('跟','gēn'),W('我們','wǒmen'),W('一起','yìqǐ'),W('去','qù'),D], en:()=>'Tomorrow is Saturday. My older brother is coming with us too.',
+    hint:c=>[W('真的嗎','zhēnde ma'),Q,W('太好了','tài hǎo le'),X,OR,W('是喔','shì o'),X],
+    good:['太好了','太棒','好棒','好耶','真的','是喔','是哦','哦','喔','好啊'],
+    bad:['原來如此','不一樣','沒關係'],
+    tip:c=>[W('這','zhè'),W('是','shì'),W('好消息','hǎo xiāoxi'),X,W('可以','kěyǐ'),W('說','shuō'),W('「太好了！」','「tài hǎo le!」'),W('或','huò'),W('「真的嗎？」','「zhēnde ma?」'),D],
+    tipEn:'This is good news! Try "Great!" or "Really?"',
+    reply:c=>[W('對啊','duì a'),X,W('他','tā'),W('很','hěn'),W('會','huì'),W('游泳','yóuyǒng'),D], ren:"Yeah! He's a great swimmer." },
+
+  { bot:c=>[W('我們','wǒmen'),W('上午','shàngwǔ'),W('九點','jiǔ diǎn'),W('在','zài'),W('學校','xuéxiào'),W('見','jiàn'),C,W('好不好','hǎo bù hǎo'),Q], en:()=>"Let's meet at school at 9 a.m., OK?",
+    hint:c=>[W('好','hǎo'),C,W('明天','míngtiān'),W('見','jiàn'),X], check:t=>/好|見|可以/.test(t),
+    reply:c=>[W('太好了','tài hǎo le'),X,W('明天','míngtiān'),W('見','jiàn'),X], ren:'Great! See you tomorrow!' }
+];
+/** 回應判斷：'good' 恰當、'bad' 不恰當、'none' 沒說到回應語 */
+function judgeReact(t, said){
+  const all=(t.good||[]).concat(t.bad||[]).join('');
+  const s=norm(fixHomo(said, all));
+  if (!s) return 'none';
+  if ((t.bad||[]).some(w=>s.includes(norm(w)))) return 'bad';
+  if ((t.good||[]).some(w=>s.includes(norm(w)))) return 'good';
+  return 'none';
+}
+function viewL3(){
+  const ctx={sport:SP.youyong, other:SP.wangqiu, step:0};
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">💬 和文文聊天 <span class="en" style="font-size:18px">Chat with Wenwen</span></h2>
+    <div class="hint" style="margin:4px 0 12px">文文問你問題，按 🎤 用中文回答。 <span class="en">Wenwen asks; tap 🎤 and answer in Chinese.</span></div>
+    <div class="card">
+      <div class="chat" id="chat"></div>
+      <div class="chatbar">
+        <div class="hintbox" id="hb"></div>
+        <div style="text-align:center"><button class="mic" id="mic">🎤</button></div>
+      </div>
+      <div class="bcbank" id="bcb"><span class="lbl">💬 回應小幫手 Responses（點一下聽聽看）:</span>${BACKCHANNEL.map(t=>`<button class="bc" data-t="${esc(t[0])}">${ruby([t])}</button>`).join('')}</div>
+      <div class="row" style="margin-top:12px;justify-content:space-between">
+        <span class="hint" id="cst"></span>
+        <span class="row"><button class="btn btn-ghost" id="rep">🔊 再聽一次</button><button class="btn btn-ghost" id="skip">跳過 Skip ➜</button></span>
+      </div>
+    </div>`;
+  $('#bk').onclick=()=>go('home');
+  const chat=$('#chat');
+  function add(who, tk, en){
+    const d=document.createElement('div');
+    d.className='msg '+(who==='me'?'me':who==='sys'?'sys':'');
+    d.innerHTML=`<div class="av">${who==='me'?'🙋':who==='sys'?'💡':'👧'}</div><div class="b">${tk}${en?`<span class="en">${esc(en)}</span>`:''}</div>`;
+    chat.appendChild(d); chat.scrollTop=chat.scrollHeight; return d;
+  }
+  const val=(f)=>typeof f==='function'?f(ctx):f;
+  function ask(){
+    const t=DIALOG[ctx.step];
+    if(!t){ finish(); return; }
+    if(ctx.sport.id==='wangqiu') ctx.other=SP.youyong; else if(ctx.sport.id==='youyong') ctx.other=SP.wangqiu; else ctx.other=SP.youyong;
+    const tk=t.bot(ctx);
+    add('bot', ruby(tk), val(t.en));
+    $('#hb').innerHTML = t.kind==='react'
+      ? `<span class="lbl">💬 回應文文！ Respond to Wenwen:</span>${ruby(t.hint(ctx))}`
+      : `<span class="lbl">💡 你可以說 You can say:</span>${ruby(t.hint(ctx))}`;
+    $('#bcb').classList.toggle('hl', t.kind==='react');
+    $('#cst').textContent=`第 ${ctx.step+1} / ${DIALOG.length} 題`;
+    say(S_txt(tk));
+  }
+  function finish(){
+    $('#hb').innerHTML='🎉 聊完了！你好棒！ <span class="en">Great chat!</span>';
+    $('#mic').disabled=true; $('#mic').style.opacity=.4; $('#skip').classList.add('hidden');
+    add('sys','對話完成！可以回首頁，或再聊一次。','Done! Go home or chat again.');
+    const again=document.createElement('button'); again.className='btn btn-sun'; again.textContent='🔁 再聊一次 Again'; again.onclick=()=>go('l3'); $('#cst').replaceWith(again);
+  }
+  $('#rep').onclick=()=>{ const t=DIALOG[ctx.step]; if(t) say(S_txt(t.bot(ctx))) };
+  app.querySelectorAll('.bc').forEach(b=>b.onclick=()=>say(b.dataset.t));
+  $('#skip').onclick=()=>{ stopAll(); ctx.step++; ask() };
+  let busy=false, live=null;
+  $('#mic').onclick=async()=>{
+    if(busy){ current && current(); return; }
+    const t=DIALOG[ctx.step]; if(!t) return;
+    busy=true; $('#mic').classList.add('rec'); $('#mic').textContent='⏹';
+    live=add('me','…');
+    let res;
+    try{ res=await listen({maxMs:10000, onInterim:x=>{ live.querySelector('.b').textContent=x }}) }
+    catch(e){ busy=false; $('#mic').classList.remove('rec'); $('#mic').textContent='🎤'; live.querySelector('.b').innerHTML='🎙️ 請允許麥克風 <span class="en">Please allow the microphone.</span>'; return; }
+    busy=false; $('#mic').classList.remove('rec'); $('#mic').textContent='🎤';
+    const said=res.transcript;
+    live.querySelector('.b').textContent = said || (res.srOk?'（沒有聽到）':'（已錄音 recorded）');
+    const qText=S_txt(t.bot(ctx)), hintText=S_txt(t.hint(ctx).filter(x=>x!=='_'));
+    let ok, sc, verdict='';
+    if(!res.srOk){ ok=true; sc=null; }
+    else if (t.kind==='react'){ verdict = said ? judgeReact(t, said) : 'none'; ok = verdict==='good'; sc = ok?100 : verdict==='bad'?50 : (said?40:0); }
+    else { ok = !!said && t.check(said, ctx); sc = ok ? 100 : (said?40:0); }
+    saveAttempt({level:'L3 對話', item:'L3-'+ctx.step, target:'文文：'+qText+' ｜'+(t.kind==='react'?'回應':'提示')+'：'+hintText+(verdict==='bad'?' ｜⚠️回應不恰當':''), transcript:said, score:sc, blob:res.blob, mime:res.mime, diag:res.diag});
+    if(ok){
+      const r=t.reply(ctx, said); add('bot', ruby(r), typeof t.ren==='function'?t.ren(ctx, said):t.ren);
+      await say(S_txt(r));
+      ctx.step++; ask();
+    } else if (verdict==='bad'){
+      const r=[W('嗯','ǹg'),W('……','……'),W('這裡','zhèlǐ'),W('這樣','zhèyàng'),W('說','shuō'),W('有一點','yǒu yìdiǎn'),W('奇怪','qíguài'),W('喔','o'),D];
+      add('bot', ruby(r), 'Hmm… that sounds a little strange here.');
+      add('sys', ruby(t.tip(ctx)), t.tipEn);
+      await say(S_txt(r));
+    } else if (t.kind==='react' && said){
+      const r=[W('你','nǐ'),W('可以','kěyǐ'),W('用','yòng'),W('「回應小幫手」','「huíyìng xiǎo bāngshǒu」'),W('的','de'),W('話','huà'),W('回應','huíyìng'),W('我','wǒ'),W('喔','o'),X];
+      add('bot', ruby(r), 'You can use a phrase from the Responses helper!');
+      say(S_txt(r));
+    } else {
+      const r=[W('我','wǒ'),W('聽不清楚','tīng bù qīngchu'),C,W('請','qǐng'),W('再','zài'),W('說','shuō'),W('一次','yí cì'),D];
+      add('bot', ruby(r), "I didn't catch that. Please say it again.");
+      say(S_txt(r));
+    }
+  };
+  ask();
+}
+
+/* ---------- LEVEL 4: free talk ---------- */
+function viewL4(arg){
+  const tIdx=arg?.t??0, topic=TOPICS[tIdx];
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🎤 我來說一說 <span class="en" style="font-size:18px">My Short Talk</span></h2>
+    <div class="tabs">${TOPICS.map((t,i)=>`<button class="tab ${i===tIdx?'on':''}" data-i="${i}">${t.e} ${esc(t.name)}</button>`).join('')}</div>
+    <div class="card">
+      <div class="hint">試著用下面的句子說一段話（至少 4 句）。說的時候，用到的句型會打勾 ✅。 <span class="en">Use these sentences to give a talk (4+ sentences). Patterns you use get a ✅.</span></div>
+      <div class="frames" id="frs" style="margin-top:12px">${topic.frames.map((f,i)=>`<div class="fr" data-i="${i}"><span class="ck">⬜</span><div>${ruby(f.tk)}<span class="en">${esc(f.en)}</span></div></div>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="btn btn-sky" id="lis">🔊 聽範例 Listen to frames</button><span class="timer" id="tm"></span></div>
+      <div class="speak" id="spk"></div>
+    </div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go('l4',{t:+b.dataset.i}));
+  $('#lis').onclick=()=>say(topic.frames.map(f=>S_txt(f.tk.filter(x=>x!=='_'))).join(''));
+  const tick=t=>{ const n=norm(t); let k=0; topic.frames.forEach((f,i)=>{ const ok=f.re.test(n); if(ok)k++; const el=app.querySelectorAll('.fr')[i]; el.classList.toggle('ok',ok); el.querySelector('.ck').textContent=ok?'✅':'⬜' }); return k };
+  let tmT=null, start=0;
+  const spk=mountSpeak($('#spk'),{level:'L4 說一說', item:'L4-'+topic.id, target:topic.name, continuous:true, maxMs:90000,
+    onInterim:t=>tick(t),
+    score:t=>{ const k=tick(t); const len=[...norm(t)].length; return Math.min(100, Math.round(k/topic.frames.length*80 + Math.min(20, len/3))) },
+    onDone:()=>{ clearInterval(tmT); $('#tm').textContent='' }});
+  spk.querySelector('.mic').addEventListener('click',()=>{ if(!tmT || !$('#tm').textContent){ start=Date.now(); clearInterval(tmT); tmT=setInterval(()=>{ const s=Math.floor((Date.now()-start)/1000); $('#tm').textContent=`⏱ ${s}s / 90s`; if(s>=90) clearInterval(tmT) },500) } },true);
+}
+
+/* ---------- LEVEL 5: 進階挑戰 ---------- */
+function l5Ids(){ return L5.flatMap(u=>u.qs.map((_,i)=>'L5-'+u.id+'-q'+(i+1))) }
+function viewL5(arg){
+  const uIdx=arg?.u??0, u=L5[uIdx], step=arg?.s??'words';
+  const prog=getProg();
+  const stepBtn=(id,label)=>`<button class="tab ${step===id?'on':''}" data-s="${id}">${label}</button>`;
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🚀 進階挑戰 <span class="en" style="font-size:18px">Challenge: Read, Think & Speak</span></h2>
+    <div class="tabs">${L5.map((x,i)=>{const done=x.qs.filter((_,j)=>prog['L5-'+x.id+'-q'+(j+1)]!=null).length;return `<button class="tab ${i===uIdx?'on':''}" data-u="${i}">${x.e} ${esc(x.name)} <span class="hint" style="color:inherit;opacity:.75">${done}/${x.qs.length}</span></button>`}).join('')}</div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div><span class="pill p-mid">${esc(u.kind)}</span> <b style="font-size:22px">${esc(u.name)}</b> <span class="en">${esc(u.en)}</span></div>
+      </div>
+      <div class="tabs steps" style="margin-top:12px">${stepBtn('words','① 新詞語 New words')}${stepBtn('read','② 閱讀 Read')}${stepBtn('qs','③ 回答問題 Answer')}</div>
+      <div id="l5body"></div>
+    </div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>go('l5',{u:+b.dataset.u,s:step==='qs'?'qs':step}));
+  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>go('l5',{u:uIdx,s:b.dataset.s}));
+  const body=$('#l5body');
+  const passageHTML=(withMic)=>u.paras.map((p,i)=> u.dialog
+      ? `<div class="msg ${p.who===u.paras[0].who?'':'me'}" style="max-width:100%"><div class="av">${p.av}</div><div class="b" style="font-size:22px"><span class="hint" style="display:block;font-size:13px;line-height:1.2">${i+1}. ${esc(p.who)}</span>${ruby(p.tk)}<span class="en">${esc(p.en)}</span>
+          ${withMic?`<div class="row" style="margin-top:6px"><button class="playme" data-say="${i}">🔊 聽</button><button class="playme" data-read="${i}">🎤 朗讀這句 Read aloud</button></div><div class="rd" id="rd${i}"></div>`:''}</div></div>`
+      : `<div class="para"><span class="pnum">${i+1}</span><div style="flex:1"><div class="ptxt">${ruby(p.tk)}</div><div class="en">${esc(p.en)}</div>
+          ${withMic?`<div class="row" style="margin-top:6px"><button class="playme" data-say="${i}">🔊 聽這段</button><button class="playme" data-read="${i}">🎤 朗讀這段 Read aloud</button></div><div class="rd" id="rd${i}"></div>`:''}</div></div>`).join('');
+
+  if (step==='words'){
+    let wi=arg?.w??0; const w=u.words[wi];
+    body.innerHTML = `
+      <div class="hint" style="margin-bottom:10px">先認識這篇的新詞語。點一張卡片聽一聽、說一說。 <span class="en">Learn the new words first.</span></div>
+      <div class="vgrid">${u.words.map((x,i)=>{const sc=prog['L5-'+u.id+'-w'+i];return `<button class="vmini ${i===wi?'on':''}" data-w="${i}"><div class="e">${x[3]}</div><div class="h">${esc(x[0])}</div><div class="s">${sc==null?'':sc<0?'🎙️':starsFor(sc)||'·'}</div></button>`}).join('')}</div>
+      <div class="focus" style="grid-template-columns:150px 1fr">
+        <div class="pic" style="font-size:80px">${w[3]}</div>
+        <div><div class="word" style="font-size:52px">${ruby([W(w[0],w[1])])}</div><div class="en">${esc(w[2])}</div>
+          <div class="row" style="margin-top:10px"><button class="btn btn-sky" id="lis">🔊 聽 Listen</button><button class="btn btn-ghost" id="nx">${wi<u.words.length-1?'下一個 Next ➜':'開始閱讀 Read ➜'}</button></div></div>
+      </div>
+      <div class="speak" id="spk"></div>`;
+    body.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>go('l5',{u:uIdx,s:'words',w:+b.dataset.w}));
+    $('#lis').onclick=()=>say(w[0].replace('…',''));
+    $('#nx').onclick=()=> wi<u.words.length-1 ? go('l5',{u:uIdx,s:'words',w:wi+1}) : go('l5',{u:uIdx,s:'read'});
+    mountSpeak($('#spk'),{target:w[0].replace('…',''), level:'L5 進階詞語', item:'L5-'+u.id+'-w'+wi, maxMs:7000, onDone:()=>{ const m=body.querySelectorAll('.vmini')[wi]; const sc=getProg()['L5-'+u.id+'-w'+wi]; if(m) m.querySelector('.s').textContent=sc<0?'🎙️':(starsFor(sc)||'·') }});
+    setTimeout(()=>say(w[0].replace('…','')),250);
+    return;
+  }
+
+  if (step==='read'){
+    body.innerHTML = `
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <span class="hint">先聽一次，再自己大聲朗讀每一段。 <span class="en">Listen first, then read each part aloud.</span></span>
+        <span class="row"><button class="btn btn-sky" id="all">🔊 聽全文 Listen to all</button><button class="btn btn-sun" id="toQ">回答問題 ➜</button></span>
+      </div>
+      <div class="${u.dialog?'chat':'passage'}" style="${u.dialog?'max-height:none':''}">${passageHTML(true)}</div>`;
+    $('#all').onclick=async()=>{ const btn=$('#all'); for(const p of u.paras){ if(!document.body.contains(btn)) break; await say(S_txt(p.tk)); } };
+    $('#toQ').onclick=()=>go('l5',{u:uIdx,s:'qs'});
+    body.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>say(S_txt(u.paras[+b.dataset.say].tk)));
+    body.querySelectorAll('[data-read]').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.read; body.querySelectorAll('.rd').forEach(x=>{ if(x.id!=='rd'+i) x.innerHTML='' });
+      mountSpeak($('#rd'+i),{target:S_txt(u.paras[i].tk), level:'L5 朗讀', item:'L5-'+u.id+'-p'+(i+1), continuous:true, maxMs:60000});
+    });
+    return;
+  }
+
+  // questions
+  let qi=arg?.q??0; const q=u.qs[qi], T=QTYPE[q.type], qid='L5-'+u.id+'-q'+(qi+1);
+  body.innerHTML = `
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><span class="qt ${T.cls}">${T.label} <span class="en" style="color:inherit">${T.en}</span></span>
+        <div class="q" style="margin-top:6px">${ruby(q.q)}</div><div class="en" style="font-size:18px">${esc(q.en)}</div>
+        ${q.p?`<div class="hint" style="margin-top:4px">📍 提示：看第 ${q.p} ${u.dialog?'句':'段'}。 <span class="en">Look at ${u.dialog?'line':'paragraph'} ${q.p}.</span></div>`:'<div class="hint" style="margin-top:4px">💭 用你自己的話回答，至少說一個完整的句子。 <span class="en">Answer in your own words — at least one full sentence.</span></div>'}
+      </div>
+      <button class="btn btn-sky" id="lisQ">🔊 聽問題</button>
+    </div>
+    <details class="peek"><summary>📖 再看一次文章 Look at the text again</summary><div class="${u.dialog?'chat':'passage'}" style="${u.dialog?'max-height:none':''};margin-top:10px">${passageHTML(false)}</div></details>
+    <div class="speak" id="spk"></div>
+    <div class="row" style="margin-top:8px"><button class="btn btn-ghost hidden" id="showA">💡 看參考答案 Model answer</button></div>
+    <div class="answer hidden" id="ans">${ruby(q.model)}</div>
+    <div class="pager">
+      <button class="btn btn-ghost" id="pv">← 上一題</button>
+      <div class="dots">${u.qs.map((x,i)=>`<span class="dot ${prog['L5-'+u.id+'-q'+(i+1)]!=null?'done':''} ${i===qi?'cur':''}"></span>`).join('')}</div>
+      <button class="btn btn-sun" id="nx">下一題 ➜</button>
+    </div>`;
+  const qText=S_txt(q.q), mText=S_txt(q.model);
+  $('#lisQ').onclick=()=>say(qText);
+  $('#showA').onclick=()=>{ $('#ans').classList.toggle('hidden'); if(!$('#ans').classList.contains('hidden')) say(mText) };
+  $('#pv').onclick=()=>{ if(qi>0) go('l5',{u:uIdx,s:'qs',q:qi-1}) };
+  $('#nx').onclick=()=>{ if(qi<u.qs.length-1) go('l5',{u:uIdx,s:'qs',q:qi+1}); else if(uIdx<L5.length-1){ toast('這一篇完成了！Next story 🎉'); go('l5',{u:uIdx+1,s:'words'}) } else { toast('進階挑戰全部完成！🏆'); go('home') } };
+  if (prog[qid]!=null) $('#showA').classList.remove('hidden');
+  mountSpeak($('#spk'),{target:'問題：'+qText+' ｜參考：'+mText, level:'L5 進階問答', item:qid, maxMs:20000, continuous:true,
+    score:t=>scoreQ(q,t),
+    onDone:(sc)=>{
+      $('#showA').classList.remove('hidden');
+      const d=body.querySelectorAll('.dot')[qi]; d && d.classList.add('done');
+      const r=$('#spk').querySelector('.result');
+      if (sc!=null && sc<100 && r){
+        const tip = q.type==='you' ? '試著多說一點，用「因為…」說出理由。 <span class="en">Say more and give a reason with 因為.</span>'
+                  : q.p ? `再讀一次第 ${q.p} ${u.dialog?'句':'段'}，找一找重點。 <span class="en">Re-read and find the key idea.</span>` : '';
+        if (tip) r.insertAdjacentHTML('beforeend', `<div class="hint" style="margin-top:4px">👉 ${tip}</div>`);
+      }
+    }});
+  setTimeout(()=>say(qText),250);
+}
+
+/* ---------- TEACHER ---------- */
+function viewPin(){
+  app.innerHTML = `
+  <div class="card login">
+    <div class="big">🧑‍🏫</div><h1>老師後台</h1><div class="en">Teacher dashboard</div>
+    <form id="f"><label>密碼 PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="off" required>
+    <div style="margin-top:18px" class="row"><button type="button" class="btn btn-ghost" id="cx">取消</button><button class="btn btn-sun" style="flex:1">進入 Enter</button></div></form>
+  </div>`;
+  $('#cx').onclick=()=>go(state.user?'home':'login');
+  $('#f').onsubmit=e=>{ e.preventDefault(); if($('#pin').value===CONFIG.TEACHER_PIN) go('teacher'); else toast('密碼錯誤 Wrong PIN') };
+  setTimeout(()=>$('#pin')?.focus(),50);
+}
+/* ============================================================
+   LEVEL 6：對話工作坊 — 兩人一組，用句型方塊組對話，再輪流說出來
+   ============================================================ */
+const BCAT = {
+  G:{zh:'打招呼', en:'Greet',   cls:'bc-g', e:'👋'},
+  Q:{zh:'問',     en:'Ask',     cls:'bc-q', e:'❓'},
+  A:{zh:'答',     en:'Answer',  cls:'bc-a', e:'💬'},
+  R:{zh:'說理由', en:'Reason',  cls:'bc-r', e:'💡'},
+  E:{zh:'回應',   en:'Respond', cls:'bc-e', e:'😮'},
+  I:{zh:'邀請／約時間', en:'Invite', cls:'bc-i', e:'🤝'}
+};
+/* {S}=運動詞語  {SV}=動詞＋得  {N}=說話的人的名字；k=進階模式的關鍵字（檢查用） */
+const BLOCKS = [
+  ['G1','G','你好|nǐ_hǎo ！',['你好'],'Hello!'],
+  ['G2','G','你|nǐ 叫|jiào 什麼|shén_me 名字|míng_zi ？',['名字'],"What's your name?"],
+  ['G3','G','我|wǒ 叫|jiào {N} 。',['叫'],'My name is …'],
+  ['G4','G','很|hěn 高興|gāo_xìng 認識|rèn_shi 你|nǐ ！',['認識'],'Nice to meet you!'],
+  ['Q1','Q','你|nǐ 喜歡|xǐ_huan 什麼|shén_me 運動|yùn_dòng ？',['喜歡','運動'],'What sport do you like?'],
+  ['Q2','Q','你|nǐ 會不會|huì_bú_huì {S} ？',['會'],'Can you …?'],
+  ['Q3','Q','你|nǐ {S} {SV} 怎麼樣|zěn_me_yàng ？',['得','怎麼樣'],'How well do you …?'],
+  ['Q4','Q','你|nǐ 為什麼|wèi_shén_me 喜歡|xǐ_huan {S} ？',['為什麼'],'Why do you like …?'],
+  ['Q5','Q','你|nǐ 覺得|jué_de {S} 怎麼樣|zěn_me_yàng ？',['覺得','怎麼樣'],'What do you think of …?'],
+  ['Q6','Q','你|nǐ 每個星期|měi_ge_xīng_qī 幾|jǐ 去|qù {S} ？',['星期幾'],'Which day do you go …?'],
+  ['A1','A','我|wǒ 喜歡|xǐ_huan {S} 。',['喜歡'],'I like …'],
+  ['A2','A','我|wǒ 很|hěn 會|huì {S} 。',['會'],"I'm good at …"],
+  ['A3','A','我|wǒ 不太會|bú_tài_huì {S} 。',['不太會'],"I'm not very good at …"],
+  ['A4','A','我|wǒ {S} {SV} 很好|hěn_hǎo 。',['得'],'I … very well.'],
+  ['A5','A','我|wǒ {S} {SV} 還不錯|hái_bú_cuò 。',['得','不錯'],'I … pretty well.'],
+  ['A6','A','我|wǒ 每個星期六|měi_ge_xīng_qī_liù 都|dōu 去|qù {S} 。',['每個星期'],'I go … every Saturday.'],
+  ['A7','A','我|wǒ 覺得|jué_de {S} 很|hěn 有趣|yǒu_qù 。',['覺得'],'I think … is fun.'],
+  ['R1','R','因為|yīn_wèi {S} 很|hěn 有趣|yǒu_qù 。',['因為'],'Because … is fun.'],
+  ['R2','R','因為|yīn_wèi {S} 很|hěn 輕鬆|qīng_sōng 。',['因為'],'Because … is relaxing.'],
+  ['R3','R','可是|kě_shì 我|wǒ 覺得|jué_de {S} 有一點|yǒu_yì_diǎn 難|nán 。',['可是'],'But I think … is a little hard.'],
+  ['R4','R','而且|ér_qiě {S} 對|duì 身體|shēn_tǐ 很|hěn 好|hǎo 。',['而且'],"And … is good for your body."],
+  ['E1','E','真的嗎|zhēn_de_ma ？',['真的'],'Really?'],
+  ['E2','E','是喔|shì_o ！',['是喔'],'Oh, I see!'],
+  ['E3','E','我也是|wǒ_yě_shì ！',['我也是'],'Me too!'],
+  ['E4','E','我|wǒ 跟|gēn 你|nǐ 一樣|yí_yàng ！',['一樣'],"I'm the same as you!"],
+  ['E5','E','我|wǒ 跟|gēn 你|nǐ 不一樣|bù_yí_yàng 。',['不一樣'],"I'm different from you."],
+  ['E6','E','原來如此|yuán_lái_rú_cǐ ！',['原來'],'I see! / So that’s why.'],
+  ['E7','E','沒關係|méi_guān_xi ！',['沒關係'],"That's OK!"],
+  ['E8','E','哇|wa ， 你|nǐ 好|hǎo 厲害|lì_hai ！',['厲害'],"Wow, you're awesome!"],
+  ['I1','I','我們|wǒ_men 一起|yì_qǐ 去|qù {S} ， 好不好|hǎo_bù_hǎo ？',['一起'],"Let's go … together, OK?"],
+  ['I2','I','你|nǐ 教|jiāo 我|wǒ {S} ， 好不好|hǎo_bù_hǎo ？',['教'],'Can you teach me …?'],
+  ['I3','I','好啊|hǎo_a ！ 我|wǒ 教|jiāo 你|nǐ ！',['教'],"Sure! I'll teach you!"],
+  ['I4','I','好啊|hǎo_a ！',['好'],'Sure!'],
+  ['I5','I','不好意思|bù_hǎo_yì_si ， 我|wǒ 不能|bù_néng 去|qù 。',['不好意思'],"Sorry, I can't go."],
+  ['I6','I','明天|míng_tiān 下午|xià_wǔ 三點|sān_diǎn 在|zài 學校|xué_xiào 見|jiàn ， 好嗎|hǎo_ma ？',['明天','見'],"See you at school tomorrow at 3 p.m., OK?"],
+  ['I7','I','好|hǎo ， 明天見|míng_tiān_jiàn ！',['明天見'],'OK, see you tomorrow!']
+].map(([id,cat,str,k,en])=>({id,cat,tk:P(str),k,en,hasS:/\{S/.test(str),hasN:/\{N\}/.test(str)}));
+const BLK = Object.fromEntries(BLOCKS.map(b=>[b.id,b]));
+
+const TIERS = {
+  beg:{zh:'初階', en:'Beginner', desc:'照著「對話地圖」，每一格選一個方塊。', descEn:'Follow the dialogue map.'},
+  mid:{zh:'中階', en:'Intermediate', desc:'自己組合對話，完成檢查清單。', descEn:'Build your own dialogue.'},
+  adv:{zh:'進階', en:'Advanced', desc:'方塊只有關鍵字，要自己說出完整的句子。', descEn:'Only keywords — say full sentences yourself.'}
+};
+const BEG_MAP = [['A','G','打招呼','Greet'],['B','G','打招呼','Greet'],['A','Q','問問題','Ask'],['B','A','回答','Answer'],['A','E','回應','Respond'],['A','Q','再問一個問題（為什麼？）','Ask more (why?)'],['B','R','說理由','Give a reason'],['A','I','邀請','Invite'],['B','I','答應或約時間','Accept / set a time']];
+const CHECKS = {
+  mid:[['lines',8,'至少 8 句','At least 8 lines'],['both',1,'A 和 B 都有說','Both of you speak'],['Q',2,'至少 2 個問句','At least 2 questions'],['R',1,'至少 1 個理由','At least 1 reason'],['E',2,'至少 2 個回應','At least 2 responses'],['I',1,'有邀請或約時間','Invite or set a time']],
+  adv:[['lines',10,'至少 10 句','At least 10 lines'],['both',1,'A 和 B 都有說','Both of you speak'],['Q',3,'至少 3 個問句','At least 3 questions'],['R',2,'至少 2 個理由','At least 2 reasons'],['E',3,'至少 3 個回應','At least 3 responses'],['I',1,'有邀請或約時間','Invite or set a time']]
+};
+
+/** 把方塊變成這一句的 tokens（填入運動、名字） */
+function lineTokens(line, names){
+  const b=BLK[line.b], s=SP[line.s]||SP.lanqiu;
+  return b.tk.flatMap(t=>{
+    if (t[0]==='{S}') return [st(s)];
+    if (t[0]==='{SV}') return [W(s.v[0]+'得', s.v[1]+' de')];
+    if (t[0]==='{N}') return [W(names[line.who]||'＿＿','')];
+    return [t];
+  });
+}
+const lineText = (line,names)=>S_txt(lineTokens(line,names));
+function lineKeys(line){ const b=BLK[line.b]; return b.k.concat(b.hasS? [ (SP[line.s]||SP.lanqiu).kw[0] ] : []); }
+function scoreKeys(line, said){
+  const t=norm(fixHomo(said, lineKeys(line).join('')+(SP[line.s]?.hz||''))); if(!t) return 0;
+  const ks=lineKeys(line), hit=ks.filter(k=>t.includes(norm(k))).length;
+  let sc=Math.round(100*hit/ks.length); const model=[...norm(lineText(line,{A:'',B:''}))].length; if([...t].length < Math.min(3, model*0.6)) sc=Math.min(sc,50); return sc;
+}
+
+function l6Key(){ return 'sp_l6_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+function l6State(){
+  const d=store.get(l6Key(),null);
+  return Object.assign({tier:'beg', partner:'', topic:'lanqiu', lines:{beg:[],mid:[],adv:[]}, swap:false, cat:'G', nextWho:'A'}, d||{});
+}
+function l6Save(S){ store.set(l6Key(), S); }
+
+function viewL6(){
+  const S=l6State();
+  if (!S.lines.beg.length) S.lines.beg = BEG_MAP.map(([who])=>({who, b:null, s:S.topic}));
+  const names = ()=> S.swap ? {A:S.partner||'B', B:state.user.name} : {A:state.user.name, B:S.partner||'B'};
+  const tier=S.tier, T=TIERS[tier], adv=tier==='adv';
+  const L = S.lines[tier];
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🧱 對話工作坊 <span class="en" style="font-size:18px">Dialogue Workshop (pairs)</span></h2>
+    <div class="card" style="padding:14px 18px;margin-top:8px">
+      <div class="row" style="gap:16px">
+        <span class="who-a">A：${esc(names().A)}</span>
+        <span class="who-b">B：<input id="pn" value="${esc(S.partner)}" maxlength="20" placeholder="同伴的名字 Partner" ${S.swap?'disabled':''}></span>
+        <button class="btn btn-ghost" id="swp" style="padding:8px 12px;font-size:15px">🔄 交換角色 Swap A/B</button>
+        <span class="row" style="margin-left:auto">${Object.entries(TIERS).map(([k,v])=>`<button class="tab ${k===tier?'on':''}" data-tier="${k}">${v.zh} ${v.en}</button>`).join('')}</span>
+      </div>
+      <div class="hint" style="margin-top:6px">${esc(T.desc)} <span class="en">${esc(T.descEn)}</span>
+        　話題運動 Topic：<select id="tp">${SPORTS.map(s=>`<option value="${s.id}" ${s.id===S.topic?'selected':''}>${s.e} ${s.hz}</option>`).join('')}</select></div>
+    </div>
+    <div class="l6grid">
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h3 class="dh" style="margin:0">📝 我們的對話 Our dialogue</h3>
+          <span class="row"><button class="btn btn-sky" id="playAll" style="padding:8px 14px;font-size:15px">▶️ 播放全部</button></span></div>
+        <div id="dlg" class="dlg"></div>
+        ${tier!=='beg'?`<div class="row" style="margin-top:8px"><span class="hint">下一句是 Next line:</span><button class="tab ${S.nextWho==='A'?'on':''}" data-nw="A">A</button><button class="tab ${S.nextWho==='B'?'on':''}" data-nw="B">B</button><button class="btn btn-ghost" id="clr" style="padding:6px 12px;font-size:14px;margin-left:auto">🗑️ 清除 Clear</button></div>`:''}
+        <div id="chk" style="margin-top:10px"></div>
+        <button class="btn btn-sun" id="go" style="width:100%;margin-top:12px;font-size:20px">🎙️ 開始說對話 Start speaking ➜</button>
+      </div>
+      <div class="card">
+        <h3 class="dh">🧱 句型方塊 Sentence blocks <span class="hint">點一下加入對話，🔊 先聽</span></h3>
+        <div class="tabs">${Object.entries(BCAT).map(([k,c])=>`<button class="tab cat ${c.cls} ${S.cat===k?'on':''}" data-cat="${k}">${c.e} ${c.zh}</button>`).join('')}</div>
+        <div id="bank" class="bank"></div>
+      </div>
+    </div>
+    <div id="pick" class="modal hidden"></div>`;
+  $('#bk').onclick=()=>go('home');
+  $('#pn') && ($('#pn').oninput=()=>{ S.partner=cleanName($('#pn').value); l6Save(S); renderDlg(); });
+  $('#swp').onclick=()=>{ if(!S.partner){ toast('先輸入同伴的名字 Enter partner name'); return; } S.swap=!S.swap; l6Save(S); viewL6(); };
+  app.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{ S.tier=b.dataset.tier; l6Save(S); viewL6(); });
+  $('#tp').onchange=()=>{ const old=S.topic; S.topic=$('#tp').value; Object.values(S.lines).forEach(ls=>ls.forEach(l=>{ if(l.s===old) l.s=S.topic })); l6Save(S); renderDlg(); renderBank(); };
+  app.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ S.cat=b.dataset.cat; l6Save(S); app.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on',x===b)); renderBank(); });
+  app.querySelectorAll('[data-nw]').forEach(b=>b.onclick=()=>{ S.nextWho=b.dataset.nw; l6Save(S); app.querySelectorAll('[data-nw]').forEach(x=>x.classList.toggle('on',x===b)); });
+  $('#clr') && ($('#clr').onclick=()=>{ S.lines[tier]=[]; S.nextWho='A'; l6Save(S); viewL6(); });
+  $('#playAll').onclick=async()=>{ const btn=$('#playAll'); for(const l of S.lines[tier].filter(l=>l.b)){ if(!document.body.contains(btn)) break; await say(lineText(l,names())); } };
+  $('#go').onclick=()=>{
+    const ls=S.lines[tier].filter(l=>l.b);
+    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn')?.focus(); return; }
+    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')); return; }
+    practiceL6(S, ls, names());
+  };
+
+  let focusSlot = tier==='beg' ? L.findIndex(l=>!l.b) : -1;
+  function blockLabel(b, line){
+    if (adv){ const s=SP[line?.s||S.topic]; return `<span class="kwonly">${b.k.map(esc).join(' … ')}${b.hasS?` <span class="hint">${s.e}${esc(s.hz)}</span>`:''}</span>`; }
+    return ruby(line? lineTokens(line,names()) : lineTokens({b:b.id,s:S.topic,who:S.nextWho},names()));
+  }
+  function renderBank(){
+    let cats=[S.cat];
+    if (tier==='beg' && focusSlot>=0){ cats=[BEG_MAP[focusSlot][1]]; }
+    const list=BLOCKS.filter(b=>cats.includes(b.cat));
+    $('#bank').innerHTML = (tier==='beg'&&focusSlot>=0?`<div class="hint" style="margin-bottom:6px">👉 第 ${focusSlot+1} 句：${esc(BEG_MAP[focusSlot][0])} ${esc(BEG_MAP[focusSlot][2])} <span class="en">${esc(BEG_MAP[focusSlot][3])}</span></div>`:'')+
+      list.map(b=>`<div class="blk ${BCAT[b.cat].cls}"><button class="blk-add" data-b="${b.id}">${blockLabel(b)}${adv?'':`<span class="en">${esc(b.en)}</span>`}</button><button class="blk-say" data-say="${b.id}" title="聽">🔊</button></div>`).join('');
+    $('#bank').querySelectorAll('[data-say]').forEach(x=>x.onclick=()=>say(adv? BLK[x.dataset.say].k.join('，') : lineText({b:x.dataset.say,s:S.topic,who:S.nextWho},names())));
+    $('#bank').querySelectorAll('.blk-add').forEach(x=>x.onclick=()=>{
+      const b=BLK[x.dataset.b];
+      if (tier==='beg'){
+        const i = focusSlot>=0 ? focusSlot : L.findIndex(l=>!l.b); if(i<0){ toast('對話地圖已經填滿了 Map is full'); return; }
+        if (BEG_MAP[i][1]!==b.cat){ toast(`第 ${i+1} 句要選「${BCAT[BEG_MAP[i][1]].zh}」的方塊`); return; }
+        L[i].b=b.id; L[i].s=L[i].s||S.topic; focusSlot=L.findIndex(l=>!l.b);
+      } else {
+        L.push({who:S.nextWho, b:b.id, s:S.topic}); S.nextWho = S.nextWho==='A'?'B':'A';
+        app.querySelectorAll('[data-nw]').forEach(y=>y.classList.toggle('on',y.dataset.nw===S.nextWho));
+      }
+      l6Save(S); renderDlg(); renderBank(); say(adv? b.k.join('，') : lineText({b:b.id,s:S.topic,who:'A'},names()));
+    });
+  }
+  function checkState(){
+    const ls=S.lines[tier].filter(l=>l.b);
+    if (tier==='beg'){ const miss=L.map((l,i)=>l.b?null:`第${i+1}句`).filter(Boolean); return {ok:!miss.length, missing:miss, rows:[]}; }
+    const cnt=k=>ls.filter(l=>BLK[l.b].cat===k).length;
+    const rows=CHECKS[tier].map(([k,n,zh,en])=>{ const v = k==='lines'?ls.length : k==='both'?(ls.some(l=>l.who==='A')&&ls.some(l=>l.who==='B')?1:0) : cnt(k); return {ok:v>=n, zh, en, v, n:k==='both'?null:n}; });
+    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), rows};
+  }
+  function renderDlg(){
+    const nm=names();
+    $('#dlg').innerHTML = L.map((l,i)=>{
+      if (!l.b) return `<div class="dline empty ${focusSlot===i?'focus':''}" data-slot="${i}"><span class="spk spk-${l.who}">${l.who}</span><span class="ph ${BCAT[BEG_MAP[i][1]].cls}">＋ ${BCAT[BEG_MAP[i][1]].e} ${esc(BEG_MAP[i][2])} <span class="en">${esc(BEG_MAP[i][3])}</span></span></div>`;
+      const b=BLK[l.b];
+      return `<div class="dline ${BCAT[b.cat].cls}"><span class="spk spk-${l.who}" ${tier!=='beg'?`data-flip="${i}" title="換說話的人"`:''}>${l.who}<small>${esc(nm[l.who])}</small></span>
+        <div class="dtxt">${blockLabel(b,l)}</div>
+        <span class="dact">${b.hasS?`<button data-sp="${i}" title="換運動">${(SP[l.s]||SP.lanqiu).e}</button>`:''}${adv?'':`<button data-ls="${i}" title="聽">🔊</button>`}${tier!=='beg'?`<button data-up="${i}" title="上移">↑</button><button data-dn="${i}" title="下移">↓</button>`:''}<button data-rm="${i}" title="刪除">✕</button></span></div>`;
+    }).join('') || '<div class="hint" style="padding:16px;text-align:center">從右邊點方塊，開始組對話！ <span class="en">Tap blocks on the right to start.</span></div>';
+    const d=$('#dlg');
+    d.querySelectorAll('[data-slot]').forEach(x=>x.onclick=()=>{ focusSlot=+x.dataset.slot; renderDlg(); renderBank(); });
+    d.querySelectorAll('[data-ls]').forEach(x=>x.onclick=()=>say(lineText(L[+x.dataset.ls],nm)));
+    d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.rm; if(tier==='beg'){ L[i].b=null; focusSlot=i; } else L.splice(i,1); l6Save(S); renderDlg(); renderBank(); });
+    d.querySelectorAll('[data-up]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.up; if(i>0){ [L[i-1],L[i]]=[L[i],L[i-1]]; l6Save(S); renderDlg(); } });
+    d.querySelectorAll('[data-dn]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.dn; if(i<L.length-1){ [L[i+1],L[i]]=[L[i],L[i+1]]; l6Save(S); renderDlg(); } });
+    d.querySelectorAll('[data-flip]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.flip; L[i].who=L[i].who==='A'?'B':'A'; l6Save(S); renderDlg(); });
+    d.querySelectorAll('[data-sp]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.sp; pickSport(s=>{ L[i].s=s; l6Save(S); renderDlg(); }); });
+    const c=checkState();
+    $('#chk').innerHTML = tier==='beg'
+      ? `<div class="hint">${c.ok?'✅ 對話地圖完成了！可以開始說對話。':'⬜ 還有 '+c.missing.length+' 句要選方塊。'}</div>`
+      : `<div class="checks">${c.rows.map(r=>`<span class="ck2 ${r.ok?'ok':''}">${r.ok?'✅':'⬜'} ${esc(r.zh)}${r.n?` (${r.v}/${r.n})`:''}<span class="ck2en">${esc(r.en||'')}</span></span>`).join('')}</div>`;
+  }
+  function pickSport(cb){
+    const m=$('#pick'); m.classList.remove('hidden');
+    m.innerHTML=`<div class="card mbox"><h3 class="dh">換成哪一個運動？ <span class="en">Choose a sport</span></h3><div class="vgrid">${SPORTS.map(s=>`<button class="vmini" data-s="${s.id}"><div class="e">${s.e}</div><div class="h">${esc(s.hz)}</div></button>`).join('')}</div><button class="btn btn-ghost" id="pcx">取消</button></div>`;
+    m.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ m.classList.add('hidden'); cb(b.dataset.s); });
+    $('#pcx').onclick=()=>m.classList.add('hidden');
+  }
+  renderDlg(); renderBank();
+}
+
+/* ---------- 說對話（錄音、計分、送給老師） ---------- */
+function practiceL6(S, lines, names){
+  const tier=S.tier, adv=tier==='adv';
+  const partnerUser={name:S.partner, cls:state.user.cls, teacher:state.user.teacher};
+  const userOf = who => (names[who]===state.user.name) ? null : partnerUser;   // null = 自己
+  const results=[]; let i=0;
+  const dlgId = 'D'+Date.now().toString(36);
+  function render(){
+    if (i>=lines.length) return finish();
+    const l=lines[i], nm=names[l.who];
+    app.innerHTML = `
+      <button class="back" id="bk">← 回去修改對話 Edit dialogue</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><b>🎙️ 說對話 Speaking</b><span class="hint">第 ${i+1} / ${lines.length} 句 · ${TIERS[tier].zh}</span></div>
+        <div class="dots" style="margin:10px 0">${lines.map((x,j)=>`<span class="dot ${j<i?'done':''} ${j===i?'cur':''}"></span>`).join('')}</div>
+        <div class="turn spk-bg-${l.who}"><span class="spk spk-${l.who}" style="font-size:22px">${l.who}</span> 輪到 <b>${esc(nm)}</b> 說 <span class="en">${esc(nm)}'s turn</span></div>
+        <div class="dline ${BCAT[BLK[l.b].cat].cls}" style="font-size:28px;margin-top:12px">
+          <div class="dtxt">${adv? `<span class="kwonly">${BLK[l.b].k.map(esc).join(' … ')}${BLK[l.b].hasS?` · ${SP[l.s].e}${esc(SP[l.s].hz)}`:''}</span><div class="hint">用完整的句子說 Say a full sentence</div>` : ruby(lineTokens(l,names))}</div>
+          ${adv?'':`<span class="dact"><button id="ls">🔊</button></span>`}
+        </div>
+        ${i>0?`<div class="hint" style="margin-top:8px">上一句 ${esc(lines[i-1].who)}：${esc(lineText(lines[i-1],names))}</div>`:''}
+        <div class="speak" id="spk"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-ghost" id="skip">跳過 Skip</button><button class="btn btn-sun" id="nx" disabled style="opacity:.5">下一句 Next ➜</button></div>
+      </div>`;
+    $('#bk').onclick=()=>go('l6');
+    $('#ls') && ($('#ls').onclick=()=>say(lineText(l,names)));
+    const target=lineText(l,names);
+    mountSpeak($('#spk'),{target, level:'L6 對話', item:'L6-line', asUser:userOf(l.who), maxMs:12000,
+      targetLabel:`對話${dlgId}｜${TIERS[tier].zh}｜第${i+1}句 ${l.who}：${target}`,
+      score: adv ? (t=>scoreKeys(l,t)) : null,
+      onDone:(sc,said)=>{ results[i]={who:l.who, target, said, sc}; const nx=$('#nx'); nx.disabled=false; nx.style.opacity=1; }});
+    $('#nx').onclick=()=>{ i++; render(); };
+    $('#skip').onclick=()=>{ results[i]=results[i]||{who:l.who,target,said:'',sc:null}; i++; render(); };
+    if(!adv) setTimeout(()=>say(target),300);
+  }
+  async function finish(){
+    const scored=results.filter(r=>r&&r.sc!=null), avg=scored.length?Math.round(scored.reduce((a,r)=>a+r.sc,0)/scored.length):null;
+    const text=lines.map((l,j)=>`${l.who}（${names[l.who]}）：${lineText(l,names)}`).join('\n');
+    const said=results.map((r,j)=>r?`${r.who}：${r.said||'（沒說）'}`:'').join(' ／ ');
+    const per = who=>{ const rs=results.filter(r=>r&&r.who===who&&r.sc!=null); return rs.length?Math.round(rs.reduce((a,r)=>a+r.sc,0)/rs.length):null; };
+    // 作品紀錄：A、B 各存一筆（分數用自己那幾句的平均）
+    for (const who of ['A','B']){
+      const u=userOf(who);
+      await saveAttempt({level:'L6 對話', item:'L6-'+tier, target:`對話${dlgId}｜${TIERS[tier].zh}｜同伴：${names[who==='A'?'B':'A']}\n${text}`, transcript:said, score:per(who), blob:null, mime:'', diag:'', asUser:u});
+    }
+    app.innerHTML = `
+      <div class="card" style="text-align:center">
+        <div style="font-size:60px">🎉</div>
+        <h2 style="font-size:28px;font-weight:900">對話完成！ Dialogue complete!</h2>
+        <div class="kpis" style="justify-content:center">
+          <div class="kpi">A ${esc(names.A)}<b>${per('A')??'—'}</b></div>
+          <div class="kpi">B ${esc(names.B)}<b>${per('B')??'—'}</b></div>
+        </div>
+        <div class="hint">✅ 錄音和分數已經送給老師了。 <span class="en">Sent to your teacher.</span></div>
+        <div style="text-align:left;margin-top:14px">${lines.map((l,j)=>{const r=results[j]; return `<div class="weakrow"><span class="spk spk-${l.who}">${l.who}</span><div style="flex:1">${esc(lineText(l,names))}<div class="hint">說的：${esc(r?.said||'（沒說）')}</div></div>${r?.sc!=null?`<span class="pill ${r.sc>=85?'p-good':r.sc>=60?'p-mid':'p-low'}">${r.sc}</span>`:''}</div>`}).join('')}</div>
+        <div class="row" style="justify-content:center;margin-top:16px">
+          <button class="btn btn-sky" id="again">🔄 交換角色再說一次 Swap & again</button>
+          <button class="btn btn-ghost" id="edit">✏️ 修改對話 Edit</button>
+          <button class="btn btn-ghost" id="home">🏠 回首頁</button>
+        </div>
+      </div>`;
+    $('#again').onclick=()=>{ S.swap=!S.swap; l6Save(S); const nn = S.swap ? {A:S.partner, B:state.user.name} : {A:state.user.name, B:S.partner}; practiceL6(S, lines, nn); };
+    $('#edit').onclick=()=>go('l6');
+    $('#home').onclick=()=>go('home');
+  }
+  render();
+}
+
+/* ============================================================
+   LEVEL 7：對話測驗 — 兩人一組、各自計分；只有關鍵字，沒有句子／拼音／發音
+   ============================================================ */
+const RUBRIC = [
+  ['kw',   '關鍵字運用', 'Uses the keywords'],
+  ['full', '句子完整',   'Complete sentences'],
+  ['pron', '發音聲調',   'Pronunciation & tones'],
+  ['flow', '對話互動',   'Interaction & flow']
+];
+const RUBRIC_LV = ['1 需要加強','2 部分做到','3 做到','4 很好'];
+const TEST_CHECK = [['lines',8,'至少 8 句','At least 8 lines'],['both',1,'兩個人都有說','Both of you speak'],['Q',2,'至少 2 個問句','At least 2 questions'],['R',1,'至少 1 個理由','At least 1 reason'],['E',2,'至少 2 個回應','At least 2 responses'],['I',1,'有邀請或約時間','Invite or set a time']];
+/* 關鍵字卡片：同一類別裡關鍵字一樣的方塊只出現一張 */
+const KCARDS = (()=>{ const seen=new Set(), out=[]; BLOCKS.forEach(b=>{ const key=b.cat+'|'+b.k.join('/'); if(!seen.has(key)){ seen.add(key); out.push(b); } }); return out; })();
+
+/** 測驗計分：關鍵字 70%＋句子完整 30% */
+function testScore(line, said){
+  const kw = scoreKeys(line, said);
+  const t = [...norm(said||'')];
+  const model = [...norm(lineText(line,{A:'',B:''}))].length;   // 參考句的長度（短句像「你好」不會被扣分）
+  const comp = t.length >= model*0.7 ? 1 : t.length >= model*0.4 ? 0.5 : 0;
+  return Math.round(kw*0.7 + comp*30);
+}
+
+function l7Key(){ return 'sp_l7_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+/* 對話測驗卡片上的字：回應＝完整句子，其他＝關鍵字 */
+function kwText(b,l){ return b.cat==='E' ? lineText(l,{A:'',B:''}) : b.k.join(' … '); }
+/* 對方說了什麼類別 → 建議這一句用什麼類別 */
+const NEXT_CAT = {G:'G', Q:'A', A:'E', R:'E', E:'Q', I:'A'};
+const L7_CATS = ['G','Q','A','E','R','I'];
+function viewL7(){
+  const S=Object.assign({partner:'', topic:'lanqiu', lines:[], nextWho:'A', catA:'G', catB:'G'}, store.get(l7Key(),{}));
+  const save=()=>store.set(l7Key(),S);
+  const names=()=>({A:state.user.name, B:S.partner||'（同伴）'});
+  const side=w=>`
+      <div class="l7side side-${w}" id="side${w}">
+        <div class="l7who spk-bg-${w}"><span class="spk spk-${w}">${w}</span> <b id="nm${w}">${esc(names()[w])}</b></div>
+        <div class="l7turn" id="turn${w}"></div>
+        <div class="l7cats" id="cats${w}"></div>
+        <div class="bank l7bank" id="bank${w}"></div>
+      </div>`;
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">📝 對話測驗 <span class="en" style="font-size:18px">Dialogue Test (pairs)</span></h2>
+    <div class="card" style="padding:12px 18px;margin-top:8px">
+      <div class="row" style="gap:16px">
+        <span class="who-a">A：${esc(state.user.name)}</span>
+        <span class="who-b">B：<input id="pn" value="${esc(S.partner)}" maxlength="20" placeholder="同伴的名字 Partner's name"></span>
+        <span class="hint">話題運動 Topic：<select id="tp">${SPORTS.map(s=>`<option value="${s.id}" ${s.id===S.topic?'selected':''}>${s.e} ${s.hz}</option>`).join('')}</select></span>
+      </div>
+      <div class="hint" style="margin-top:8px">👉 A 和 B 輪流點自己那一邊的選項，聽清楚對方說什麼，再選怎麼回應。對話會出現在中間。
+        <span class="en">Take turns tapping your own side. Listen to your partner, then choose how to respond.</span></div>
+    </div>
+    <div class="l7grid">
+      ${side('A')}
+      <div class="card l7mid">
+        <div class="l7head"><div class="spk-bg-A"><span class="spk spk-A">A</span> <b id="hA">${esc(names().A)}</b></div><div class="spk-bg-B"><span class="spk spk-B">B</span> <b id="hB">${esc(names().B)}</b></div></div>
+        <div class="l7conv" id="dlg"></div>
+        <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="undo" style="padding:6px 12px;font-size:14px">↩️ 上一步 Undo</button><button class="btn btn-ghost" id="clr" style="padding:6px 12px;font-size:14px;margin-left:auto">🗑️ 全部清除</button></div>
+        <div id="chk" style="margin-top:10px"></div>
+        <button class="btn btn-sun" id="go" style="width:100%;margin-top:12px;font-size:20px">🎙️ 開始測驗 Start the test ➜</button>
+      </div>
+      ${side('B')}
+    </div>`;
+  $('#bk').onclick=()=>go('home');
+  const syncNames=()=>{ const n=names(); ['A','B'].forEach(w=>{ $('#nm'+w).textContent=n[w]; $('#h'+w).textContent=n[w]; }); };
+  $('#pn').oninput=()=>{ S.partner=cleanName($('#pn').value); save(); syncNames(); renderAll(); };
+  $('#tp').onchange=()=>{ const o=S.topic; S.topic=$('#tp').value; S.lines.forEach(l=>{ if(l.s===o) l.s=S.topic }); save(); renderAll(); };
+  $('#undo').onclick=()=>{ const l=S.lines.pop(); if(l) S.nextWho=l.who; save(); renderAll(); };
+  $('#clr').onclick=()=>{ if(S.lines.length && !confirmSoft()) return; S.lines=[]; S.nextWho='A'; S.catA='G'; S.catB='G'; save(); renderAll(); };
+  function confirmSoft(){ const b=$('#clr'); if(b.dataset.sure){ delete b.dataset.sure; b.textContent='🗑️ 全部清除'; return true; } b.dataset.sure=1; b.textContent='再按一次確定清除'; setTimeout(()=>{ if(b.dataset.sure){ delete b.dataset.sure; b.textContent='🗑️ 全部清除'; } },2500); return false; }
+  const card=(b,l)=>{ const s=SP[l?.s||S.topic]; return `<span class="kwonly">${esc(kwText(b,l||{b:b.id,s:S.topic,who:'A'}))}</span>${b.hasS?` <span class="hint">${s.e} ${esc(s.hz)}</span>`:''}`; };
+  const suggest=w=>{ const last=S.lines[S.lines.length-1]; if(!last) return 'G'; return last.who===w ? null : NEXT_CAT[BLK[last.b].cat]; };
+  function renderSide(w){
+    const active=S.nextWho===w, sug=active?suggest(w):null, other=w==='A'?'B':'A', n=names();
+    $('#side'+w).classList.toggle('on',active);
+    $('#turn'+w).innerHTML = active
+      ? `<div class="l7now now-${w}"><span class="l7mic">🎤</span><div><div class="l7big">輪到你了！</div><div class="l7en">YOUR TURN</div></div><span class="l7arrow">👇</span></div>`
+      : `<div class="l7wait">⏳ 等 ${esc(n[other])} 說… <span class="en">Wait</span></div><button class="l7more" data-more="${w}">➕ 我還要再說一句 <span class="en">I want to say one more</span></button>`;
+    const key='cat'+w;
+    $('#cats'+w).innerHTML = L7_CATS.map(k=>`<button class="tab cat ${BCAT[k].cls} ${S[key]===k?'on':''} ${sug===k?'sug':''}" data-cat="${k}" data-w="${w}">${BCAT[k].e} ${BCAT[k].zh}${sug===k?' <small>建議</small>':''}</button>`).join('');
+    $('#bank'+w).innerHTML = KCARDS.filter(b=>b.cat===S[key]).map(b=>`<div class="blk ${BCAT[b.cat].cls}"><button class="blk-add" data-b="${b.id}" ${active?'':'disabled'}>${card(b)}</button></div>`).join('');
+    $('#cats'+w).querySelectorAll('[data-cat]').forEach(x=>x.onclick=()=>{ S[key]=x.dataset.cat; save(); renderSide(w); });
+    $('#bank'+w).querySelectorAll('.blk-add').forEach(x=>x.onclick=()=>{ if(S.nextWho!==w) return;
+      S.lines.push({who:w, b:x.dataset.b, s:S.topic}); S.nextWho=other;
+      const nx=NEXT_CAT[BLK[x.dataset.b].cat]; if(nx) S['cat'+other]=nx;
+      save(); renderAll(); const d=$('#dlg'); d.scrollTop=d.scrollHeight; });
+    const m=$('#turn'+w).querySelector('[data-more]'); if(m) m.onclick=()=>{ S.nextWho=w; save(); renderAll(); };
+  }
+  function checkState(){
+    const ls=S.lines, cnt=k=>ls.filter(l=>BLK[l.b].cat===k).length;
+    const rows=TEST_CHECK.map(([k,n,zh,en])=>{ const v=k==='lines'?ls.length : k==='both'?(ls.some(l=>l.who==='A')&&ls.some(l=>l.who==='B')?1:0) : cnt(k); return {ok:v>=n, zh, en, v, n:k==='both'?null:n}; });
+    return {ok:rows.every(r=>r.ok), missing:rows.filter(r=>!r.ok).map(r=>r.zh), rows};
+  }
+  function renderDlg(){
+    const L=S.lines;
+    $('#dlg').innerHTML = L.length ? L.map((l,i)=>{ const b=BLK[l.b]; return `<div class="l7line l7-${l.who}" style="grid-row:${i+1}"><div class="l7bub ${BCAT[b.cat].cls}">
+        <div class="l7top"><span class="l7n">${i+1}</span><span class="hint l7c">${BCAT[b.cat].e} ${BCAT[b.cat].zh}</span>
+        <span class="l7act">${b.hasS?`<button data-sp="${i}" title="換運動">${(SP[l.s]||SP.lanqiu).e}</button>`:''}<button data-rm="${i}" title="刪掉">✕</button></span></div>
+        <div class="l7txt">${card(b,l)}</div></div></div>`; }).join('')
+      : `<div class="l7empty" style="grid-column:1/3">A 先點左邊的「👋 打招呼」開始！ <span class="en">A starts: tap a greeting on the left.</span></div>`;
+    const d=$('#dlg');
+    d.querySelectorAll('[data-rm]').forEach(x=>x.onclick=()=>{ L.splice(+x.dataset.rm,1); S.nextWho=L.length?(L[L.length-1].who==='A'?'B':'A'):'A'; save(); renderAll(); });
+    d.querySelectorAll('[data-sp]').forEach(x=>x.onclick=()=>{ const i=+x.dataset.sp; const cur=SPORTS.findIndex(s=>s.id===L[i].s); L[i].s=SPORTS[(cur+1)%SPORTS.length].id; save(); renderDlg(); });
+    const c=checkState();
+    $('#chk').innerHTML=`<div class="checks">${c.rows.map(r=>`<span class="ck2 ${r.ok?'ok':''}">${r.ok?'✅':'⬜'} ${esc(r.zh)}${r.n?` (${r.v}/${r.n})`:''}<span class="ck2en">${esc(r.en||'')}</span></span>`).join('')}</div>`;
+  }
+  function renderAll(){ renderDlg(); renderSide('A'); renderSide('B'); ['A','B'].forEach(w=>{ const h=$('#h'+w).parentElement; h.classList.toggle('l7headon',S.nextWho===w); let t=h.querySelector('.l7tag'); if(S.nextWho===w){ if(!t){ t=document.createElement('span'); t.className='l7tag'; h.appendChild(t);} t.textContent='🎤 輪到我'; } else if(t) t.remove(); }); }
+  $('#go').onclick=()=>{
+    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
+    if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
+    const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')); return; }
+    runTest(S, S.lines.slice(), names());
+  };
+  renderAll();
+}
+
+function runTest(S, lines, names){
+  const partnerUser={name:S.partner, cls:state.user.cls, teacher:state.user.teacher};
+  const userOf = who => who==='A' ? null : partnerUser;
+  const testId='T'+Date.now().toString(36);
+  const results=[]; let i=0;
+  function render(){
+    if (i>=lines.length) return finish();
+    const l=lines[i], b=BLK[l.b], nm=names[l.who];
+    app.innerHTML = `
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><b>📝 對話測驗 Dialogue Test</b><span class="hint">第 ${i+1} / ${lines.length} 句</span></div>
+        <div class="dots" style="margin:10px 0">${lines.map((x,j)=>`<span class="dot ${j<i?'done':''} ${j===i?'cur':''}"></span>`).join('')}</div>
+        <div class="turn spk-bg-${l.who}"><span class="spk spk-${l.who}" style="font-size:22px">${l.who}</span> 輪到 <b>${esc(nm)}</b> 說 <span class="en">${esc(nm)}'s turn</span></div>
+        <div class="dline ${BCAT[b.cat].cls}" style="margin-top:12px"><div class="dtxt"><span class="hint">${BCAT[b.cat].e} ${BCAT[b.cat].zh}</span><br><span class="kwonly" style="font-size:30px">${esc(kwText(b,l))}</span>${b.hasS?` <span style="font-size:24px">${SP[l.s].e} ${esc(SP[l.s].hz)}</span>`:''}</div></div>
+        <div class="hint" style="margin-top:6px">${b.cat==='E'?'把這句回應說出來。 <span class="en">Say this response.</span>':'用這些關鍵字說一個完整的句子。 <span class="en">Say a full sentence with these keywords.</span>'}</div>
+        ${i>0?`<div class="hint" style="margin-top:8px">上一句 ${esc(names[lines[i-1].who])} 說：「${esc(results[i-1]?.said||'')}」</div>`:''}
+        <div class="speak" id="spk"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-ghost" id="skip">跳過 Skip</button><button class="btn btn-sun" id="nx" disabled style="opacity:.5">下一句 Next ➜</button></div>
+      </div>`;
+    $('#skip').onclick=()=>{ results[i]=results[i]||{who:l.who, kw:kwText(b,l)+(b.hasS?'＋'+SP[l.s].hz:''), said:'', sc:0}; i++; render(); };
+    const label=`測驗${testId}｜第${i+1}句 ${l.who}（${nm}）｜關鍵字：${b.k.join('…')}${b.hasS?'＋'+SP[l.s].hz:''}`;
+    const sp=mountSpeak($('#spk'),{target:b.k.join('')+(b.hasS?SP[l.s].hz:''), targetLabel:label, level:'L7 測驗', item:'L7-line', asUser:userOf(l.who), maxMs:15000,
+      score:t=>testScore(l,t),
+      onDone:(sc,said)=>{ results[i]={who:l.who, kw:kwText(b,l)+(b.hasS?'＋'+SP[l.s].hz:''), said, sc};
+        const r=sp.querySelector('.result'); if(r) r.innerHTML='✅ 已錄音 Recorded'+(said?'':'（沒有辨識到，可以再說一次）');
+        const nx=$('#nx'); nx.disabled=false; nx.style.opacity=1; }});
+    $('#nx').onclick=()=>{ i++; render(); };
+  }
+  async function finish(){
+    const per=who=>{ const rs=results.filter(r=>r&&r.who===who&&r.sc!=null); return rs.length?Math.round(rs.reduce((a,r)=>a+r.sc,0)/rs.length):null; };
+    for (const who of ['A','B']){
+      const mine=lines.map((l,j)=>({l,j,r:results[j]})).filter(x=>x.l.who===who);
+      const text=`測驗${testId}｜同伴：${names[who==='A'?'B':'A']}｜${who}\n`+lines.map((l,j)=>`${l.who}（${names[l.who]}）［${results[j]?.kw||''}］：${results[j]?.said||'（沒說）'}`).join('\n');
+      await saveAttempt({level:'L7 測驗', item:'L7-test', target:text, transcript:mine.map(x=>x.r?.said||'').join(' ／ '), score:per(who), blob:null, mime:'', diag:'', asUser:userOf(who)});
+    }
+    store.set(l7Key(), Object.assign({}, S, {lines:[]}));
+    app.innerHTML = `
+      <div class="card" style="text-align:center">
+        <div style="font-size:60px">📨</div>
+        <h2 style="font-size:28px;font-weight:900">測驗完成！ Test submitted!</h2>
+        <div class="hint" style="font-size:16px;margin-top:6px">你們的錄音已經送給老師，老師會聽完再給分數。 <span class="en">Your recordings were sent to your teacher, who will listen and grade them.</span></div>
+        <div style="text-align:left;margin-top:14px">${lines.map((l,j)=>`<div class="weakrow"><span class="spk spk-${l.who}">${l.who}</span><div style="flex:1"><span class="hint">${esc(results[j]?.kw||'')}</span><div>${esc(results[j]?.said||'（沒說）')}</div></div></div>`).join('')}</div>
+        <button class="btn btn-ghost" id="home" style="margin-top:14px">🏠 回首頁</button>
+      </div>`;
+    $('#home').onclick=()=>go('home');
+  }
+  render();
+}
+
+/* ---------- 老師：測驗批改 ---------- */
+async function postGrade(g){
+  if (REMOTE){ const r=await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action:'grade',pin:CONFIG.TEACHER_PIN},g))}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed'); return j; }
+  const all=store.get('sp_grades',[]); all.push(Object.assign({time:Date.now()},g)); store.set('sp_grades',all); return {ok:true};
+}
+function testSubmissions(rows){
+  const subs=[];
+  rows.filter(r=>r.item==='L7-test').forEach(r=>{
+    const m=String(r.target||'').match(/^測驗(T\w+)｜同伴：([^｜]*)｜([AB])/); if(!m) return;
+    const lines=String(r.target).split('\n').slice(1);
+    const T=teacherOf(r), key=T+'|'+r.cls+'|'+nameKey(r.name);
+    const rec=rows.filter(x=>x.item==='L7-line' && String(x.target).startsWith('測驗'+m[1]+'｜') && nameKey(x.name)===nameKey(r.name));
+    subs.push({id:m[1], key, name:cleanName(r.name), cls:r.cls, teacher:T, partner:m[2], role:m[3], time:+r.time||+r.t, auto:(r.score===''||r.score==null)?null:+r.score, lines, rec});
+  });
+  return subs.sort((a,b)=>b.time-a.time);
+}
+
+/* ============================================================
+   TEACHER DASHBOARD v2 — 課後看「誰需要幫忙、錯在哪裡」
+   ============================================================ */
+const PKEY = { like:['喜歡'], can:['會'], well:['得'], feel:['覺得'], why:['因為'], invite:['一起','好不好'], dou:['都'], yiyang:['一樣'] };
+const PAT_EN = { like:'"What sport do you like?"', can:'"Can you…?" (會)', well:'"V得" — how well', feel:'"I think…" (覺得)', why:'"Because…" (因為)', invite:'Inviting (一起…好不好)', dou:'"Both/all" (都)', yiyang:'"The same as" (一樣)' };
+const strip = s=>String(s).replace(/^[❶❷❸❹❺❻❼❽]\s*/,'').replace(/\s*\(L\d\)$/,'');
+
+let CATALOG=null, HEAT_COLS=null;
+function catalog(){
+  if (CATALOG) return CATALOG;
+  const C={}, H=[];
+  const ctx={sport:SP.youyong, other:SP.wangqiu};
+  VOCAB_SETS.forEach(s=>{
+    const g='L1-'+s.id; H.push({g, h:'L1 '+s.name.split(' ')[0], zh:'詞語：'+s.name.split(' ')[0], en:'Vocabulary: '+s.name.split(' ').slice(1).join(' ')});
+    s.items.forEach(w=>C['L1-'+s.id+'-'+w.id]={L:'L1', g, label:w.hz, kind:'word', word:w.hz});
+  });
+  PATTERNS.forEach(p=>{
+    const g='L2-'+p.id; H.push({g, h:p.name.split(' ')[0], zh:'句型：'+strip(p.name), en:'Pattern: '+(PAT_EN[p.id]||p.id), pid:p.id});
+    p.items.forEach(it=>{ const lab=S_txt(it.a); const sp=SPORTS.find(s=>lab.includes(s.hz)); C['L2-'+it.id]={L:'L2', g, label:lab, kind:'pattern', pid:p.id, word: sp?sp.hz:null}; });
+  });
+  H.push({g:'L3', h:'L3 對話', zh:'和文文對話', en:'Conversation with Wenwen'});
+  DIALOG.forEach((t,i)=>C['L3-'+i]={L:'L3', g:'L3', label:'文文：'+S_txt(t.bot(ctx)), kind:t.kind==='react'?'react':'dialog'});
+  H.push({g:'L4', h:'L4 說一說', zh:'說一段話', en:'Short talk'});
+  TOPICS.forEach(t=>C['L4-'+t.id]={L:'L4', g:'L4', label:strip(t.name), kind:'talk'});
+  H.push({g:'L6', h:'L6 對話', zh:'對話工作坊', en:'Dialogue workshop'});
+  Object.entries(TIERS).forEach(([k,v])=>C['L6-'+k]={L:'L6', g:'L6', label:'對話工作坊（'+v.zh+'）', kind:'talk'});
+  C['L6-line']={L:'L6', g:null, label:'', kind:'dline'};
+  H.push({g:'L7', h:'L7 測驗', zh:'對話測驗', en:'Dialogue test'});
+  C['L7-test']={L:'L7', g:'L7', label:'對話測驗', kind:'test'};
+  C['L7-line']={L:'L7', g:null, label:'', kind:'dline'};
+  L5.forEach(u=>{
+    const g='L5-'+u.id; H.push({g, h:'L5 '+u.name.slice(0,4), zh:'進階閱讀：'+u.name, en:'Reading: '+u.en});
+    u.words.forEach((w,i)=>C['L5-'+u.id+'-w'+i]={L:'L5', g, label:w[0], kind:'word', word:w[0]});
+    u.paras.forEach((p,i)=>C['L5-'+u.id+'-p'+(i+1)]={L:'L5', g, label:'朗讀第 '+(i+1)+(u.dialog?' 句':' 段'), kind:'read'});
+    u.qs.forEach((q,i)=>C['L5-'+u.id+'-q'+(i+1)]={L:'L5', g, label:S_txt(q.q), kind:'q', qtype:q.type});
+  });
+  CATALOG=C; HEAT_COLS=H; return C;
+}
+
+function missingParts(target, said){
+  said=fixHomo(said,target);
+  const a=[...norm(target)], b=[...norm(said)];
+  if(!a.length) return []; if(!b.length) return ['（整句沒說）'];
+  const m=a.length,n=b.length, dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=m-1;i>=0;i--) for(let j=n-1;j>=0;j--) dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const hit=new Array(m).fill(false); let i=0,j=0;
+  while(i<m&&j<n){ if(a[i]===b[j]){hit[i]=true;i++;j++} else if(dp[i+1][j]>=dp[i][j+1]) i++; else j++; }
+  const out=[]; let cur=''; for(let k=0;k<m;k++){ if(!hit[k]) cur+=a[k]; else if(cur){out.push(cur);cur=''} } if(cur) out.push(cur);
+  return out;
+}
+/** 目標句裡學生沒說到的字標紅 */
+function diffHTML(target, said){
+  said=fixHomo(said,target);
+  const tc=[...String(target)], a=[], keep=[];
+  tc.forEach((c,i)=>{ const n=norm(c); if(n){ a.push(n); keep.push(i);} });
+  const b=[...norm(said)];
+  if(!b.length) return `<span class="miss">${esc(target)}</span>`;
+  const m=a.length,n=b.length, dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=m-1;i>=0;i--) for(let j=n-1;j>=0;j--) dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const hit=new Set(); let i=0,j=0;
+  while(i<m&&j<n){ if(a[i]===b[j]){hit.add(keep[i]);i++;j++} else if(dp[i+1][j]>=dp[i][j+1]) i++; else j++; }
+  return tc.map((c,k)=> (!norm(c)||hit.has(k)) ? esc(c) : `<span class="miss">${esc(c)}</span>`).join('');
+}
+
+/* 問題類型（分組用） */
+const ISSUE = {
+  'pat:like':  {zh:'「喜歡什麼運動」問答', en:'asking/answering "what sport do you like"', tip:'練「你喜歡什麼運動？我喜歡＿＿。」一問一答。'},
+  'pat:can':   {zh:'「會／不會」句型', en:'the "can / can\'t" (會) pattern', tip:'練「你會＿＿嗎？我很會／不太會／不會＿＿。」'},
+  'pat:well':  {zh:'「V得＋程度」句型（常漏「得」）', en:'the "V得 + degree" pattern (often missing 得)', tip:'練「我游泳游得很好」：動詞要說兩次，中間加「得」。'},
+  'pat:feel':  {zh:'「我覺得…」句型', en:'expressing opinions with 覺得', tip:'練「我覺得＿＿很有趣／有一點難」。'},
+  'pat:why':   {zh:'「因為…」說理由', en:'giving reasons with 因為', tip:'回答「為什麼」時，用「因為＿＿很＿＿」。'},
+  'pat:invite':{zh:'邀請朋友「一起…好不好」', en:'inviting a friend (一起…好不好)', tip:'練「我們一起去＿＿，好不好？」'},
+  'pat:dou':   {zh:'「都」句型', en:'the "both / all" (都) pattern', tip:'練「我和妹妹都喜歡＿＿」：「都」放在動詞前面。'},
+  'pat:yiyang':{zh:'「A和B一樣＿＿」句型', en:'the "as … as" (一樣) pattern', tip:'練「我和哥哥一樣高」。'},
+  'word':      {zh:'運動詞語說不出來', en:'saying the sports vocabulary', tip:'先回 Level 1 跟讀詞語，再放進句子。'},
+  'incomplete':{zh:'句子說不完整', en:'saying complete sentences', tip:'提醒學生「主語＋動詞＋…」整句說完，不要只說一兩個字。'},
+  'dialog':    {zh:'對話接不上（聽不懂問題）', en:'understanding questions in conversation', tip:'先聽文文的問題，用「💡 你可以說」的句子回答；老師可先帶全班練問答。'},
+  'react':     {zh:'不會回應對方（是喔、真的嗎）', en:'responding with back-channels', tip:'練習「是喔！／真的嗎？／我也是！」接話。'},
+  'reading:find': {zh:'閱讀：找不到文章重點', en:'finding key information in the text', tip:'請學生先找出問題的關鍵字，再回文章找同樣的字。'},
+  'reading:think':{zh:'閱讀：推理題答不出', en:'inference questions', tip:'帶學生把兩段內容連起來想「為什麼」。'},
+  'reading:you':  {zh:'說不出自己的想法', en:'giving their own opinion', tip:'用「我覺得…因為…」的句型架構幫忙開頭。'},
+  'fluency':   {zh:'朗讀／說話不流暢', en:'reading aloud and fluency', tip:'先聽範讀，再一句一句跟讀。'},
+  'practice':  {zh:'練習量太少', en:'amount of practice', tip:'提醒學生每天練 10 分鐘，或課堂上多給一點時間。'},
+  'mic':       {zh:'常常沒辨識到聲音', en:'speech not recognized (mic/volume)', tip:'先聽錄音：若有聲音但說得太小聲或不清楚，請學生靠近麥克風；若沒聲音，檢查麥克風設定。'}
+};
+
+function analyzeRows(rows){
+  const C=catalog(), stu={};
+  rows.forEach(r=>{
+    const T=teacherOf(r), k=T+'|'+r.cls+'|'+nameKey(r.name); const s=stu[k]||(stu[k]={key:k,name:cleanName(r.name),cls:r.cls,teacher:T,rows:[],items:{},n:0,unrec:0,last:0});
+    s.n++; s.last=Math.max(s.last,+r.time||+r.t||0);
+    let sc = (r.score===''||r.score==null)?null:+r.score;
+    // 舊紀錄用同音字表重新計分（只會往上調）
+    if (sc!=null && r.transcript && /^L[12]/.test(String(r.level))){ const re=scoreText(r.transcript, r.target); if(re>sc){ sc=re; r=Object.assign({},r,{score:re, rescored:true}); } }
+    if(!r.transcript) s.unrec++;
+    s.rows.push(r);
+    const it=s.items[r.item]||(s.items[r.item]={id:r.item, n:0, best:null, bestRow:null, lastRow:null});
+    it.n++; it.lastRow=r;
+    if(sc!=null && (it.best==null || sc>it.best)){ it.best=sc; it.bestRow=r; }
+  });
+  Object.values(stu).forEach(s=>{
+    s.issues=[]; const scored=s.rows.filter(r=>r.score!==''&&r.score!=null);
+    s.avg = scored.length ? Math.round(scored.reduce((a,r)=>a+ +r.score,0)/scored.length) : null;
+    // heat
+    s.heat={};
+    Object.values(s.items).forEach(it=>{
+      const m=C[it.id]; if(!m || !m.g || it.best==null) return;
+      const h=s.heat[m.g]||(s.heat[m.g]={sum:0,c:0}); h.sum+=it.best; h.c++;
+      const said=it.bestRow?.transcript||'';
+      const push=(type,why)=>s.issues.push({type, item:it.id, label:m.label, best:it.best, said, why});
+      if (m.kind==='word' && it.best<60) push('word', `「${m.label}」最高 ${it.best} 分`);
+      else if (m.kind==='pattern' && it.best<85){
+        const miss=missingParts(m.label, said), keys=PKEY[m.pid]||[];
+        const missKey = keys.find(k=>miss.some(f=>f.includes(k)));
+        if (missKey) push('pat:'+m.pid, `漏了「${missKey}」`);
+        else if (m.word && miss.some(f=>m.word.includes(f) || f.includes(m.word.slice(-2)))) push('word', `說不出「${m.word}」`);
+        else push('incomplete', miss.length?`漏了「${miss.slice(0,2).join('、')}」`:`${it.best} 分`);
+      }
+      else if ((m.kind==='dialog'||m.kind==='react') && it.best<100) push(m.kind, '這一題沒接上');
+      else if (m.kind==='q' && it.best<60) push('reading:'+m.qtype, `${it.best} 分`);
+      else if ((m.kind==='read'||m.kind==='talk') && it.best<60) push('fluency', `${it.best} 分`);
+    });
+    Object.values(s.heat).forEach(h=>h.avg=Math.round(h.sum/h.c));
+    s.types={}; s.issues.forEach(x=>{ (s.types[x.type]=s.types[x.type]||[]).push(x) });
+    if (s.unrec>=3 && s.unrec/s.n>=0.3) s.types.mic=[{type:'mic', why:`${s.unrec} 次沒辨識到`}];
+    s.weakItems = s.issues.slice().sort((a,b)=>a.best-b.best);
+  });
+  // 練習量：比全班中位數少很多才提醒
+  const all=Object.values(stu), ns=all.map(s=>s.n).sort((a,b)=>a-b), med=ns.length?ns[Math.floor(ns.length/2)]:0;
+  all.forEach(s=>{
+    if (all.length>=3 && s.n < Math.max(5, med*0.4)) s.types.practice=[{type:'practice', why:`只練了 ${s.n} 次（全班中位數 ${med} 次）`}];
+    s.needScore = s.issues.length + (s.types.practice?4:0) + (s.types.mic?3:0) + (s.avg!=null && s.avg<60 ? 5 : 0);
+  });
+  return all;
+}
+
+/* ---------- assignments ---------- */
+async function loadAssigns(){ // teacher
+  if (REMOTE) return (state._assigns||[]);
+  return store.get('sp_assigns',[]).filter(a=>a.status!=='cancel');
+}
+async function postAssign(payload){
+  if (REMOTE){
+    const r=await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({pin:CONFIG.TEACHER_PIN},payload))});
+    const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed'); return j;
+  }
+  const all=store.get('sp_assigns',[]);
+  if (payload.action==='assign') payload.targets.forEach(t=>all.push({time:Date.now(),name:t.name,cls:t.cls,teacher:t.teacher,items:payload.items,note:payload.note||'',status:'active'}));
+  else all.forEach(a=>{ if(nameKey(a.name)===nameKey(payload.name) && a.cls===(payload.cls||'') && teacherOf(a)===payload.teacher) a.status='cancel' });
+  store.set('sp_assigns',all); return {ok:true};
+}
+async function myAssigns(){ // student
+  if (!state.user) return [];
+  if (REMOTE){
+    try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=myAssign&name=${encodeURIComponent(state.user.name)}&cls=${encodeURIComponent(state.user.cls||'')}&teacher=${encodeURIComponent(state.user.teacher||'')}`); const j=await r.json(); return j.assigns||[]; }catch(e){ return [] }
+  }
+  return store.get('sp_assigns',[]).filter(a=>a.status!=='cancel' && nameKey(a.name)===nameKey(state.user.name) && a.cls===(state.user.cls||'') && teacherOf(a)===(state.user.teacher||CONFIG.LEGACY_TEACHER));
+}
+
+/** 打開某一題（派題用） */
+function openItem(id){
+  let m;
+  if ((m=id.match(/^L1-(\w+)-(\w+)$/))){ const si=VOCAB_SETS.findIndex(s=>s.id===m[1]); const i=VOCAB_SETS[si]?.items.findIndex(w=>w.id===m[2]); return go('l1',{set:Math.max(0,si),i:Math.max(0,i)}); }
+  if ((m=id.match(/^L2-(.+)$/))){ for(let p=0;p<PATTERNS.length;p++){ const i=PATTERNS[p].items.findIndex(x=>x.id===m[1]); if(i>=0) return go('l2',{p,i}); } }
+  if (/^L3-/.test(id)) return go('l3');
+  if ((m=id.match(/^L4-(\w+)$/))) return go('l4',{t:Math.max(0,TOPICS.findIndex(t=>t.id===m[1]))});
+  if ((m=id.match(/^L5-(\w)-([wpq])(\d+)$/))){ const u=L5.findIndex(x=>x.id===m[1]); const n=+m[3];
+    if(m[2]==='w') return go('l5',{u,s:'words',w:n}); if(m[2]==='p') return go('l5',{u,s:'read'}); return go('l5',{u,s:'qs',q:n-1}); }
+  go('home');
+}
+
+/* ---------- views ---------- */
+let tAuto=null;
+function viewTeacher(arg){
+  clearInterval(tAuto);
+  const C=catalog();
+  const tv = state.tv = Object.assign({tab:'overview', cls:'', teacher:'', range:'today', student:null}, state.tv||{}, arg||{});
+  app.innerHTML = `
+    <div class="row" style="justify-content:space-between">
+      <h2 style="font-size:28px;font-weight:900">🧑‍🏫 老師後台 <span class="en" style="font-size:18px">Teacher</span></h2>
+      <div class="row">
+        <select id="fr" class="btn btn-ghost" style="padding:10px"><option value="today">今天 Today</option><option value="week">最近 7 天</option><option value="all">全部 All</option></select>
+        <select id="ft" class="btn btn-ghost" style="padding:10px"><option value="">全部老師</option>${(CONFIG.TEACHERS||[]).map(t=>`<option>${esc(t.name)}</option>`).join('')}</select>
+        <select id="fc" class="btn btn-ghost" style="padding:10px"></select>
+        <button class="btn btn-sky" id="rf">🔄</button>
+        <button class="btn btn-ghost" id="out">登出</button>
+      </div>
+    </div>
+    <div class="tabs" style="margin-top:12px">
+      ${[['overview','🚦 總覽 Overview'],['groups','🧩 分組建議 Groups'],['heat','🗺️ 全班熱力圖 Heatmap'],['student','👤 學生報告 Student'],['tests','📝 測驗批改 Tests']].map(([k,l])=>`<button class="tab ${tv.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
+    </div>
+    <div id="tb"><div class="card">載入中… Loading…</div></div>`;
+  const fillC=()=>{ const cl=tv.teacher?classesOf(tv.teacher):[...new Set((CONFIG.TEACHERS||[]).flatMap(t=>t.classes).concat(CONFIG.CLASSES||[]))]; $('#fc').innerHTML='<option value="">全部班級</option>'+cl.map(c=>`<option>${esc(c)}</option>`).join(''); if(!cl.includes(tv.cls)) tv.cls=''; $('#fc').value=tv.cls; };
+  $('#fr').value=tv.range; $('#ft').value=tv.teacher; fillC();
+  $('#fr').onchange=()=>{ tv.range=$('#fr').value; render() };
+  $('#ft').onchange=()=>{ tv.teacher=$('#ft').value; tv.student=null; fillC(); render() };
+  $('#fc').onchange=()=>{ tv.cls=$('#fc').value; render() };
+  $('#rf').onclick=()=>refresh();
+  $('#out').onclick=()=>{ clearInterval(tAuto); state.tv=null; go(state.user?'home':'login') };
+  app.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ tv.tab=b.dataset.t; app.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b)); render() });
+  let rows=[], assigns=[], grades=[];
+  async function refresh(){
+    try{
+      if (REMOTE){ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=list&pin=${encodeURIComponent(CONFIG.TEACHER_PIN)}`); const j=await r.json(); if(!j.ok) throw new Error(j.error); rows=normAll(j.rows); state._assigns=normAll(j.assigns); grades=normAll(j.grades); }
+      else { rows=store.get('sp_records',[]); grades=store.get('sp_grades',[]); }
+      assigns=await loadAssigns(); render();
+    }catch(e){ $('#tb').innerHTML=`<div class="warn">讀取失敗：${esc(e.message)}</div>` }
+  }
+  const since = ()=> tv.range==='all'?0 : tv.range==='week'? Date.now()-7*864e5 : new Date(new Date().toDateString()).getTime();
+  const pill=(v)=> v==null?'<span class="pill p-none">—</span>':`<span class="pill ${v>=85?'p-good':v>=60?'p-mid':'p-low'}">${v}</span>`;
+  const stuName=s=>`<b>${esc(s.name)}</b> <span class="hint">${tv.teacher?'':esc(String(s.teacher).replace('老師',''))+' '}${esc(s.cls)}</span>`;
+  function data(){
+    const ex=new Set((CONFIG.EXCLUDE_NAMES||[]).map(nameKey));
+    const rs=rows.filter(r=>(+r.time||+r.t||0)>=since() && (!tv.teacher||teacherOf(r)===tv.teacher) && (!tv.cls||r.cls===tv.cls) && !ex.has(nameKey(r.name)));
+    return {rs, S:analyzeRows(rs)};
+  }
+  function assignFor(s){ return assigns.filter(a=>nameKey(a.name)===nameKey(s.name) && String(a.cls)===String(s.cls) && teacherOf(a)===s.teacher) }
+  function assignDone(s,a){ return a.items.filter(id=>s.rows.some(r=>r.item===id && (+r.time||+r.t)>=+a.time)).length }
+  async function doAssign(targets, items, note){
+    items=[...new Set(items)].slice(0,10); if(!items.length) return toast('沒有可以派的題目');
+    const labels=items.map(id=>C[id]?.label||id).join('｜');
+    try{ await postAssign({action:'assign', targets:targets.map(s=>({name:s.name,cls:s.cls,teacher:s.teacher})), items, labels, note}); toast(`📌 已派 ${items.length} 題給 ${targets.length} 位學生`); await refresh(); }
+    catch(e){ toast('派題失敗：'+e.message) }
+  }
+
+  function render(){
+    const {rs,S}=data();
+    if (tv.tab==='tests') return rTests(rs,S);
+    if (!rs.length && tv.tab!=='student'){ $('#tb').innerHTML='<div class="card">這段時間還沒有練習紀錄。 No attempts in this range. <span class="hint">（可以把右上角改成「最近 7 天」或「全部」）</span></div>'; return; }
+    ({overview:rOverview, groups:rGroups, heat:rHeat, student:rStudent})[tv.tab](rs,S);
+  }
+
+  function rOverview(rs,S){
+    const allR=S.flatMap(s=>s.rows), scored=allR.filter(r=>r.score!==''&&r.score!=null), avg=scored.length?Math.round(scored.reduce((a,r)=>a+ +r.score,0)/scored.length):'—';
+    const unrec=rs.filter(r=>!r.transcript).length;
+    const need=S.filter(s=>s.needScore>0).sort((a,b)=>b.needScore-a.needScore).slice(0,10);
+    // class weakest items (by avg of students' best), at least 2 students
+    const byItem={}; S.forEach(s=>Object.values(s.items).forEach(it=>{ if(it.best==null) return; const b=byItem[it.id]||(byItem[it.id]={id:it.id,sum:0,c:0,miss:{}}); b.sum+=it.best; b.c++;
+      const m=C[it.id]; if(m && (m.kind==='pattern'||m.kind==='word') && it.best<100) missingParts(m.label,it.bestRow?.transcript||'').forEach(f=>b.miss[f]=(b.miss[f]||0)+1); }));
+    const weakItems=Object.values(byItem).filter(b=>b.c>=2).map(b=>({...b,avg:Math.round(b.sum/b.c)})).sort((a,b)=>a.avg-b.avg).slice(0,6);
+    $('#tb').innerHTML = `
+      <div class="kpis">
+        <div class="kpi">練習的學生 Students<b>${S.length}</b></div>
+        <div class="kpi">作答次數 Attempts<b>${rs.length}</b></div>
+        <div class="kpi">平均分數 Avg<b>${avg}</b></div>
+        <div class="kpi">需要幫忙 Need help<b style="color:var(--rose)">${need.length}</b></div>
+        <div class="kpi">沒辨識到 Unrecognized<b>${rs.length?Math.round(unrec/rs.length*100):0}%</b></div>
+      </div>
+      <div class="dash2">
+        <div class="card">
+          <h3 class="dh">🙋 需要幫忙的學生 <span class="hint">Students who need help</span></h3>
+          ${need.length?need.map(s=>{ const reasons=Object.keys(s.types).sort((a,b)=>s.types[b].length-s.types[a].length).slice(0,3);
+            return `<div class="needrow" data-k="${esc(s.key)}"><div style="min-width:120px">${stuName(s)}<div class="hint">平均 ${s.avg??'—'}・${s.n} 次</div></div>
+              <div style="flex:1">${reasons.map(t=>`<span class="tag">${esc(ISSUE[t].zh)}${s.types[t][0]?.why?`<span class="hint">（${esc(s.types[t][0].why)}${s.types[t].length>1?` 等 ${s.types[t].length} 題`:''}）</span>`:''}</span>`).join('')}</div><span class="hint">›</span></div>` }).join('')
+            : '<div class="hint">🎉 這段時間沒有特別需要幫忙的學生。</div>'}
+        </div>
+        <div class="card">
+          <h3 class="dh">📉 全班最弱的題目 <span class="hint">下一堂課可以重點加強</span></h3>
+          ${weakItems.length?weakItems.map(b=>{const m=C[b.id]||{}; const top=Object.entries(b.miss).sort((x,y)=>y[1]-x[1]).slice(0,2);
+            return `<div class="weakrow"><div style="flex:1"><div style="font-weight:800">${esc(m.label||b.id)}</div><div class="hint">${esc(b.id.split('-')[0])} · ${b.c} 位學生${top.length?` · 常漏：${top.map(([f,n])=>`「${esc(f)}」×${n}`).join(' ')}`:''}</div></div>${pill(b.avg)}</div>`}).join('')
+            : '<div class="hint">至少要有 2 位學生做過同一題才會顯示。</div>'}
+        </div>
+      </div>`;
+    $('#tb').querySelectorAll('.needrow').forEach(el=>el.onclick=()=>{ tv.student=el.dataset.k; tv.tab='student'; viewTeacher() });
+  }
+
+  function rGroups(rs,S){
+    const G={};
+    S.forEach(s=>Object.keys(s.types).forEach(t=>{ (G[t]=G[t]||[]).push(s) }));
+    const order=Object.keys(G).sort((a,b)=>G[b].length-G[a].length);
+    $('#tb').innerHTML = `<div class="hint" style="margin-bottom:10px">系統依照每位學生「練過之後還沒做好」的題目自動分組。同一位學生可能在好幾組。 <span class="en">Students grouped by the problems that remain after practice.</span></div>
+      <div class="groups">${order.length?order.map(t=>{ const ss=G[t]; const items=ss.flatMap(s=>(s.types[t]||[]).map(x=>x.item).filter(Boolean));
+        const ex=ss.flatMap(s=>s.types[t]).find(x=>x.label);
+        return `<div class="card gcard"><div class="row" style="justify-content:space-between"><h3 class="dh" style="margin:0">${esc(ISSUE[t].zh)}</h3><span class="pill p-low">${ss.length} 人</span></div>
+          <div class="hint" style="margin:4px 0 8px">${esc(ISSUE[t].tip)}</div>
+          <div>${ss.map(s=>`<button class="chipbtn" data-k="${esc(s.key)}">${esc(s.name)}<span class="hint"> ${esc((s.types[t][0]?.why)||'')}</span></button>`).join('')}</div>
+          ${ex?`<div class="hint" style="margin-top:8px">例：${esc(ex.label)}${ex.said?` → 學生說「${esc(ex.said)}」`:''}</div>`:''}
+          ${items.length?`<button class="btn btn-ghost" style="margin-top:10px;padding:8px 14px;font-size:15px" data-assign="${esc(t)}">📌 派相關題目給這 ${ss.length} 位</button>`:''}
+        </div>`}).join(''):'<div class="card">🎉 目前沒有需要分組加強的問題。</div>'}</div>`;
+    $('#tb').querySelectorAll('.chipbtn').forEach(b=>b.onclick=()=>{ tv.student=b.dataset.k; tv.tab='student'; viewTeacher() });
+    $('#tb').querySelectorAll('[data-assign]').forEach(b=>b.onclick=()=>{ const t=b.dataset.assign; const ss=G[t]; doAssign(ss, ss.flatMap(s=>s.types[t].map(x=>x.item).filter(Boolean)), ISSUE[t].zh) });
+  }
+
+  function rHeat(rs,S){
+    catalog(); const cols=HEAT_COLS.filter(c=>S.some(s=>s.heat[c.g]));
+    const list=S.slice().sort((a,b)=>(a.avg??999)-(b.avg??999));
+    const colAvg=c=>{ const v=S.map(s=>s.heat[c.g]?.avg).filter(x=>x!=null); return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null };
+    $('#tb').innerHTML = `<div class="hint" style="margin-bottom:8px">每格是學生在這個部分「每題最高分」的平均。紅色＝需要加強，空白＝還沒練。點學生名字看報告。</div>
+      <div style="overflow:auto"><table class="heat"><thead><tr><th>學生</th><th>平均</th>${cols.map(c=>`<th title="${esc(c.zh)}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>
+      ${list.map(s=>`<tr><td class="click" data-k="${esc(s.key)}">${stuName(s)}</td><td>${pill(s.avg)}</td>${cols.map(c=>{const h=s.heat[c.g]; return `<td class="hc ${h?(h.avg>=85?'h-g':h.avg>=60?'h-m':'h-l'):''}">${h?h.avg:''}</td>`}).join('')}</tr>`).join('')}
+      <tr class="avgrow"><td><b>全班</b></td><td></td>${cols.map(c=>{const v=colAvg(c);return `<td class="hc ${v==null?'':v>=85?'h-g':v>=60?'h-m':'h-l'}"><b>${v??''}</b></td>`}).join('')}</tr>
+      </tbody></table></div>`;
+    $('#tb').querySelectorAll('td.click').forEach(td=>td.onclick=()=>{ tv.student=td.dataset.k; tv.tab='student'; viewTeacher() });
+  }
+
+  function rStudent(rs,S){
+    const list=S.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+    if(!tv.student || !list.find(s=>s.key===tv.student)) tv.student=list[0]?.key||null;
+    const s=list.find(x=>x.key===tv.student);
+    const sel=`<select id="ss" class="btn btn-ghost" style="padding:10px;min-width:220px">${list.map(x=>`<option value="${esc(x.key)}" ${x.key===tv.student?'selected':''}>${esc(x.name)}（${tv.teacher?'':esc(x.teacher)+' '}${esc(x.cls)}）</option>`).join('')}</select>`;
+    if(!s){ $('#tb').innerHTML=`<div class="card">這段時間沒有學生資料。</div>`; return; }
+    catalog();
+    const groupsDone=HEAT_COLS.filter(c=>s.heat[c.g]);
+    const strong=groupsDone.filter(c=>s.heat[c.g].avg>=85).sort((a,b)=>s.heat[b.g].avg-s.heat[a.g].avg).slice(0,3);
+    const weakTypes=Object.keys(s.types).filter(t=>t!=='practice'&&t!=='mic').sort((a,b)=>s.types[b].length-s.types[a].length);
+    const weak=s.weakItems.slice(0,6);
+    const A=assignFor(s);
+    const ex=weak.find(w=>C[w.item]?.kind==='pattern')||weak[0];
+    const zh = `${s.name}在這段期間完成了 ${s.n} 次口說練習（${Object.keys(s.items).length} 題）${s.avg!=null?`，平均 ${s.avg} 分`:''}。`
+      + (strong.length?`表現最好的是「${strong.map(c=>strip(c.zh.split('：')[1]||c.zh)).join('」、「')}」。`:'')
+      + (weakTypes.length?`需要再加強的是${weakTypes.slice(0,2).map(t=>ISSUE[t].zh.replace(/（.*）/,'')).join('，以及')}${ex?`，例如可以在家多練習說：「${ex.label.replace(/^文文：/,'').replace(/[。！？]$/,'')}」`:''}。`:'各項表現都很穩定，可以挑戰進階關卡。')
+      + (s.types.practice?'建議每天在家練習 10 分鐘。':'') + '繼續加油！';
+    const en = `${s.name} completed ${s.n} speaking attempts (${Object.keys(s.items).length} items)${s.avg!=null?` with an average score of ${s.avg}`:''}. `
+      + (strong.length?`Strongest areas: ${strong.map(c=>c.en).join('; ')}. `:'')
+      + (weakTypes.length?`Areas to work on: ${weakTypes.slice(0,2).map(t=>ISSUE[t].en).join(' and ')}${ex?` — for example, practicing the sentence "${ex.label.replace(/^文文：/,'').replace(/[。！？]$/,'')}" at home`:''}. `:'Performance is consistent across all areas; ready for the challenge level. ')
+      + (s.types.practice?'We recommend about 10 minutes of practice at home each day. ':'') + 'Keep up the great work!';
+    $('#tb').innerHTML = `
+      <div class="row" style="margin-bottom:12px">${sel}<span class="hint">最後練習：${s.last?new Date(s.last).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</span></div>
+      <div class="kpis"><div class="kpi">練習次數<b>${s.n}</b></div><div class="kpi">練過題數<b>${Object.keys(s.items).length}</b></div><div class="kpi">平均分數<b>${s.avg??'—'}</b></div><div class="kpi">沒辨識到<b>${s.unrec}</b></div></div>
+      <div class="dash2">
+        <div class="card">
+          <h3 class="dh">💪 強項 Strengths</h3>
+          ${strong.length?strong.map(c=>`<div class="weakrow"><div style="flex:1">${esc(c.zh)}</div>${pill(s.heat[c.g].avg)}</div>`).join(''):'<div class="hint">還沒有 85 分以上的部分。</div>'}
+          <h3 class="dh" style="margin-top:14px">🧩 需要加強的地方 Needs work</h3>
+          ${weakTypes.length?weakTypes.map(t=>`<div class="tag" style="display:block;margin:6px 0">${esc(ISSUE[t].zh)}（${s.types[t].length} 題）<div class="hint">${esc(ISSUE[t].tip)}</div></div>`).join(''):'<div class="hint">🎉 沒有明顯的弱點。</div>'}
+          ${s.types.practice?`<div class="tag" style="display:block;margin:6px 0">${ISSUE.practice.zh}（${esc(s.types.practice[0].why)}）</div>`:''}
+          ${s.types.mic?`<div class="tag" style="display:block;margin:6px 0">${ISSUE.mic.zh}（${esc(s.types.mic[0].why)}）<div class="hint">${esc(ISSUE.mic.tip)}</div></div>`:''}
+        </div>
+        <div class="card">
+          <h3 class="dh">📌 派題 Assign practice</h3>
+          ${A.length?A.map(a=>`<div class="weakrow"><div style="flex:1"><b>${assignDone(s,a)}/${a.items.length} 題完成</b> <span class="hint">${new Date(+a.time).toLocaleDateString('zh-TW')} ${esc(a.note||'')}</span><div class="hint">${a.items.map(id=>esc(C[id]?.label||id)).join('｜')}</div></div></div>`).join('')+`<button class="btn btn-ghost" id="unas" style="padding:8px 14px;font-size:15px">取消這位學生的派題</button>`
+            :'<div class="hint">目前沒有派題。</div>'}
+          ${weak.length?`<div style="margin-top:12px"><div class="hint">勾選要派的題目：</div>${weak.map((w,i)=>`<label class="ck"><input type="checkbox" value="${esc(w.item)}" ${i<5?'checked':''}> ${esc(w.label)} <span class="hint">（${w.best} 分）</span></label>`).join('')}
+            <button class="btn btn-sun" id="asg" style="margin-top:8px">📌 派給 ${esc(s.name)}</button></div>`:''}
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3 class="dh">🔎 最弱的題目：目標句 vs. 學生說的 <span class="hint">紅字＝沒說到的部分</span></h3>
+        ${weak.length?`<table><thead><tr><th>題目</th><th>目標句（紅字沒說到）</th><th>學生最好的一次</th><th>分數</th><th>錄音</th></tr></thead><tbody>
+          ${weak.map(w=>{const m=C[w.item]||{}; const r=s.items[w.item]?.bestRow; const tgt=(m.kind==='pattern'||m.kind==='word'||m.kind==='read')? (m.kind==='read'?(r?.target||''):m.label) : null;
+            return `<tr><td class="hint">${esc(w.item.split('-')[0])} ${esc(ISSUE[w.type]?.zh||'')}</td><td style="font-size:17px">${tgt!=null?diffHTML(tgt,w.said):esc(m.label||'')}</td><td><b>${esc(w.said)||'<span class="hint">（無辨識）</span>'}</b></td><td>${pill(w.best)}</td><td>${r?.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`}).join('')}
+          </tbody></table>`:'<div class="hint">沒有低分的題目。</div>'}
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3 class="dh">✉️ 給家長的評語（草稿） <span class="hint">可以先修改再複製</span></h3>
+        <textarea id="cm" style="width:100%;min-height:150px;font:inherit;font-size:16px;padding:12px;border-radius:12px;border:2px solid var(--line)">${esc(zh)}\n\n${esc(en)}</textarea>
+        <button class="btn btn-sky" id="cp" style="margin-top:8px">📋 複製 Copy</button>
+      </div>
+      <details class="peek" style="margin-top:14px"><summary>📜 所有作答紀錄（${s.rows.length}）All attempts</summary>
+        <table style="margin-top:8px"><thead><tr><th>時間</th><th>題目</th><th>學生說的</th><th>分數</th><th>錄音</th></tr></thead><tbody>
+        ${s.rows.slice().sort((a,b)=>(+b.time||+b.t)-(+a.time||+a.t)).map(r=>`<tr><td class="hint">${new Date(+r.time||+r.t).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${(C[r.item]?.label && !/^L[67]/.test(r.item)) ? esc(C[r.item].label) : esc(r.target).replace(/\n/g,'<br>')}</td><td><b>${esc(r.transcript)||'<span class="hint">（無辨識）</span>'}</b>${(!r.transcript&&r.diag)?`<div class="hint" style="font-size:12px">⚠️ ${esc(r.diag)}</div>`:''}</td><td>${pill(r.score===''||r.score==null?null:+r.score)}${r.rescored?'<div class="hint" style="font-size:11px">同音字已調整</div>':''}</td><td>${r.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`).join('')}
+        </tbody></table></details>`;
+    $('#ss').onchange=()=>{ tv.student=$('#ss').value; render() };
+    $('#cp').onclick=async()=>{ try{ await navigator.clipboard.writeText($('#cm').value); toast('已複製 Copied') }catch(e){ $('#cm').select(); toast('請按 Ctrl+C 複製') } };
+    $('#asg') && ($('#asg').onclick=()=>doAssign([s], [...$('#tb').querySelectorAll('.ck input:checked')].map(x=>x.value), '老師指定'));
+    $('#unas') && ($('#unas').onclick=async()=>{ try{ await postAssign({action:'unassign', name:s.name, cls:s.cls, teacher:s.teacher}); toast('已取消派題'); await refresh(); }catch(e){ toast('失敗：'+e.message) } });
+    $('#tb').querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{
+      b.textContent='⏳';
+      try{ const blob=await loadAudio(b.dataset.f); if(!blob) throw new Error('not found'); const a=new Audio(URL.createObjectURL(blob)); await a.play(); b.textContent='🔊'; a.onended=()=>b.textContent='▶️'; }
+      catch(e){ b.textContent='⚠️'; toast('無法播放 Cannot play: '+e.message) }
+    });
+  }
+
+  function rTests(rs){
+    const subs=testSubmissions(rs);
+    const gOf=sb=>grades.filter(g=>g.testId===sb.id && nameKey(g.name)===nameKey(sb.name) && teacherOf(g)===sb.teacher).sort((a,b)=>(+b.time)-(+a.time))[0];
+    const pend=subs.filter(sb=>!gOf(sb)).length;
+    $('#tb').innerHTML = `<div class="hint" style="margin-bottom:10px">每位學生的測驗分開列出。先看自動分數，再聽錄音，用 4 項規準評分（每項 1–4 分，滿分 16）。 <span class="en">Listen, then grade with the 4-point rubric.</span>　待批改 <b style="color:var(--rose)">${pend}</b> / ${subs.length}</div>
+      ${subs.length?subs.map((sb,si)=>{ const g=gOf(sb);
+        return `<div class="card" style="margin-bottom:14px">
+          <div class="row" style="justify-content:space-between"><div><b style="font-size:20px">${esc(sb.name)}</b> <span class="hint">${esc(sb.teacher)} ${esc(sb.cls)} · 同伴：${esc(sb.partner)} · ${new Date(sb.time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
+            <div class="row">${'<span class="hint">自動分數</span> '+(sb.auto==null?'<span class="pill p-none">—</span>':`<span class="pill ${sb.auto>=85?'p-good':sb.auto>=60?'p-mid':'p-low'}">${sb.auto}</span>`)} ${g?`<span class="pill p-good">老師 ${g.total}/16</span>`:'<span class="pill p-low">待批改</span>'}</div></div>
+          <table style="margin-top:10px"><thead><tr><th>#</th><th>關鍵字</th><th>說的話</th><th>錄音</th></tr></thead><tbody>
+          ${sb.lines.map((ln,j)=>{ const mm=ln.match(/^([AB])（(.*?)）［(.*?)］：(.*)$/); const who=mm?mm[1]:''; const mine=who===sb.role;
+             const rec=mine? sb.rec.find(x=>String(x.target).includes('第'+(j+1)+'句')) : null;
+             return `<tr style="${mine?'':'opacity:.55'}"><td><span class="spk spk-${who}" style="min-width:30px;height:30px;font-size:14px">${who}</span></td><td class="hint">${esc(mm?mm[3]:'')}</td><td><b>${esc(mm?mm[4]:ln)}</b>${mine?'':' <span class="hint">（同伴）</span>'}</td><td>${rec?.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(rec.fileId)}">▶️</button>`:''}</td></tr>`; }).join('')}
+          </tbody></table>
+          <div class="rubric" data-si="${si}">
+            ${RUBRIC.map(([k,zh,en])=>`<label class="rb"><span><b>${zh}</b> <span class="en">${en}</span></span><select data-k="${k}">${[1,2,3,4].map(v=>`<option value="${v}" ${(g?g[k]:3)==v?'selected':''}>${RUBRIC_LV[v-1]}</option>`).join('')}</select></label>`).join('')}
+            <textarea data-k="comment" placeholder="評語（可不填） Comment" style="width:100%;min-height:60px;font:inherit;padding:8px;border-radius:10px;border:2px solid var(--line);margin-top:8px">${esc(g?.comment||'')}</textarea>
+            <button class="btn btn-sun" data-save="${si}" style="margin-top:8px">💾 ${g?'更新評分':'儲存評分'} Save</button>
+          </div>
+        </div>`}).join(''):'<div class="card">這段時間還沒有測驗。 No tests yet. <span class="hint">（可以把右上角改成「全部」）</span></div>'}`;
+    $('#tb').querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{
+      const sb=subs[+b.dataset.save], box=$('#tb').querySelector(`.rubric[data-si="${b.dataset.save}"]`);
+      const g={testId:sb.id, name:sb.name, cls:sb.cls, teacher:sb.teacher, auto:sb.auto, comment:box.querySelector('[data-k=comment]').value};
+      RUBRIC.forEach(([k])=>g[k]=+box.querySelector(`[data-k=${k}]`).value); g.total=RUBRIC.reduce((a,[k])=>a+g[k],0);
+      b.textContent='⏳'; try{ await postGrade(g); toast('已儲存評分 Saved'); await refresh(); }catch(e){ b.textContent='💾 儲存評分'; toast('儲存失敗：'+e.message) }
+    });
+    $('#tb').querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{
+      b.textContent='⏳';
+      try{ const blob=await loadAudio(b.dataset.f); if(!blob) throw new Error('not found'); const a=new Audio(URL.createObjectURL(blob)); await a.play(); b.textContent='🔊'; a.onended=()=>b.textContent='▶️'; }
+      catch(e){ b.textContent='⚠️'; toast('無法播放 Cannot play: '+e.message) }
+    });
+  }
+
+  refresh();
+  tAuto=setInterval(()=>{ if(tv.tab==='overview') refresh() }, 60000);
+}
+
+/* ---------- boot ---------- */
+applyPrefs();
+if (REMOTE) flushPending();
+go(state.user?'home':'login');
+</script>
+</body>
+</html>
