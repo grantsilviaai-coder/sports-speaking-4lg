@@ -111,6 +111,18 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.l7timer{margin-top:12px;border:3px solid #fcd34d;background:#fffbeb;border-radius:16px;padding:10px 12px}
+.tdur2{display:inline-flex;gap:6px;margin-left:auto}
+.tdb2{border-radius:999px;border:2px solid #e5dccb;background:#fff;padding:4px 12px;font-weight:900;font-size:16px}
+.tdb2.on{border-color:#f59e0b;background:#f59e0b;color:#fff}
+.tfloat{position:fixed;right:max(4px,calc((100vw - 1000px)/2 - 96px));top:50%;transform:translateY(-50%);z-index:60;width:84px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:22px;padding:8px 5px;box-shadow:0 10px 30px rgba(0,0,0,.22);border:3px solid #f59e0b}
+.tring.sm{width:70px;height:70px}.tring.sm>div{width:54px;height:54px}
+.tring.sm .tsec{font-size:26px}
+.tlab{font-size:11px;color:#78716c;font-weight:800}
+.trec.sm{font-size:14px;gap:5px}.trec.sm .tdot{width:10px;height:10px}
+.tstop{background:#fee2e2;color:#b91c1c;border-radius:12px;padding:5px 4px;font-weight:900;font-size:14px;width:100%}
+.tstop .en{display:block;font-size:11px;color:#b91c1c}
+@media (max-width:1000px){.tfloat{top:auto;bottom:16px;transform:none;right:10px;width:104px}.tfloat .tring.sm{width:88px;height:88px}.tfloat .tring.sm>div{width:68px;height:68px}.tfloat .tring.sm .tsec{font-size:32px}}
 .l7go{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}
 .l7go .btn{font-size:20px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 10px}
 .l7go .btn small{font-size:13px;font-weight:700;opacity:.8}
@@ -1038,7 +1050,7 @@ function mountSpeak(el, o){
    VIEWS
    ============================================================ */
 function go(view, arg){
-  stopAll();
+  stopAll(); document.getElementById('tfloat')?.remove();
   if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
   state.teacher = view==='teacher';
   const showUser = !!state.user && !state.teacher && view!=='login';
@@ -1860,10 +1872,13 @@ function viewL7(){
         <div class="l7conv" id="dlg"></div>
         <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="undo" style="padding:6px 12px;font-size:14px">↩️ 上一步 Undo</button><button class="btn btn-ghost" id="clr" style="padding:6px 12px;font-size:14px;margin-left:auto">🗑️ 全部清除</button></div>
         <div id="chk" style="margin-top:10px"></div>
-        <div class="l7go">
-          <button class="btn btn-sun" id="goT">⏱️ 計時對話 <span class="en">Timed dialogue</span><small>30／60／90 秒，一起錄整段</small></button>
-          <button class="btn btn-ghost" id="go">🎙️ 一句一句錄 <span class="en">Line by line</span><small>每句分開錄</small></button>
+        <div class="l7timer">
+          <div class="row" style="gap:8px;align-items:center"><b>⏱️ 計時對話 <span class="en">Timed dialogue</span></b>
+            <span class="tdur2">${TIMER_OPTS.map(x=>`<button class="tdb2" data-d="${x}">${x} 秒</button>`).join('')}</span></div>
+          <button class="btn btn-sun" id="goT" style="width:100%;margin-top:8px;font-size:21px">▶️ 開始計時＋錄音 <span class="en">Start timer & record</span></button>
+          <div class="hint" style="margin-top:4px">按下去以後，一邊點選對話一邊說出來，計時器會一直顯示在畫面右邊。 <span class="en">Tap your lines and say them while the timer runs.</span></div>
         </div>
+        <button class="btn btn-ghost" id="go" style="width:100%;margin-top:10px">🎙️ 或者：一句一句錄 <span class="en">Or record line by line</span></button>
       </div>
       ${side('B')}
     </div>`;
@@ -1917,8 +1932,38 @@ function viewL7(){
     const c=checkState(); if(!c.ok){ toast('還沒完成：'+c.missing.join('、')+(c.missingEn&&c.missingEn.length?'\nNot yet: '+c.missingEn.join(', '):''),4000); return false; }
     return true;
   };
-  $('#go').onclick=()=>{ if(ready()) runTest(S, S.lines.slice(), names()); };
-  $('#goT').onclick=()=>{ if(ready()) runTimed(S, S.lines.slice(), names()); };
+  $('#go').onclick=()=>{ if(T.on) return; if(ready()) runTest(S, S.lines.slice(), names()); };
+  /* 計時＋錄音：計時器浮在畫面右邊，學生可以繼續點選對話 */
+  const T={on:false};
+  const durSync=()=>app.querySelectorAll('.tdb2').forEach(b=>b.classList.toggle('on',+b.dataset.d===(S.dur||60)));
+  app.querySelectorAll('.tdb2').forEach(b=>b.onclick=()=>{ if(T.on) return; S.dur=+b.dataset.d; save(); durSync(); });
+  if(!TIMER_OPTS.includes(S.dur)) S.dur=60; durSync();
+  $('#goT').onclick=async()=>{
+    if(T.on) return;
+    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
+    if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
+    T.on=true; const dur=S.dur, total=dur*1000;
+    $('#goT').disabled=true; $('#goT').innerHTML='⏺️ 錄音中… <span class="en">Recording</span>';
+    const fl=document.createElement('div'); fl.className='tfloat'; fl.id='tfloat';
+    fl.innerHTML=`<div class="tring sm" id="ring"><div><div class="tsec" id="sec">3</div><div class="tlab" id="tlab">準備 Ready</div></div></div><div class="trec sm hidden" id="trec"><span class="tdot"></span>錄音中</div><button class="tstop" id="tstop">⏹ 結束<span class="en">Stop</span></button>`;
+    document.body.appendChild(fl);
+    const cleanup=()=>{ fl.remove(); T.on=false; };
+    let cancelled=false;
+    fl.querySelector('#tstop').onclick=()=>{ if(T.rec) current && current(); else { cancelled=true; } };
+    for(let n=3;n>0;n--){ if(cancelled||!document.body.contains(fl)) break; fl.querySelector('#sec').textContent=n; await new Promise(r=>setTimeout(r,1000)); }
+    if(cancelled){ cleanup(); viewL7(); return; }
+    fl.querySelector('#tlab').textContent='秒 sec'; fl.querySelector('#trec').classList.remove('hidden');
+    const t0=Date.now(); T.rec=true;
+    const iv=setInterval(()=>{ const left=Math.max(0,total-(Date.now()-t0)); const sec=Math.ceil(left/1000); const r=fl.querySelector('#ring');
+      fl.querySelector('#sec').textContent=sec; r.style.setProperty('--p',left/total); r.classList.toggle('low',sec<=10); },200);
+    let res=null;
+    try{ res=await listen({continuous:true, maxMs:total}); }
+    catch(e){ clearInterval(iv); cleanup(); T.rec=false; toast('🎙️ 沒有麥克風權限 Please allow the microphone',3000); viewL7(); return; }
+    clearInterval(iv); T.rec=false;
+    const used=Math.min(dur, Math.round((Date.now()-t0)/1000));
+    cleanup();
+    timedFinish(S, S.lines.slice(), names(), res, used, dur, !!document.getElementById('dlg'));
+  };
   renderAll();
 }
 
@@ -1932,80 +1977,30 @@ function timedScore(lines, said){
   keys.forEach((ks,i)=>{ const fixed=norm(fixHomo(said, ks.join(''))); ks.forEach(k=>{ tot++; if(fixed.includes(norm(k))) hit++; }); });
   return tot? Math.round(100*hit/tot) : 0;
 }
-function runTimed(S, lines, names){
+async function timedFinish(S, lines, names, res, used, dur, show){
   const partnerUser={name:S.partner, cls:state.user.cls, teacher:state.user.teacher};
-  let dur = TIMER_OPTS.includes(S.dur)? S.dur : 60;
   const kwOf=l=>{ const b=BLK[l.b]; return kwText(b,l)+(b.hasS?'＋'+SP[l.s].hz:''); };
-  const script=()=>lines.map((l,i)=>{ const b=BLK[l.b]; return `<div class="l7line l7-${l.who}" style="grid-row:${i+1}"><div class="l7bub ${BCAT[b.cat].cls}"><div class="l7top"><span class="l7n">${i+1}</span><span class="hint l7c">${BCAT[b.cat].e} ${BCAT[b.cat].zh}</span></div><div class="l7txt"><span class="kwonly">${esc(kwText(b,l))}</span>${b.hasS?` <span class="hint">${SP[l.s].e} ${esc(SP[l.s].hz)}</span>`:''}</div></div></div>`; }).join('');
-  function setup(){
-    app.innerHTML = `
-      <button class="back" id="bk">← 回去改對話 Back</button>
-      <div class="card">
-        <h2 style="font-size:26px;font-weight:900">⏱️ 計時對話 <span class="en" style="font-size:17px">Timed dialogue</span></h2>
-        <div class="hint" style="margin-top:4px">選好時間，按「開始」。計時開始後會<b>同時錄下你們兩個人的對話</b>。時間到就自動停止。 <span class="en">Pick a time and press Start. Your whole conversation is recorded until time is up.</span></div>
-        <div class="tdur">${TIMER_OPTS.map(x=>`<button class="tdbtn ${x===dur?'on':''}" data-d="${x}"><b>${x}</b> 秒<span class="en">${x} sec</span></button>`).join('')}</div>
-        <button class="btn btn-sun" id="start" style="width:100%;font-size:24px;margin-top:12px">▶️ 開始 Start（${dur} 秒）</button>
-        <div class="l7head" style="margin-top:14px"><div class="spk-bg-A"><span class="spk spk-A">A</span> <b>${esc(names.A)}</b></div><div class="spk-bg-B"><span class="spk spk-B">B</span> <b>${esc(names.B)}</b></div></div>
-        <div class="l7conv" style="min-height:0;max-height:none">${script()}</div>
-      </div>`;
-    $('#bk').onclick=()=>viewL7();
-    app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ dur=+b.dataset.d; S.dur=dur; store.set(l7Key(),S); setup(); });
-    $('#start').onclick=countdown;
+  const said=res.transcript||'';
+  const sc = res.srOk && said ? timedScore(lines, said) : null;
+  const testId='T'+Date.now().toString(36);
+  if(show) app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:50px">⏳</div><div class="hint" style="font-size:18px">正在把錄音送給老師… <span class="en">Sending to your teacher…</span></div></div>`;
+  for (const who of ['A','B']){
+    const text=`測驗${testId}｜同伴：${names[who==='A'?'B':'A']}｜${who}｜計時${dur}秒（說了${used}秒）\n`+lines.map(l=>`${l.who}（${names[l.who]}）［${kwOf(l)}］：（見整段錄音）`).join('\n');
+    await saveAttempt({level:'L7 測驗', item:'L7-test', target:text, transcript:said, score:sc, blob:res.blob, mime:res.mime, diag:res.diag, asUser: who==='A'?null:partnerUser});
   }
-  function countdown(){
-    let n=3;
-    app.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div class="hint" style="font-size:20px">準備好了嗎？ Get ready…</div><div class="tcount" id="cd">3</div><div class="hint">A ${esc(names.A)} 先說 <span class="en">A starts</span></div></div>`;
-    const tick=()=>{ n--; if(!document.getElementById('cd')) return; if(n<=0) return record(); $('#cd').textContent=n; setTimeout(tick,1000); };
-    setTimeout(tick,1000);
-  }
-  async function record(){
-    const t0=Date.now(), total=dur*1000;
-    app.innerHTML = `
-      <div class="card">
-        <div class="trow">
-          <div class="tring" id="ring" style="--p:1"><div><div class="tsec" id="sec">${dur}</div><div class="hint">秒 sec</div></div></div>
-          <div style="flex:1;min-width:220px">
-            <div class="trec"><span class="tdot"></span> 錄音中… <span class="en">Recording</span></div>
-            <div class="heard" style="margin-top:8px"><span class="lbl">我聽到 I heard:</span><span class="txt" id="live">…</span></div>
-            <button class="btn btn-ghost" id="stop" style="margin-top:10px">⏹ 說完了，提早結束 <span class="en">Finish early</span></button>
-          </div>
-        </div>
-        <div class="l7head" style="margin-top:14px"><div class="spk-bg-A"><span class="spk spk-A">A</span> <b>${esc(names.A)}</b></div><div class="spk-bg-B"><span class="spk spk-B">B</span> <b>${esc(names.B)}</b></div></div>
-        <div class="l7conv" style="min-height:0;max-height:none">${script()}</div>
-      </div>`;
-    const iv=setInterval(()=>{ const left=Math.max(0,total-(Date.now()-t0)); const sec=Math.ceil(left/1000);
-      const el=$('#sec'); if(!el){ clearInterval(iv); return; } el.textContent=sec; $('#ring').style.setProperty('--p',left/total); $('#ring').classList.toggle('low',sec<=10); },200);
-    $('#stop').onclick=()=>{ current && current(); };
-    let res;
-    try{ res=await listen({continuous:true, maxMs: total, onInterim:t=>{ const l=$('#live'); if(l) l.textContent=t; }}); }
-    catch(e){ clearInterval(iv); app.innerHTML=`<div class="card"><div class="warn">🎙️ 沒有麥克風權限。請按網址列的🔒允許麥克風，再試一次。 <span class="en">Please allow the microphone.</span></div><button class="btn btn-sun" id="again" style="margin-top:12px">再試一次 Try again</button></div>`; $('#again').onclick=setup; return; }
-    clearInterval(iv);
-    const used=Math.min(dur, Math.round((Date.now()-t0)/1000));
-    finish(res, used);
-  }
-  async function finish(res, used){
-    const said=res.transcript||'';
-    const sc = res.srOk && said ? timedScore(lines, said) : null;
-    const testId='T'+Date.now().toString(36);
-    app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:50px">⏳</div><div class="hint" style="font-size:18px">正在把錄音送給老師… <span class="en">Sending to your teacher…</span></div></div>`;
-    for (const who of ['A','B']){
-      const text=`測驗${testId}｜同伴：${names[who==='A'?'B':'A']}｜${who}｜計時${dur}秒（說了${used}秒）\n`+lines.map(l=>`${l.who}（${names[l.who]}）［${kwOf(l)}］：（見整段錄音）`).join('\n');
-      await saveAttempt({level:'L7 測驗', item:'L7-test', target:text, transcript:said, score:sc, blob:res.blob, mime:res.mime, diag:res.diag, asUser: who==='A'?null:partnerUser});
-    }
-    store.set(l7Key(), Object.assign({}, S, {lines:[]}));
-    const url=res.blob?URL.createObjectURL(res.blob):'';
-    app.innerHTML = `
-      <div class="card" style="text-align:center">
-        <div style="font-size:60px">📨</div>
-        <h2 style="font-size:28px;font-weight:900">完成！ Done!</h2>
-        <div class="hint" style="font-size:16px;margin-top:6px">你們說了 <b>${used}</b> 秒，錄音已經送給老師。 <span class="en">You spoke for ${used} seconds. Your recording was sent to your teacher.</span></div>
-        ${url?`<audio controls src="${url}" style="width:100%;margin-top:14px"></audio>`:''}
-        <div class="heard" style="text-align:left;margin-top:12px"><span class="lbl">我聽到 I heard:</span><span class="txt">${esc(said)||'（沒有辨識到文字，老師會聽錄音）'}</span></div>
-        <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="home">🏠 回首頁</button><button class="btn btn-sun" id="again">🔁 再做一次</button></div>
-      </div>`;
-    $('#home').onclick=()=>go('home'); $('#again').onclick=()=>{ S.lines=lines.slice(); store.set(l7Key(),S); viewL7(); };
-  }
-  setup();
+  store.set(l7Key(), Object.assign({}, S, {lines:[]}));
+  if(!show) return;
+  const url=res.blob?URL.createObjectURL(res.blob):'';
+  app.innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="font-size:60px">📨</div>
+      <h2 style="font-size:28px;font-weight:900">完成！ Done!</h2>
+      <div class="hint" style="font-size:16px;margin-top:6px">你們說了 <b>${used}</b> 秒、排了 <b>${lines.length}</b> 句，錄音已經送給老師。 <span class="en">You spoke for ${used} seconds (${lines.length} lines). Your recording was sent to your teacher.</span></div>
+      ${url?`<audio controls src="${url}" style="width:100%;margin-top:14px"></audio>`:''}
+      <div class="heard" style="text-align:left;margin-top:12px"><span class="lbl">我聽到 I heard:</span><span class="txt">${esc(said)||'（沒有辨識到文字，老師會聽錄音）'}</span></div>
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="home">🏠 回首頁</button><button class="btn btn-sun" id="again">🔁 再做一次</button></div>
+    </div>`;
+  $('#home').onclick=()=>go('home'); $('#again').onclick=()=>{ store.set(l7Key(), Object.assign({}, S, {lines:[]})); viewL7(); };
 }
 
 function runTest(S, lines, names){
