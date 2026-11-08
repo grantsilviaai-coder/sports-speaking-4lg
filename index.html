@@ -142,6 +142,16 @@ h1,h2,h3{margin:0}
 .vboth{background:rgba(22,163,74,.18);border:3px solid #16a34a}
 .vb{background:rgba(217,119,6,.14);border-radius:0 999px 999px 0;border:3px solid #d97706;border-left:none}
 .cmptask{border-radius:16px;padding:10px 12px;margin-top:10px}
+.kpi.click{cursor:pointer;outline:2px dashed transparent}.kpi.click:hover{outline-color:var(--rose)}
+.stbar{display:flex;height:46px;border-radius:14px;overflow:hidden;margin-top:8px}
+.stseg{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px;cursor:pointer;min-width:70px;gap:4px}
+.stg{font-size:13px}
+.common{border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.tcols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;align-items:start}
+@media (max-width:900px){.tcols{grid-template-columns:1fr}}
+.tcol{border-top:6px solid}.c-help{border-top-color:#f43f5e}.c-ok{border-top-color:#eab308}.c-up{border-top-color:#ec4899}
+.trow2{border-bottom:1px dashed var(--line);padding:6px 0}
+.tbtn{margin-top:10px;padding:8px 12px;font-size:14px;width:100%}
 .stage{margin-top:22px;border-radius:24px;padding:14px 16px 18px;border:3px solid}
 .stage .levels{margin-top:10px}
 .st-s{background:#f0fdf4;border-color:#bbf7d0}.st-d{background:#ecfeff;border-color:#a5f3fc}.st-t{background:#fdf2f8;border-color:#fbcfe8}
@@ -2291,8 +2301,8 @@ const DETECT = [
 /* 說成原本錯的句子 → 最多 40 分 */
 function detectScore(d,t){ const sc=Math.max(...d.fix.map(f=>scoreText(t,f))); return d.no && d.no.test(norm(fixHomo(t,d.fix[0]))) ? Math.min(sc,40) : sc; }
 const DRULE = {verb:['🏃 動詞搭配','Which verb goes with which sport'], de:['📏「得」的句型','The 得 pattern'], q:['❓ 問句','Questions'], why:['💡「因為」說理由','Reasons with 因為'], feel:['🤔「覺得」','Opinions with 覺得'], same:['👫 一樣／不一樣','Same / different']};
-function viewLD(){
-  let i=0;
+function viewLD(arg){
+  let i=arg?.i||0;
   const prog=()=>getProg();
   function render(){
     const d=DETECT[i]; let picked=new Set(), tries=0, solved=false;
@@ -2363,8 +2373,8 @@ function sortReasonScore(r, said){
   if(r.need.every(re=>re.test(t))) sc+=30;
   return sc;
 }
-function viewLS(){
-  let ri=0;
+function viewLS(arg){
+  let ri=arg?.ri||0;
   function render(){
     const r=SORTS[ri]; const ids=Object.keys(r.cards); const place={}; let sel=null, checked=false;
     const label=id=>{ const s=SP[id]; return r.noVerb? s.hz.slice(1) : s.hz; };  // 「打／踢」那一組只給球名，不能直接看出答案
@@ -2442,8 +2452,9 @@ function cmpScore(kind, said, sports){
   return sc;
 }
 function lcKey(){ return 'sp_lc_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
-function viewLC(){
+function viewLC(arg){
   const S=Object.assign({partner:'', ci:0, pick:{}}, store.get(lcKey(),{}));
+  if(arg && arg.ci!=null) S.ci=arg.ci;
   const save=()=>store.set(lcKey(),S);
   const nm=()=>({A:state.user.name, B:S.partner||'（同伴）'});
   function render(){
@@ -2615,6 +2626,34 @@ const ISSUE = {
   'mic':       {zh:'常常沒辨識到聲音', en:'speech not recognized (mic/volume)', tip:'先聽錄音：若有聲音但說得太小聲或不清楚，請學生靠近麥克風；若沒聲音，檢查麥克風設定。'}
 };
 
+
+/* ---------- 三階段落點、可以挑戰、分數變化 ---------- */
+const STAGE_OF = p => (p==='L1'||p==='L2') ? 'S' : (p==='L7'||p==='L8') ? 'T' : 'D';
+function stageOf(s, gradesList){
+  const b={S:[],D:[],T:[]};
+  Object.values(s.items).forEach(it=>{ if(it.best==null) return; const p=String(it.id).split('-')[0]; if(/-line$/.test(it.id)) return; b[STAGE_OF(p)].push(it.best); });
+  const g=(gradesList||state._grades||[]).filter(x=>nameKey(x.name)===nameKey(s.name) && teacherOf(x)===s.teacher && x.total!=null && x.total!=='').map(x=>Math.round(+x.total/16*100));
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const sA=avg(b.S), dA=avg(b.D), tA=g.length?avg(g):avg(b.T), tN=g.length||b.T.length;
+  let stage='S';
+  if (tN && tA>=70) stage='T';
+  else if ((b.S.length>=8 && sA>=85) || (b.D.length>=3 && dA>=70)) stage='D';
+  const done=new Set(Object.keys(s.items));
+  const pick=ids=>ids.filter(id=>!done.has(id));
+  let ready=false, why='', next=[], nextZh='';
+  if (stage==='S' && b.S.length>=5 && sA>=90){ ready=true; why=`第 1–2 關平均 ${sA}`; next=pick(['LD-d1','LD-d2','LD-d7','LS-ball','LS-hand','L3-0']); nextZh='想通：小偵探、分一分'; }
+  if (stage==='D' && b.D.length>=5 && dA>=85){ ready=true; why=`第 3–9 關平均 ${dA}`; next=pick(['L7-test','L8-visit','L8-club','L8-reporter']); nextZh='用出來：對話測驗、情境任務'; }
+  if (stage==='T' && tA>=85){ ready=true; why=`第 10–11 關 ${tA}`; next=pick(['L8-visit','L8-club','L8-reporter']); nextZh=next.length?'其他情境任務（計時 90 秒）':'計時 90 秒、換同伴再挑戰'; }
+  return {stage, sA, dA, tA, sN:b.S.length, dN:b.D.length, tN, ready, why, next, nextZh};
+}
+function growthOf(s){
+  const byItem={}; s.rows.forEach(r=>{ if(r.score===''||r.score==null||/-line$/.test(r.item)) return; (byItem[r.item]=byItem[r.item]||[]).push(r); });
+  const ds=[]; let f=0,l=0;
+  Object.values(byItem).forEach(a=>{ if(a.length<2) return; a.sort((x,y)=>(+x.time||+x.t)-(+y.time||+y.t)); const first=+a[0].score, last=+a[a.length-1].score; ds.push(last-first); f+=first; l+=last; });
+  if(!ds.length) return null;
+  return {n:ds.length, delta:Math.round(ds.reduce((x,y)=>x+y,0)/ds.length), first:Math.round(f/ds.length), last:Math.round(l/ds.length)};
+}
+
 function analyzeRows(rows){
   const C=catalog(), stu={};
   rows.forEach(r=>{
@@ -2700,6 +2739,12 @@ function openItem(id){
   if ((m=id.match(/^L4-(\w+)$/))) return go('l4',{t:Math.max(0,TOPICS.findIndex(t=>t.id===m[1]))});
   if ((m=id.match(/^L5-(\w)-([wpq])(\d+)$/))){ const u=L5.findIndex(x=>x.id===m[1]); const n=+m[3];
     if(m[2]==='w') return go('l5',{u,s:'words',w:n}); if(m[2]==='p') return go('l5',{u,s:'read'}); return go('l5',{u,s:'qs',q:n-1}); }
+  if ((m=id.match(/^LD-(\w+)$/))) return go('ld',{i:Math.max(0,DETECT.findIndex(x=>x.id===m[1]))});
+  if ((m=id.match(/^LS-(\w+)$/))) return go('ls',{ri:Math.max(0,SORTS.findIndex(x=>x.id===m[1]))});
+  if ((m=id.match(/^LC-(\w+)/))) return go('lc',{ci:Math.max(0,COMPARE.findIndex(x=>x.id===m[1]))});
+  if (/^L6-/.test(id)) return go('l6');
+  if (/^L7-/.test(id)) return go('l7');
+  if ((m=id.match(/^L8-(\w+)$/)) && SCENE[m[1]]) return sceneView(m[1]);
   go('home');
 }
 
@@ -2708,7 +2753,7 @@ let tAuto=null;
 function viewTeacher(arg){
   clearInterval(tAuto);
   const C=catalog();
-  const tv = state.tv = Object.assign({tab:'overview', cls:'', teacher:'', range:'today', student:null}, state.tv||{}, arg||{});
+  const tv = state.tv = Object.assign({tab:'today', cls:'', teacher:'', range:'today', student:null}, state.tv||{}, arg||{});
   app.innerHTML = `
     <div class="row" style="justify-content:space-between">
       <h2 style="font-size:28px;font-weight:900">🧑‍🏫 老師後台 <span class="en" style="font-size:18px">Teacher</span></h2>
@@ -2721,11 +2766,11 @@ function viewTeacher(arg){
       </div>
     </div>
     <div class="tabs" style="margin-top:12px">
-      ${[['overview','🚦 總覽 Overview'],['groups','🧩 分組建議 Groups'],['heat','🗺️ 全班熱力圖 Heatmap'],['student','👤 學生報告 Student'],['tests','📝 測驗批改 Tests']].map(([k,l])=>`<button class="tab ${tv.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
+      ${[['today','📋 今日行動 Today'],['overview','🚦 總覽 Overview'],['groups','🧩 分組建議 Groups'],['heat','🗺️ 全班熱力圖 Heatmap'],['student','👤 學生報告 Student'],['tests','📝 測驗批改 Tests']].map(([k,l])=>`<button class="tab ${tv.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
     </div>
     <div id="tb"><div class="card">載入中… Loading…</div></div>`;
   const fillC=()=>{ const cl=tv.teacher?classesOf(tv.teacher):[...new Set((CONFIG.TEACHERS||[]).flatMap(t=>t.classes).concat(CONFIG.CLASSES||[]))]; $('#fc').innerHTML='<option value="">全部班級</option>'+cl.map(c=>`<option>${esc(c)}</option>`).join(''); if(!cl.includes(tv.cls)) tv.cls=''; $('#fc').value=tv.cls; };
-  $('#fr').value=tv.range; $('#ft').value=tv.teacher; fillC();
+  $('#fr').value=tv.range; $('#fr').title='今日行動頁一律看全部紀錄'; $('#ft').value=tv.teacher; fillC();
   $('#fr').onchange=()=>{ tv.range=$('#fr').value; render() };
   $('#ft').onchange=()=>{ tv.teacher=$('#ft').value; tv.student=null; fillC(); render() };
   $('#fc').onchange=()=>{ tv.cls=$('#fc').value; render() };
@@ -2737,15 +2782,16 @@ function viewTeacher(arg){
     try{
       if (REMOTE){ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=list&pin=${encodeURIComponent(CONFIG.TEACHER_PIN)}`); const j=await r.json(); if(!j.ok) throw new Error(j.error); rows=normAll(j.rows); state._assigns=normAll(j.assigns); grades=normAll(j.grades); }
       else { rows=store.get('sp_records',[]); grades=store.get('sp_grades',[]); }
+      state._grades=grades;
       assigns=await loadAssigns(); render();
     }catch(e){ $('#tb').innerHTML=`<div class="warn">讀取失敗：${esc(e.message)}</div>` }
   }
   const since = ()=> tv.range==='all'?0 : tv.range==='week'? Date.now()-7*864e5 : new Date(new Date().toDateString()).getTime();
   const pill=(v)=> v==null?'<span class="pill p-none">—</span>':`<span class="pill ${v>=85?'p-good':v>=60?'p-mid':'p-low'}">${v}</span>`;
   const stuName=s=>`<b>${esc(s.name)}</b> <span class="hint">${tv.teacher?'':esc(String(s.teacher).replace('老師',''))+' '}${esc(s.cls)}</span>`;
-  function data(){
+  function data(allTime){
     const ex=new Set((CONFIG.EXCLUDE_NAMES||[]).map(nameKey));
-    const rs=rows.filter(r=>(+r.time||+r.t||0)>=since() && (!tv.teacher||teacherOf(r)===tv.teacher) && (!tv.cls||r.cls===tv.cls) && !ex.has(nameKey(r.name)));
+    const rs=rows.filter(r=>(allTime || (+r.time||+r.t||0)>=since()) && (!tv.teacher||teacherOf(r)===tv.teacher) && (!tv.cls||r.cls===tv.cls) && !ex.has(nameKey(r.name)));
     return {rs, S:analyzeRows(rs)};
   }
   function assignFor(s){ return assigns.filter(a=>nameKey(a.name)===nameKey(s.name) && String(a.cls)===String(s.cls) && teacherOf(a)===s.teacher) }
@@ -2758,10 +2804,85 @@ function viewTeacher(arg){
   }
 
   function render(){
+    if (tv.tab==='today'){ const d=data(true); return rToday(d.rs,d.S); }
     const {rs,S}=data();
     if (tv.tab==='tests') return rTests(rs,S);
     if (!rs.length && tv.tab!=='student'){ $('#tb').innerHTML='<div class="card">這段時間還沒有練習紀錄。 No attempts in this range. <span class="hint">（可以把右上角改成「最近 7 天」或「全部」）</span></div>'; return; }
     ({overview:rOverview, groups:rGroups, heat:rHeat, student:rStudent})[tv.tab](rs,S);
+  }
+
+
+  /* 📋 今日行動：一打開就知道今天要做什麼 */
+  function rToday(rs,S){
+    if(!S.length){ $('#tb').innerHTML='<div class="card">還沒有學生的練習紀錄。 No data yet.</div>'; return; }
+    S.forEach(s=>s.st=stageOf(s));
+    const help=[], ok=[], up=[];
+    /* 需要幫忙：平均不到 60、有兩種以上的問題、或練習量太少 */
+    const needsHelp=s=>(s.avg!=null && s.avg<60) || new Set(Object.keys(s.types).filter(t=>t!=='mic').map(t=>t==='react'?'dialog':t.split(':')[0]==='pat'?t:t)).size>=2 || !!s.types.practice;
+    S.forEach(s=>{ if(needsHelp(s)) help.push(s); else if(s.st.ready) up.push(s); else ok.push(s); });
+    help.sort((a,b)=>b.needScore-a.needScore);
+    const week=Date.now()-7*864e5, idle=S.filter(s=>s.last<week);
+    const subs=testSubmissions(rs), pend=subs.filter(sb=>!grades.some(g=>g.testId===sb.id && nameKey(g.name)===nameKey(sb.name))).length;
+    // 全班共同問題
+    const G={}; S.forEach(s=>Object.keys(s.types).forEach(t=>{ if(t!=='practice'&&t!=='mic') (G[t]=G[t]||[]).push(s) }));
+    const common=Object.keys(G).filter(t=>G[t].length>=Math.max(2,Math.ceil(S.length*0.2))).sort((a,b)=>G[b].length-G[a].length).slice(0,3);
+    const cnt={S:0,D:0,T:0}; S.forEach(s=>cnt[s.st.stage]++);
+    const STG={S:['🌱','學會','Surface','#22c55e'],D:['🌳','想通','Deep','#06b6d4'],T:['🚀','用出來','Transfer','#ec4899']};
+    const chip=s=>`<button class="chipbtn" data-k="${esc(s.key)}">${esc(s.name)} <span class="stg stg-${s.st.stage}">${STG[s.st.stage][0]}</span>${tv.cls?'':` <span class="hint">${esc(s.cls)}</span>`}</button>`;
+    const helpRow=s=>{ const top=Object.keys(s.types)[0]; const why=top?(ISSUE[top]?.zh||top):''; const w=(s.types[top]||[])[0]?.why||'';
+      return `<div class="trow2"><div>${chip(s)}</div><div class="hint">${esc(why)}${w?'：'+esc(w):''}</div></div>`; };
+    const upRow=s=>`<div class="trow2"><div>${chip(s)}</div><div class="hint">${esc(s.st.why)} → ${esc(s.st.nextZh)}</div></div>`;
+    const grow=S.map(s=>({s, g:growthOf(s)})).filter(x=>x.g).sort((a,b)=>b.g.delta-a.g.delta);
+    $('#tb').innerHTML = `
+      <div class="hint" style="margin-bottom:10px">📋 這一頁看的是<b>全部紀錄</b>（不受右上角日期影響），可以用右上角選老師、班級。 <span class="en">Based on all records.</span></div>
+      <div class="kpis">
+        <div class="kpi">學生 Students<b>${S.length}</b></div>
+        <div class="kpi click" id="gotest">📝 待批改 To grade<b style="color:${pend?'var(--rose)':'inherit'}">${pend}</b></div>
+        <div class="kpi" title="${esc(idle.map(s=>s.name).join('、'))}">💤 7 天沒練習<b style="color:${idle.length?'var(--rose)':'inherit'}">${idle.length}</b></div>
+        <div class="kpi">🆘 需要幫忙<b style="color:var(--rose)">${help.length}</b></div>
+        <div class="kpi">🚀 可以挑戰<b style="color:#be185d">${up.length}</b></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <b style="font-size:18px">🧭 全班在哪個階段？ <span class="en">Where is the class?</span></b>
+        <div class="stbar">${['S','D','T'].map(k=>cnt[k]?`<div class="stseg" data-stg="${k}" style="flex:${cnt[k]};background:${STG[k][3]}">${STG[k][0]} ${STG[k][1]} <b>${cnt[k]}</b></div>`:'').join('')}</div>
+        <div class="hint" style="margin-top:6px">點顏色看名單。判斷方式：學會＝第 1–2 關還沒穩（最高分平均 &lt; 85）；想通＝第 1–2 關已穩，正在練第 3–9 關；用出來＝第 10–11 關平均 ≥ 70（有老師評分時以老師評分為準）。</div>
+        <div id="stlist" style="margin-top:6px"></div>
+      </div>
+      ${common.length?`<div class="card" style="margin-top:12px;border:3px solid #fda4af">
+        <b style="font-size:18px">📣 全班共同問題 → 下一堂課的小課重點 <span class="en">Mini-lesson ideas</span></b>
+        ${common.map(t=>{ const ex=G[t].flatMap(s=>s.types[t]).find(x=>x.label);
+          return `<div class="common"><div class="row" style="justify-content:space-between"><b>${esc(ISSUE[t].zh)}</b><span class="pill p-low">${G[t].length} 人（${Math.round(G[t].length/S.length*100)}%）</span></div>
+          <div class="hint">💡 ${esc(ISSUE[t].tip)}</div>${ex?`<div class="hint">例：${esc(ex.label)}${ex.said?` → 學生說「${esc(ex.said)}」`:''}</div>`:''}
+          <button class="btn btn-ghost" style="margin-top:6px;padding:6px 12px;font-size:14px" data-cassign="${esc(t)}">📌 派相關題目給這 ${G[t].length} 位</button></div>`; }).join('')}
+      </div>`:''}
+      <div class="tcols">
+        <div class="card tcol c-help"><div class="row" style="justify-content:space-between"><b>🆘 需要幫忙 <span class="en">Need support</span></b><span class="pill p-low">${help.length}</span></div>
+          <div class="hint">平均不到 60 分、有兩種以上的問題，或練習量比全班少很多。</div>
+          ${help.map(helpRow).join('')||'<div class="hint" style="padding:10px">🎉 沒有</div>'}
+          ${help.length?`<button class="btn btn-ghost tbtn" id="aHelp">📌 每人派 3 題自己最弱的題目</button>`:''}</div>
+        <div class="card tcol c-ok"><div class="row" style="justify-content:space-between"><b>✅ 照進度走 <span class="en">On track</span></b><span class="pill p-mid">${ok.length}</span></div>
+          <div class="hint">照原本的課程計畫進行。</div>
+          <div style="margin-top:6px">${ok.map(chip).join('')||'<span class="hint">—</span>'}</div></div>
+        <div class="card tcol c-up"><div class="row" style="justify-content:space-between"><b>🚀 可以挑戰 <span class="en">Ready for more</span></b><span class="pill p-good">${up.length}</span></div>
+          <div class="hint">目前階段的題目都做得很好，可以往下一個階段走。</div>
+          ${up.map(upRow).join('')||'<div class="hint" style="padding:10px">還沒有</div>'}
+          ${up.length?`<button class="btn btn-ghost tbtn" id="aUp">📌 派下一階段的題目</button>`:''}</div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <b style="font-size:18px">📈 分數變化 <span class="en">Change over time</span></b>
+        <div class="hint">同一題練了兩次以上：第一次和最近一次的分數差（平均）。由老師判斷是不是「進步很多」。</div>
+        ${grow.length?`<table style="margin-top:8px"><thead><tr><th>學生</th><th>練過再練的題目</th><th>第一次 → 最近</th><th>變化</th></tr></thead><tbody>
+          ${grow.slice(0,12).map(x=>`<tr><td class="click" data-k="${esc(x.s.key)}">${esc(x.s.name)}${tv.cls?'':` <span class="hint">${esc(x.s.cls)}</span>`}</td><td>${x.g.n} 題</td><td>${x.g.first} → ${x.g.last}</td><td><b style="color:${x.g.delta>0?'var(--grass)':x.g.delta<0?'var(--rose)':'inherit'}">${x.g.delta>0?'+':''}${x.g.delta}</b></td></tr>`).join('')}
+        </tbody></table>`:'<div class="hint" style="padding:8px">還沒有學生把同一題練兩次以上。</div>'}
+      </div>`;
+    const tb=$('#tb');
+    tb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ tv.student=b.dataset.k; tv.tab='student'; viewTeacher() });
+    $('#gotest').onclick=()=>{ tv.tab='tests'; tv.range='all'; viewTeacher(); };
+    tb.querySelectorAll('[data-stg]').forEach(b=>b.onclick=()=>{ const k=b.dataset.stg; const L=S.filter(s=>s.st.stage===k);
+      $('#stlist').innerHTML=`<b>${STG[k][0]} ${STG[k][1]}（${L.length}）</b> `+L.map(chip).join(''); $('#stlist').querySelectorAll('[data-k]').forEach(c=>c.onclick=()=>{ tv.student=c.dataset.k; tv.tab='student'; viewTeacher() }); });
+    tb.querySelectorAll('[data-cassign]').forEach(b=>b.onclick=()=>{ const t=b.dataset.cassign; doAssign(G[t], G[t].flatMap(s=>s.types[t].map(x=>x.item).filter(Boolean)), ISSUE[t].zh) });
+    $('#aHelp') && ($('#aHelp').onclick=async()=>{ for(const s of help){ const items=s.weakItems.map(x=>x.item).filter(Boolean); if(items.length) await doAssign([s], items.slice(0,3), '加強：自己最弱的題目'); } });
+    $('#aUp') && ($('#aUp').onclick=async()=>{ for(const s of up){ if(s.st.next.length) await doAssign([s], s.st.next, '挑戰：'+s.st.nextZh); } });
   }
 
   function rOverview(rs,S){
