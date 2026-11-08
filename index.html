@@ -111,6 +111,23 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.stage{margin-top:22px;border-radius:24px;padding:14px 16px 18px;border:3px solid}
+.stage .levels{margin-top:10px}
+.st-s{background:#f0fdf4;border-color:#bbf7d0}.st-d{background:#ecfeff;border-color:#a5f3fc}.st-t{background:#fdf2f8;border-color:#fbcfe8}
+.sthead{display:flex;gap:12px;align-items:center}.sthead b{font-size:21px}.stico{font-size:40px}
+.l8{background:linear-gradient(135deg,#b45309,#f59e0b)}
+.scn-visit{background:linear-gradient(135deg,#0369a1,#38bdf8)}.scn-club{background:linear-gradient(135deg,#15803d,#4ade80)}.scn-reporter{background:linear-gradient(135deg,#7c2d12,#f97316)}
+.scstory{border:3px solid #fcd34d}
+.scgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+@media (max-width:700px){.scgrid{grid-template-columns:1fr}}
+.scrole{margin:0}
+.sctasks{list-style:none;padding:0;margin:6px 0 0;display:flex;flex-direction:column;gap:6px}
+.sctasks li{background:#fff;border-radius:12px;padding:8px 10px;font-weight:800;font-size:17px}
+.sctasks li .en{display:block;font-size:13px;font-weight:600}
+.scwords{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.scw{background:#fffbeb;border:2px solid #fcd34d;border-radius:14px;padding:4px 12px 6px;font-size:22px;font-weight:900;display:flex;flex-direction:column;align-items:center}
+.scw rt{font-size:12px;font-weight:700;color:#78716c}
+.scw .en{font-size:12px;font-weight:700}
 .l7timer{margin-top:12px;border:3px solid #fcd34d;background:#fffbeb;border-radius:16px;padding:10px 12px}
 .tdur2{display:inline-flex;gap:6px;margin-left:auto}
 .tdb2{border-radius:999px;border:2px solid #e5dccb;background:#fff;padding:4px 12px;font-weight:900;font-size:16px}
@@ -1058,7 +1075,7 @@ function go(view, arg){
   $('#btnSwitch').classList.toggle('hidden',!showUser);
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+state.user.name;
   window.scrollTo(0,0);
-  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, teacher:viewTeacher, pin:viewPin})[view](arg);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, teacher:viewTeacher, pin:viewPin})[view](arg);
 }
 
 function viewLogin(){
@@ -1123,15 +1140,24 @@ function viewHome(){
       <div id="mtMsg" style="margin-top:8px;font-weight:700"></div>
     </div>
     <div id="asgCard"></div>
+    <div class="stage st-s"><div class="sthead"><span class="stico">🌱</span><div><b>第一階段：學會</b> <span class="en">Surface · Learn it</span><div class="hint">聽懂、說出運動詞語和句型 <span class="en">Hear and say the words and patterns</span></div></div></div>
     <div class="levels">
       <button class="level l1" data-v="l1"><span class="num">LEVEL 1</span><span class="ico">🔤</span><span class="t">詞語暖身</span><span class="d">聽一聽、說一說運動詞語<br><span class="en" style="color:#fff">Listen & say the words</span></span><span class="prog">✅ ${a.done}/${a.total}</span></button>
       <button class="level l2" data-v="l2"><span class="num">LEVEL 2</span><span class="ico">🧩</span><span class="t">句型練習</span><span class="d">用句型回答問題<br><span class="en" style="color:#fff">Answer with sentence patterns</span></span><span class="prog">✅ ${b.done}/${b.total}</span></button>
+    </div></div>
+    <div class="stage st-d"><div class="sthead"><span class="stico">🌳</span><div><b>第二階段：想通</b> <span class="en">Deep · Connect it</span><div class="hint">知道什麼時候用哪個句型，接住對方的話、說理由 <span class="en">Choose the right pattern, respond, and give reasons</span></div></div></div>
+    <div class="levels">
       <button class="level l3" data-v="l3"><span class="num">LEVEL 3</span><span class="ico">💬</span><span class="t">和文文聊天</span><span class="d">一問一答，練習對話<br><span class="en" style="color:#fff">Chat with Wenwen</span></span><span class="prog">✅ ${c.done}/${c.total}</span></button>
       <button class="level l4" data-v="l4"><span class="num">LEVEL 4</span><span class="ico">🎤</span><span class="t">我來說一說</span><span class="d">說一段話介紹運動或運動員<br><span class="en" style="color:#fff">Give a short talk</span></span><span class="prog">✅ ${d.done}/${d.total}</span></button>
       <button class="level l5" data-v="l5"><span class="num">LEVEL 5 · 進階</span><span class="ico">🚀</span><span class="t">進階挑戰</span><span class="d">讀短文和對話，用說的回答問題<br><span class="en" style="color:#fff">Read, think & answer</span></span><span class="prog">✅ ${e5.done}/${e5.total}</span></button>
       <button class="level l6" data-v="l6"><span class="num">LEVEL 6 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
-      <button class="level l7" data-v="l7"><span class="num">LEVEL 7 · 最後測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
-    </div>`;
+    </div></div>
+    <div class="stage st-t"><div class="sthead"><span class="stico">🚀</span><div><b>第三階段：用出來</b> <span class="en">Transfer · Use it</span><div class="hint">在新的情境裡，自己決定要說什麼 <span class="en">Use what you know in new situations</span></div></div></div>
+    <div class="levels">
+      <button class="level l7" data-v="l7"><span class="num">LEVEL 7 · 對話測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
+      <button class="level l8" data-v="l8"><span class="num">LEVEL 8 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
+    </div></div>
+    `;
   app.querySelectorAll('.level').forEach(b=>b.onclick=()=>go(b.dataset.v));
   myAssigns().then(list=>{
     const el=$('#asgCard'); if(!el || !list.length) return;
@@ -1942,31 +1968,39 @@ function viewL7(){
     if(T.on) return;
     if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
     if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
-    T.on=true; const dur=S.dur, total=dur*1000;
+    T.on=true; const dur=S.dur;
     $('#goT').disabled=true; $('#goT').innerHTML='⏺️ 錄音中… <span class="en">Recording</span>';
-    const fl=document.createElement('div'); fl.className='tfloat'; fl.id='tfloat';
-    fl.innerHTML=`<div class="tring sm" id="ring"><div><div class="tsec" id="sec">3</div><div class="tlab" id="tlab">準備 Ready</div></div></div><div class="trec sm hidden" id="trec"><span class="tdot"></span>錄音中</div><button class="tstop" id="tstop">⏹ 結束<span class="en">Stop</span></button>`;
-    document.body.appendChild(fl);
-    const cleanup=()=>{ fl.remove(); T.on=false; };
-    let cancelled=false;
-    fl.querySelector('#tstop').onclick=()=>{ if(T.rec) current && current(); else { cancelled=true; } };
-    for(let n=3;n>0;n--){ if(cancelled||!document.body.contains(fl)) break; fl.querySelector('#sec').textContent=n; await new Promise(r=>setTimeout(r,1000)); }
-    if(cancelled){ cleanup(); viewL7(); return; }
-    fl.querySelector('#tlab').textContent='秒 sec'; fl.querySelector('#trec').classList.remove('hidden');
-    const t0=Date.now(); T.rec=true;
-    const iv=setInterval(()=>{ const left=Math.max(0,total-(Date.now()-t0)); const sec=Math.ceil(left/1000); const r=fl.querySelector('#ring');
-      fl.querySelector('#sec').textContent=sec; r.style.setProperty('--p',left/total); r.classList.toggle('low',sec<=10); },200);
-    let res=null;
-    try{ res=await listen({continuous:true, maxMs:total}); }
-    catch(e){ clearInterval(iv); cleanup(); T.rec=false; toast('🎙️ 沒有麥克風權限 Please allow the microphone',3000); viewL7(); return; }
-    clearInterval(iv); T.rec=false;
-    const used=Math.min(dur, Math.round((Date.now()-t0)/1000));
-    cleanup();
+    const out=await floatTimer(dur); T.on=false;
+    if(!out){ viewL7(); return; }
+    const {res, used}=out;
     timedFinish(S, S.lines.slice(), names(), res, used, dur, !!document.getElementById('dlg'));
   };
   renderAll();
 }
 
+
+
+/* 浮動計時器：倒數 3 秒後開始錄音＋計時，回傳 {res, used}；取消或沒有麥克風回傳 null */
+async function floatTimer(dur){
+  const total=dur*1000;
+  document.getElementById('tfloat')?.remove();
+  const fl=document.createElement('div'); fl.className='tfloat'; fl.id='tfloat';
+  fl.innerHTML=`<div class="tring sm" id="ring"><div><div class="tsec" id="sec">3</div><div class="tlab" id="tlab">準備 Ready</div></div></div><div class="trec sm hidden" id="trec"><span class="tdot"></span>錄音中</div><button class="tstop" id="tstop">⏹ 結束<span class="en">Stop</span></button>`;
+  document.body.appendChild(fl);
+  let cancelled=false, rec=false;
+  fl.querySelector('#tstop').onclick=()=>{ if(rec) current && current(); else cancelled=true; };
+  for(let n=3;n>0;n--){ if(cancelled||!document.body.contains(fl)) break; fl.querySelector('#sec').textContent=n; await new Promise(r=>setTimeout(r,1000)); }
+  if(cancelled||!document.body.contains(fl)){ fl.remove(); return null; }
+  fl.querySelector('#tlab').textContent='秒 sec'; fl.querySelector('#trec').classList.remove('hidden');
+  const t0=Date.now(); rec=true;
+  const iv=setInterval(()=>{ const left=Math.max(0,total-(Date.now()-t0)); const sec=Math.ceil(left/1000); const r=fl.querySelector('#ring');
+    fl.querySelector('#sec').textContent=sec; r.style.setProperty('--p',left/total); r.classList.toggle('low',sec<=10); },200);
+  let res=null;
+  try{ res=await listen({continuous:true, maxMs:total}); }
+  catch(e){ clearInterval(iv); fl.remove(); toast('🎙️ 沒有麥克風權限 Please allow the microphone',3000); return null; }
+  clearInterval(iv); fl.remove();
+  return {res, used: Math.min(dur, Math.round((Date.now()-t0)/1000))};
+}
 
 /* ---------- 計時對話：選 30/60/90 秒，按開始後同時計時＋錄下整段對話 ---------- */
 const TIMER_OPTS=[30,60,90];
@@ -2052,6 +2086,137 @@ function runTest(S, lines, names){
   render();
 }
 
+
+/* ============================================================
+   LEVEL 8：情境任務（Transfer）— 新情境、任務卡、新詞只當提示；計時錄整段對話
+   ============================================================ */
+const SCENES = [
+  {id:'visit', e:'🌏', zh:'外國朋友來台灣', en:'A friend visits Taiwan',
+   story:'B 是從國外來台灣玩的朋友。A 想帶 B 去體驗一個台灣的運動活動。兩個人要一起決定：去做什麼運動、為什麼、什麼時候去。',
+   storyEn:'B is a friend visiting Taiwan. A wants to take B to try a sports activity here. Together, decide what to do, why, and when.',
+   A:{zh:'台灣的主人', en:'Host in Taiwan', tasks:[['問 B 喜歡什麼運動、會不會','Ask what sports B likes and can do'],['推薦一個活動，說一個理由','Suggest an activity and give a reason'],['約好星期幾一起去','Agree on a day to go together']]},
+   B:{zh:'外國朋友', en:'Visiting friend', tasks:[['說自己喜歡、不喜歡的運動','Say what you like and don’t like'],['問那個活動難不難、好不好玩','Ask if it is hard or fun'],['回應 A 的話（真的嗎？我也是…）','Respond to A (Really? Me too…)']]},
+   words:[['看棒球比賽','kàn bàng qiú bǐ sài','watch a baseball game'],['河濱公園','hé bīn gōng yuán','riverside park'],['墾丁','kěn dīng','Kenting (a beach town)'],['門票','mén piào','ticket'],['外國','wài guó','foreign country']],
+   invite:true},
+  {id:'club', e:'🏫', zh:'運動社團招生', en:'Sports club sign-up',
+   story:'新學期開始了！A 是運動社團的學長姐，正在找新社員。B 是新同學，還不知道要參加哪一個社團。',
+   storyEn:'A new term has started! A is a club leader looking for new members. B is a new student who hasn’t chosen a club yet.',
+   A:{zh:'社團學長姐', en:'Club leader', tasks:[['問 B 喜歡什麼運動、會不會','Ask what B likes and can do'],['介紹社團：什麼時候練習','Tell B when the club practices'],['說一個理由，邀請 B 參加','Give a reason and invite B to join']]},
+   B:{zh:'新同學', en:'New student', tasks:[['問練習難不難、累不累','Ask if practice is hard or tiring'],['說自己打得／跑得怎麼樣','Say how well you play'],['決定要不要報名，說理由','Decide whether to sign up, and why']]},
+   words:[['社團','shè tuán','club'],['練習','liàn xí','practice'],['報名','bào míng','sign up'],['隊長','duì zhǎng','team captain'],['新同學','xīn tóng xué','new classmate']],
+   invite:true},
+  {id:'reporter', e:'🎤', zh:'小記者訪問運動員', en:'Kid reporter interview',
+   story:'A 是學校的小記者，要訪問一位運動員。B 扮演自己最喜歡的運動員，可以是真的運動員，也可以是未來的自己。',
+   storyEn:'A is a school kid reporter interviewing an athlete. B plays a favorite athlete — a real one, or your future self.',
+   A:{zh:'小記者', en:'Kid reporter', tasks:[['問 B 做什麼運動、為什麼喜歡','Ask what sport B plays and why'],['問一場比賽：贏了還是輸了？覺得怎麼樣？','Ask about a game: win or lose? How did it feel?'],['問教練或練習的事','Ask about the coach or practice']]},
+   B:{zh:'運動員', en:'Athlete', tasks:[['介紹自己和自己的運動','Introduce yourself and your sport'],['說一場比賽和自己的感覺','Talk about a game and how you felt'],['用「因為…」說理由','Give a reason with 因為']]},
+   words:[['記者','jì zhě','reporter'],['訪問','fǎng wèn','interview'],['冠軍','guàn jūn','champion'],['得分','dé fēn','score points'],['觀眾','guān zhòng','audience']],
+   invite:false}
+];
+const SCENE = Object.fromEntries(SCENES.map(x=>[x.id,x]));
+/* 自動任務檢查（看辨識到的整段文字；分不出誰說的，所以是兩個人一起的） */
+function sceneChecks(sc, said){
+  const t=String(said||'');
+  const cnt=re=>(t.match(re)||[]).length;
+  const used=sc.words.filter(w=>norm(t).includes(norm(w[0])));
+  const rows=[
+    ['q',  '至少問 2 個問題', 'Ask at least 2 questions', cnt(/嗎|什麼|為什麼|怎麼樣|幾|哪|誰|會不會|要不要|好不好|難不難|累不累/g)>=2],
+    ['r',  '用「因為…」說理由', 'Give a reason with 因為', /因為/.test(t)],
+    ['e',  '有回應對方', 'Respond to your partner', /真的|是喔|是哦|我也是|一樣|原來|沒關係|厲害|太好了|好啊/.test(t)],
+    ['w',  '用到至少 1 個新詞', 'Use at least 1 new word', used.length>=1]
+  ];
+  if (sc.invite) rows.push(['i','有邀請或約時間','Invite or set a time',/一起|星期|週末|周末|好不好|要不要|報名|參加/.test(t)]);
+  return {rows, used:used.map(w=>w[0]), score: Math.round(100*rows.filter(r=>r[3]).length/rows.length)};
+}
+function l8Key(){ return 'sp_l8_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+function viewL8(){
+  const S=Object.assign({partner:'', dur:90}, store.get(l8Key(),{}));
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🌟 情境任務 <span class="en" style="font-size:18px">Real-life missions</span></h2>
+    <div class="hint" style="margin-top:4px">選一個情境，跟同伴用學過的詞語和句型，自己想要說什麼。沒有標準答案！ <span class="en">Pick a situation and talk with your partner using what you’ve learned. There’s no single right answer!</span></div>
+    <div class="levels">${SCENES.map(sc=>`<button class="level scn scn-${sc.id}" data-s="${sc.id}"><span class="num">情境 MISSION</span><span class="ico">${sc.e}</span><span class="t">${esc(sc.zh)}</span><span class="d">${esc(sc.A.zh)} × ${esc(sc.B.zh)}<br><span class="en" style="color:#fff">${esc(sc.en)}</span></span></button>`).join('')}</div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>sceneView(b.dataset.s));
+}
+function sceneView(id){
+  const sc=SCENE[id]; const S=Object.assign({partner:'', dur:90}, store.get(l8Key(),{}));
+  const save=()=>store.set(l8Key(),S);
+  if(!TIMER_OPTS.includes(S.dur)) S.dur=90;
+  const nm=()=>({A:state.user.name, B:S.partner||'（同伴）'});
+  const role=w=>`<div class="card scrole spk-bg-${w}">
+      <div class="row" style="gap:8px"><span class="spk spk-${w}">${w}</span><b style="font-size:20px" id="rn${w}">${esc(nm()[w])}</b><span class="pill">${esc(sc[w].zh)} <span class="en">${esc(sc[w].en)}</span></span></div>
+      <div class="hint" style="margin-top:6px;font-weight:900">📋 你的任務 Your mission</div>
+      <ul class="sctasks">${sc[w].tasks.map(t=>`<li>☐ ${esc(t[0])}<span class="en">${esc(t[1])}</span></li>`).join('')}</ul>
+    </div>`;
+  app.innerHTML = `
+    <button class="back" id="bk">← 選別的情境 Other missions</button>
+    <div class="card scstory">
+      <div class="row" style="gap:10px"><span style="font-size:46px">${sc.e}</span><div><h2 style="font-size:28px;font-weight:900;margin:0">${esc(sc.zh)}</h2><div class="en">${esc(sc.en)}</div></div></div>
+      <p style="font-size:19px;line-height:1.7;margin:10px 0 2px">${esc(sc.story)}</p>
+      <div class="en">${esc(sc.storyEn)}</div>
+      <div class="row" style="gap:16px;margin-top:10px">
+        <span class="who-a">A：${esc(state.user.name)}</span>
+        <span class="who-b">B：<input id="pn" value="${esc(S.partner)}" maxlength="20" placeholder="同伴的名字 Partner's name"></span>
+      </div>
+    </div>
+    <div class="scgrid">${role('A')}${role('B')}</div>
+    <div class="card">
+      <b>💡 可能用得到的新詞 <span class="en">Words you might use</span></b> <span class="hint">（不一定要用，自己決定放在哪裡 · optional）</span>
+      <div class="scwords">${sc.words.map((w,i)=>`<button class="scw" data-w="${i}"><ruby>${esc(w[0])}<rt>${esc(w[1])}</rt></ruby> 🔊<span class="en">${esc(w[2])}</span></button>`).join('')}</div>
+      <div class="hint" style="margin-top:8px">🧰 也可以用學過的：你喜歡什麼運動？／你會…嗎？／你…得怎麼樣？／為什麼？因為…／我也是／真的嗎？／我們一起去…，好不好？</div>
+    </div>
+    <div class="card l7timer" style="margin-top:12px">
+      <div class="row" style="gap:8px;align-items:center"><b>⏱️ 計時對話 <span class="en">Timed talk</span></b>
+        <span class="tdur2">${TIMER_OPTS.map(x=>`<button class="tdb2 ${x===S.dur?'on':''}" data-d="${x}">${x} 秒</button>`).join('')}</span></div>
+      <button class="btn btn-sun" id="goT" style="width:100%;margin-top:8px;font-size:22px">▶️ 開始計時＋錄音 <span class="en">Start timer & record</span></button>
+      <div class="hint" style="margin-top:4px">先花一點時間看任務、想一想要說什麼。準備好再按開始。 <span class="en">Read your mission and plan first. Press Start when you’re ready.</span></div>
+    </div>`;
+  $('#bk').onclick=()=>viewL8();
+  $('#pn').oninput=()=>{ S.partner=cleanName($('#pn').value); save(); $('#rnB').textContent=nm().B; };
+  app.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>say(sc.words[+b.dataset.w][0]));
+  app.querySelectorAll('.tdb2').forEach(b=>b.onclick=()=>{ S.dur=+b.dataset.d; save(); app.querySelectorAll('.tdb2').forEach(x=>x.classList.toggle('on',x===b)); });
+  let busy=false;
+  $('#goT').onclick=async()=>{
+    if(busy) return;
+    if(!S.partner){ toast('請先輸入同伴的名字 Enter your partner’s name'); $('#pn').focus(); return; }
+    if(nameKey(S.partner)===nameKey(state.user.name)){ toast('同伴的名字不能和自己一樣'); return; }
+    busy=true; const dur=S.dur; const b=$('#goT'); b.disabled=true; b.innerHTML='⏺️ 錄音中… <span class="en">Recording</span>';
+    const out=await floatTimer(dur); busy=false;
+    if(!out){ if(document.getElementById('goT')) sceneView(id); return; }
+    sceneFinish(sc, S, nm(), out.res, out.used, dur, !!document.getElementById('goT'));
+  };
+}
+async function sceneFinish(sc, S, names, res, used, dur, show){
+  const partnerUser={name:S.partner, cls:state.user.cls, teacher:state.user.teacher};
+  const said=res.transcript||'';
+  const ck=sceneChecks(sc, said);
+  const score = res.srOk && said ? ck.score : null;
+  const testId='T'+Date.now().toString(36);
+  if(show) app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:50px">⏳</div><div class="hint" style="font-size:18px">正在把錄音送給老師… <span class="en">Sending to your teacher…</span></div></div>`;
+  for (const who of ['A','B']){
+    const text=`測驗${testId}｜同伴：${names[who==='A'?'B':'A']}｜${who}｜計時${dur}秒（說了${used}秒）｜情境：${sc.zh}\n`
+      + sc[who].tasks.map(t=>`${who}（${names[who]}）［任務］：${t[0]}`).join('\n')
+      + `\n任務檢查：${ck.rows.map(r=>(r[3]?'✅':'⬜')+r[1]).join('　')}${ck.used.length?'｜新詞：'+ck.used.join('、'):''}`;
+    await saveAttempt({level:'L8 情境', item:'L8-'+sc.id, target:text, transcript:said, score, blob:res.blob, mime:res.mime, diag:res.diag, asUser: who==='A'?null:partnerUser});
+  }
+  if(!show) return;
+  const url=res.blob?URL.createObjectURL(res.blob):'';
+  app.innerHTML = `
+    <div class="card" style="text-align:center">
+      <div style="font-size:56px">${sc.e}</div>
+      <h2 style="font-size:28px;font-weight:900">任務完成！ Mission complete!</h2>
+      <div class="hint" style="font-size:16px;margin-top:6px">你們說了 <b>${used}</b> 秒，錄音已經送給老師。 <span class="en">You talked for ${used} seconds. Your recording was sent to your teacher.</span></div>
+      ${url?`<audio controls src="${url}" style="width:100%;margin-top:14px"></audio>`:''}
+      ${res.srOk?`<div style="text-align:left;margin-top:14px"><b>🔎 任務檢查 Mission check</b> <span class="hint">（電腦聽到的，兩個人一起看 · based on what the computer heard）</span>
+        <div class="checks" style="margin-top:6px">${ck.rows.map(r=>`<span class="ck2 ${r[3]?'ok':''}">${r[3]?'✅':'⬜'} ${esc(r[1])}<span class="ck2en">${esc(r[2])}</span></span>`).join('')}</div>
+        ${ck.used.length?`<div class="hint" style="margin-top:6px">💡 用到的新詞：${ck.used.map(esc).join('、')}</div>`:''}</div>`:''}
+      <div class="heard" style="text-align:left;margin-top:12px"><span class="lbl">我聽到 I heard:</span><span class="txt">${esc(said)||'（沒有辨識到文字，老師會聽錄音）'}</span></div>
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="home">🏠 回首頁</button><button class="btn btn-ghost" id="other">🌟 換一個情境</button><button class="btn btn-sun" id="again">🔁 再試一次</button></div>
+    </div>`;
+  $('#home').onclick=()=>go('home'); $('#other').onclick=()=>viewL8(); $('#again').onclick=()=>sceneView(sc.id);
+}
+
 /* ---------- 老師：測驗批改 ---------- */
 async function postGrade(g){
   if (REMOTE){ const r=await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action:'grade',pin:CONFIG.TEACHER_PIN},g))}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed'); return j; }
@@ -2059,13 +2224,13 @@ async function postGrade(g){
 }
 function testSubmissions(rows){
   const subs=[];
-  rows.filter(r=>r.item==='L7-test').forEach(r=>{
+  rows.filter(r=>r.item==='L7-test'||String(r.item).startsWith('L8-')).forEach(r=>{
     const m=String(r.target||'').match(/^測驗(T\w+)｜同伴：([^｜]*)｜([AB])/); if(!m) return;
-    const lines=String(r.target).split('\n').slice(1);
+    const lines=String(r.target).split('\n').slice(1).filter(x=>!x.startsWith('任務檢查：')); const mcheck=(String(r.target).split('\n').find(x=>x.startsWith('任務檢查：'))||'').replace('任務檢查：','');
     const T=teacherOf(r), key=T+'|'+r.cls+'|'+nameKey(r.name);
     const rec=rows.filter(x=>x.item==='L7-line' && String(x.target).startsWith('測驗'+m[1]+'｜') && nameKey(x.name)===nameKey(r.name));
     const tm=String(r.target||'').split('\n')[0].match(/｜計時(\d+)秒(?:（說了(\d+)秒）)?/);
-    subs.push({id:m[1], key, name:cleanName(r.name), cls:r.cls, teacher:T, partner:m[2], role:m[3], time:+r.time||+r.t, auto:(r.score===''||r.score==null)?null:+r.score, lines, rec, timed: tm?{dur:+tm[1], used:tm[2]?+tm[2]:null}:null, full:r.fileId||'', said:r.transcript||''});
+    subs.push({id:m[1], key, name:cleanName(r.name), cls:r.cls, teacher:T, partner:m[2], role:m[3], time:+r.time||+r.t, auto:(r.score===''||r.score==null)?null:+r.score, lines, rec, timed: tm?{dur:+tm[1], used:tm[2]?+tm[2]:null}:null, full:r.fileId||'', said:r.transcript||'', mcheck, scene:(String(r.target||'').split('\n')[0].match(/｜情境：(.+)$/)||[])[1]||''});
   });
   return subs.sort((a,b)=>b.time-a.time);
 }
@@ -2100,6 +2265,8 @@ function catalog(){
   H.push({g:'L7', h:'L7 測驗', zh:'對話測驗', en:'Dialogue test'});
   C['L7-test']={L:'L7', g:'L7', label:'對話測驗', kind:'test'};
   C['L7-line']={L:'L7', g:null, label:'', kind:'dline'};
+  H.push({g:'L8', h:'L8 情境', zh:'情境任務', en:'Real-life missions'});
+  SCENES.forEach(x=>C['L8-'+x.id]={L:'L8', g:'L8', label:'情境：'+x.zh, kind:'test'});
   L5.forEach(u=>{
     const g='L5-'+u.id; H.push({g, h:'L5 '+u.name.slice(0,4), zh:'進階閱讀：'+u.name, en:'Reading: '+u.en});
     u.words.forEach((w,i)=>C['L5-'+u.id+'-w'+i]={L:'L5', g, label:w[0], kind:'word', word:w[0]});
@@ -2442,9 +2609,9 @@ function viewTeacher(arg){
         return `<div class="card" style="margin-bottom:14px">
           <div class="row" style="justify-content:space-between"><div><b style="font-size:20px">${esc(sb.name)}</b> <span class="hint">${esc(sb.teacher)} ${esc(sb.cls)} · 同伴：${esc(sb.partner)} · ${new Date(sb.time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
             <div class="row">${'<span class="hint">自動分數</span> '+(sb.auto==null?'<span class="pill p-none">—</span>':`<span class="pill ${sb.auto>=85?'p-good':sb.auto>=60?'p-mid':'p-low'}">${sb.auto}</span>`)} ${g?`<span class="pill p-good">老師 ${g.total}/16</span>`:'<span class="pill p-low">待批改</span>'}</div></div>
-          ${sb.timed?`<div class="warn" style="margin-top:10px;background:#f0fdf4;border-color:#86efac">⏱️ 計時對話 ${sb.timed.dur} 秒${sb.timed.used!=null?`（說了 ${sb.timed.used} 秒）`:''}　${sb.full?`<button class="btn btn-sun" style="padding:6px 14px;font-size:16px" data-f="${esc(sb.full)}">▶️</button> 整段錄音（兩個人一起）`:'（沒有錄音檔）'}
-            <div style="margin-top:6px"><span class="hint">辨識到的文字：</span>${esc(sb.said)||'<span class="hint">（無）</span>'}</div><div class="hint" style="margin-top:4px">自動分數＝對話用到幾成關鍵字（兩個人同一個分數）；請聽錄音分別給 A、B 評分。</div></div>`:''}
-          <table style="margin-top:10px"><thead><tr><th>#</th><th>關鍵字</th><th>說的話</th><th>錄音</th></tr></thead><tbody>
+          ${sb.timed?`<div class="warn" style="margin-top:10px;background:#f0fdf4;border-color:#86efac">${sb.scene?`🌟 <b>情境：${esc(sb.scene)}</b>　`:''}⏱️ 計時對話 ${sb.timed.dur} 秒${sb.timed.used!=null?`（說了 ${sb.timed.used} 秒）`:''}　${sb.full?`<button class="btn btn-sun" style="padding:6px 14px;font-size:16px" data-f="${esc(sb.full)}">▶️</button> 整段錄音（兩個人一起）`:'（沒有錄音檔）'}
+            <div style="margin-top:6px"><span class="hint">辨識到的文字：</span>${esc(sb.said)||'<span class="hint">（無）</span>'}</div>${sb.mcheck?`<div style="margin-top:4px">${esc(sb.mcheck)}</div>`:''}<div class="hint" style="margin-top:4px">${sb.scene?'自動分數＝任務檢查完成幾成':'自動分數＝對話用到幾成關鍵字'}（兩個人同一個分數）；請聽錄音分別給 A、B 評分。</div></div>`:''}
+          ${sb.scene?`<div class="hint" style="margin-top:8px">📋 ${esc(sb.role)} 的任務：${sb.lines.map(x=>esc(x.split('：').slice(1).join('：'))).join('／')}</div>`:''}<table class="${sb.scene?'hidden':''}" style="margin-top:10px"><thead><tr><th>#</th><th>關鍵字</th><th>說的話</th><th>錄音</th></tr></thead><tbody>
           ${sb.lines.map((ln,j)=>{ const mm=ln.match(/^([AB])（(.*?)）［(.*?)］：(.*)$/); const who=mm?mm[1]:''; const mine=who===sb.role;
              const rec=mine? sb.rec.find(x=>String(x.target).includes('第'+(j+1)+'句')) : null;
              return `<tr style="${mine?'':'opacity:.55'}"><td><span class="spk spk-${who}" style="min-width:30px;height:30px;font-size:14px">${who}</span></td><td class="hint">${esc(mm?mm[3]:'')}</td><td><b>${esc(mm?mm[4]:ln)}</b>${mine?'':' <span class="hint">（同伴）</span>'}</td><td>${rec?.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(rec.fileId)}">▶️</button>`:''}</td></tr>`; }).join('')}
