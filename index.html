@@ -111,6 +111,37 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.ld{background:linear-gradient(135deg,#1e3a8a,#3b82f6)}.ls{background:linear-gradient(135deg,#4d7c0f,#84cc16)}.lc{background:linear-gradient(135deg,#be185d,#f472b6)}
+.dsent{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:12px;font-size:28px;font-weight:900}
+.dtok{background:#fff;border:3px solid #e5dccb;border-radius:14px;padding:2px 10px 6px;font-size:28px;font-weight:900;line-height:1.6}
+.dtok rt{font-size:13px;font-weight:700;color:#78716c}
+.dtok.on{border-color:#f59e0b;background:#fff7e0;box-shadow:0 3px 0 #f59e0b}
+.dtok.bad{border-color:#dc2626;background:#fee2e2;color:#b91c1c}
+.dfix{font-size:24px;color:#57534e;padding-bottom:6px}
+.dexp{background:#eff6ff;border-radius:14px;padding:10px 12px}
+.dans{margin-top:6px;font-size:22px;font-weight:900;color:#15803d;background:#f0fdf4;border-radius:12px;padding:6px 12px}
+.dframe{margin-top:6px;font-size:20px;font-weight:800;background:#fffbeb;border:2px dashed #fcd34d;border-radius:12px;padding:8px 12px}
+.sbank{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:52px;padding:8px;border-radius:14px;background:#f8f6f0}
+.scard{background:#fff;border:3px solid #e5dccb;border-radius:14px;padding:6px 12px;font-size:20px;font-weight:900}
+.scard.on{border-color:#f59e0b;background:#fff7e0;transform:translateY(-2px);box-shadow:0 4px 0 #f59e0b}
+.scard.ok{border-color:#16a34a;background:#f0fdf4}.scard.bad{border-color:#dc2626;background:#fee2e2}
+.sbins{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.sbin{border:3px dashed #a8a29e;border-radius:18px;min-height:150px;padding:8px;cursor:pointer;background:#fff}
+.sbh{font-weight:900;font-size:19px;margin-bottom:8px}
+.sbc{display:flex;flex-wrap:wrap;gap:8px}
+.cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media (max-width:700px){.cmpgrid,.sbins{grid-template-columns:1fr}}
+.cmpcol{border-radius:16px;padding:10px}
+.cmpchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cchip{background:#fff;border:2px solid #e5dccb;border-radius:999px;padding:4px 10px;font-size:16px;font-weight:800}
+.cchip.on{border-color:#16a34a;background:#16a34a;color:#fff}
+.venn{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:10px;min-height:170px}
+.vc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:19px;font-weight:900;padding:14px 8px;text-align:center}
+.vh{font-size:14px;color:#57534e;margin-bottom:4px}.vh .en{display:block;font-size:11px}
+.va{background:rgba(29,78,216,.14);border-radius:999px 0 0 999px;border:3px solid #1d4ed8;border-right:none}
+.vboth{background:rgba(22,163,74,.18);border:3px solid #16a34a}
+.vb{background:rgba(217,119,6,.14);border-radius:0 999px 999px 0;border:3px solid #d97706;border-left:none}
+.cmptask{border-radius:16px;padding:10px 12px;margin-top:10px}
 .stage{margin-top:22px;border-radius:24px;padding:14px 16px 18px;border:3px solid}
 .stage .levels{margin-top:10px}
 .st-s{background:#f0fdf4;border-color:#bbf7d0}.st-d{background:#ecfeff;border-color:#a5f3fc}.st-t{background:#fdf2f8;border-color:#fbcfe8}
@@ -1075,7 +1106,7 @@ function go(view, arg){
   $('#btnSwitch').classList.toggle('hidden',!showUser);
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+state.user.name;
   window.scrollTo(0,0);
-  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, teacher:viewTeacher, pin:viewPin})[view](arg);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, teacher:viewTeacher, pin:viewPin})[view](arg);
 }
 
 function viewLogin(){
@@ -1150,12 +1181,15 @@ function viewHome(){
       <button class="level l3" data-v="l3"><span class="num">LEVEL 3</span><span class="ico">💬</span><span class="t">和文文聊天</span><span class="d">一問一答，練習對話<br><span class="en" style="color:#fff">Chat with Wenwen</span></span><span class="prog">✅ ${c.done}/${c.total}</span></button>
       <button class="level l4" data-v="l4"><span class="num">LEVEL 4</span><span class="ico">🎤</span><span class="t">我來說一說</span><span class="d">說一段話介紹運動或運動員<br><span class="en" style="color:#fff">Give a short talk</span></span><span class="prog">✅ ${d.done}/${d.total}</span></button>
       <button class="level l5" data-v="l5"><span class="num">LEVEL 5 · 進階</span><span class="ico">🚀</span><span class="t">進階挑戰</span><span class="d">讀短文和對話，用說的回答問題<br><span class="en" style="color:#fff">Read, think & answer</span></span><span class="prog">✅ ${e5.done}/${e5.total}</span></button>
-      <button class="level l6" data-v="l6"><span class="num">LEVEL 6 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
+      <button class="level ld" data-v="ld"><span class="num">LEVEL 6 · 找規則</span><span class="ico">🔍</span><span class="t">小偵探</span><span class="d">這句話哪裡怪怪的？找出來、說對它<br><span class="en" style="color:#fff">Spot the mistake & fix it</span></span><span class="prog">✅ ${countLevel('LD',DETECT.map(x=>'LD-'+x.id)).done}/${DETECT.length}</span></button>
+      <button class="level ls" data-v="ls"><span class="num">LEVEL 7 · 分類</span><span class="ico">🗂️</span><span class="t">分一分，說理由</span><span class="d">把運動分類，說出為什麼<br><span class="en" style="color:#fff">Sort & explain why</span></span><span class="prog">✅ ${countLevel('LS',SORTS.map(x=>'LS-'+x.id)).done}/${SORTS.length}</span></button>
+      <button class="level lc" data-v="lc"><span class="num">LEVEL 8 · 兩人一組</span><span class="ico">👫</span><span class="t">我跟你一樣嗎？</span><span class="d">比一比：一樣的地方、不一樣的地方<br><span class="en" style="color:#fff">Compare: same or different?</span></span><span class="prog">文氏圖 Venn</span></button>
+      <button class="level l6" data-v="l6"><span class="num">LEVEL 9 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
     </div></div>
     <div class="stage st-t"><div class="sthead"><span class="stico">🚀</span><div><b>第三階段：用出來</b> <span class="en">Transfer · Use it</span><div class="hint">在新的情境裡，自己決定要說什麼 <span class="en">Use what you know in new situations</span></div></div></div>
     <div class="levels">
-      <button class="level l7" data-v="l7"><span class="num">LEVEL 7 · 對話測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
-      <button class="level l8" data-v="l8"><span class="num">LEVEL 8 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
+      <button class="level l7" data-v="l7"><span class="num">LEVEL 10 · 對話測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
+      <button class="level l8" data-v="l8"><span class="num">LEVEL 11 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
   app.querySelectorAll('.level').forEach(b=>b.onclick=()=>go(b.dataset.v));
@@ -1165,7 +1199,7 @@ function viewHome(){
     const items=[]; list.forEach(a=>a.items.forEach(id=>{ if(!items.find(x=>x.id===id)) items.push({id, t:+a.time}) }));
     const done=items.filter(x=>ts[x.id]>=x.t).length;
     el.innerHTML=`<div class="card asg"><div class="row" style="justify-content:space-between"><b style="font-size:20px">📌 老師要你練習的題目 <span class="en">Practice assigned by your teacher</span></b><span class="pill ${done===items.length?'p-good':'p-mid'}">${done}/${items.length} 完成</span></div>
-      <div class="asglist">${items.map(x=>`<button class="asgitem ${ts[x.id]>=x.t?'done':''}" data-id="${esc(x.id)}">${ts[x.id]>=x.t?'✅':'⬜'} ${esc(C[x.id]?.label?.replace(/^文文：/,'')||x.id)} <span class="hint">${esc(x.id.split('-')[0])}</span></button>`).join('')}</div></div>`;
+      <div class="asglist">${items.map(x=>`<button class="asgitem ${ts[x.id]>=x.t?'done':''}" data-id="${esc(x.id)}">${ts[x.id]>=x.t?'✅':'⬜'} ${esc(C[x.id]?.label?.replace(/^文文：/,'')||x.id)} <span class="hint">${esc(lvTag(x.id))}</span></button>`).join('')}</div></div>`;
     el.querySelectorAll('.asgitem').forEach(b=>b.onclick=()=>openItem(b.dataset.id));
   });
   $('#mt').onclick=async()=>{
@@ -2217,6 +2251,255 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
   $('#home').onclick=()=>go('home'); $('#other').onclick=()=>viewL8(); $('#again').onclick=()=>sceneView(sc.id);
 }
 
+/* ============================================================
+   第二階段 Deep 新關卡：🔍 小偵探（找規則）、🗂️ 分一分說理由、👫 我跟你一樣嗎
+   內部代號 LD / LS / LC；畫面上的關卡編號見 LVNO
+   ============================================================ */
+const LVNO = {L1:1,L2:2,L3:3,L4:4,L5:5,LD:6,LS:7,LC:8,L6:9,L7:10,L8:11};
+function lvTag(id){ const p=String(id||'').split('-')[0]; return LVNO[p]!=null ? 'L'+LVNO[p] : p; }
+function rubyTok(t){ const i=t.indexOf('|'); if(i<0) return esc(t); return `<ruby>${esc(t.slice(0,i))}<rt>${esc(t.slice(i+1).replace(/_/g,' '))}</rt></ruby>`; }
+const tokHz = t=>t.split('|')[0];
+
+/* ---------- 🔍 小偵探：這句話哪裡怪怪的？ ---------- */
+// toks：句子切成可以點的小塊（漢字|拼音）；bad：有問題的小塊；fix：正確句子（可以有兩種說法）
+const DETECT = [
+  {id:'d1', no:/打游泳/, rule:'verb', toks:['我|wǒ','很|hěn','喜歡|xǐ_huān','打|dǎ','游泳|yóu_yǒng','。'], bad:[3], fix:['我很喜歡游泳。'],
+   why:'「游泳」本身就是動作，前面不用加「打」。', whyEn:'游泳 is already a verb — no 打 needed.'},
+  {id:'d2', no:/踢籃球/, rule:'verb', toks:['哥哥|gē_ge','每天|měi_tiān','踢|tī','籃球|lán_qiú','。'], bad:[2], fix:['哥哥每天打籃球。'],
+   why:'籃球是用手打的，要說「打籃球」；用腳的才說「踢」，像「踢足球」。', whyEn:'You use your hands for basketball, so it’s 打籃球. 踢 is for kicking, like 踢足球.'},
+  {id:'d3', no:/打足球/, rule:'verb', toks:['我們|wǒ_men','一起|yì_qǐ','打|dǎ','足球|zú_qiú','吧|ba','！'], bad:[2], fix:['我們一起踢足球吧！'],
+   why:'足球是用腳踢的，要說「踢足球」。', whyEn:'Soccer is kicked: 踢足球.'},
+  {id:'d4', no:/打腳踏車/, rule:'verb', toks:['弟弟|dì_di','會|huì','打|dǎ','腳踏車|jiǎo_tà_chē','。'], bad:[2], fix:['弟弟會騎腳踏車。'],
+   why:'腳踏車是坐在上面騎的，要說「騎腳踏車」。', whyEn:'You ride a bike: 騎腳踏車.'},
+  {id:'d5', no:/籃球得/, rule:'de', toks:['他|tā','打籃球|dǎ_lán_qiú','得|de','很|hěn','好|hǎo','。'], bad:[2], fix:['他打籃球打得很好。','他籃球打得很好。'],
+   why:'「打籃球」後面要再說一次動詞「打」，再加「得」：打籃球打得很好。', whyEn:'Repeat the verb before 得: 打籃球打得很好.'},
+  {id:'d6', no:/跑很快/, rule:'de', toks:['妹妹|mèi_mei','跑|pǎo','很|hěn','快|kuài','。'], bad:[1,2], fix:['妹妹跑得很快。'],
+   why:'說「做得怎麼樣」要用「得」：跑得很快。', whyEn:'Use 得 to say how well: 跑得很快.'},
+  {id:'d7', no:/運動嗎/, rule:'q', toks:['你|nǐ','喜歡|xǐ_huān','什麼|shén_me','運動|yùn_dòng','嗎|ma','？'], bad:[4], fix:['你喜歡什麼運動？'],
+   why:'已經有「什麼」就是問句了，不用再加「嗎」。', whyEn:'With 什麼 it’s already a question — drop 嗎.'},
+  {id:'d8', no:/會不會.*嗎/, rule:'q', toks:['你|nǐ','會不會|huì_bú_huì','游泳|yóu_yǒng','嗎|ma','？'], bad:[3], fix:['你會不會游泳？','你會游泳嗎？'],
+   why:'「會不會」已經是問句了，不用再加「嗎」。', whyEn:'會不會 already asks the question — drop 嗎.'},
+  {id:'d9', no:/很有趣游泳/, rule:'why', toks:['我|wǒ','喜歡|xǐ_huān','游泳|yóu_yǒng','，','因為|yīn_wèi','很|hěn','有趣|yǒu_qù','游泳|yóu_yǒng','。'], bad:[5,6,7], fix:['我喜歡游泳，因為游泳很有趣。'],
+   why:'「因為」後面先說「什麼」，再說「很＋感覺」：因為游泳很有趣。', whyEn:'After 因為: thing first, then 很 + feeling.'},
+  {id:'d10', no:/很難網球/, rule:'feel', toks:['我|wǒ','覺得|jué_de','很|hěn','難|nán','網球|wǎng_qiú','。'], bad:[2,3,4], fix:['我覺得網球很難。','我覺得打網球很難。'],
+   why:'「覺得」後面先說「什麼」，再說「很＋感覺」：我覺得網球很難。', whyEn:'覺得 + thing + 很 + feeling.'},
+  {id:'d11', no:/(^|[^不])一樣/, rule:'same', toks:['A：我喜歡跑步。','B：','我|wǒ','跟|gēn','你|nǐ','一樣|yí_yàng','，','我|wǒ','不|bù','喜歡|xǐ_huān','跑步|pǎo_bù','。'], bad:[5], fix:['我跟你不一樣，我不喜歡跑步。'],
+   why:'A 喜歡跑步，B 不喜歡，所以兩個人「不一樣」。', whyEn:'A likes running and B doesn’t, so they are 不一樣.'},
+  {id:'d12', no:/不一樣/, rule:'same', toks:['A：我會打網球。','B：','我|wǒ','也|yě','會|huì','打網球|dǎ_wǎng_qiú','，','我|wǒ','跟|gēn','你|nǐ','不一樣|bù_yí_yàng','。'], bad:[10], fix:['我也會打網球，我跟你一樣。'],
+   why:'兩個人都會打網球，所以要說「我跟你一樣」。', whyEn:'Both can play tennis, so it’s 我跟你一樣.'}
+];
+/* 說成原本錯的句子 → 最多 40 分 */
+function detectScore(d,t){ const sc=Math.max(...d.fix.map(f=>scoreText(t,f))); return d.no && d.no.test(norm(fixHomo(t,d.fix[0]))) ? Math.min(sc,40) : sc; }
+const DRULE = {verb:['🏃 動詞搭配','Which verb goes with which sport'], de:['📏「得」的句型','The 得 pattern'], q:['❓ 問句','Questions'], why:['💡「因為」說理由','Reasons with 因為'], feel:['🤔「覺得」','Opinions with 覺得'], same:['👫 一樣／不一樣','Same / different']};
+function viewLD(){
+  let i=0;
+  const prog=()=>getProg();
+  function render(){
+    const d=DETECT[i]; let picked=new Set(), tries=0, solved=false;
+    const best=prog()['LD-'+d.id];
+    app.innerHTML = `
+      <button class="back" id="bk">← 回首頁 Home</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h2 style="font-size:26px;font-weight:900;margin:0">🔍 小偵探 <span class="en" style="font-size:16px">Sentence detective</span></h2><span class="hint">第 ${i+1} / ${DETECT.length} 題</span></div>
+        <div class="dots" style="margin:10px 0">${DETECT.map((x,j)=>`<span class="dot ${prog()['LD-'+x.id]!=null?'done':''} ${j===i?'cur':''}" data-j="${j}"></span>`).join('')}</div>
+        <div class="hint" style="font-size:16px"><b>① 這句話哪裡怪怪的？點一點有問題的地方，再按「確定」。</b> <span class="en">Tap the part that’s wrong, then press Check.</span></div>
+        <div class="dsent" id="sent">${d.toks.map((t,k)=>/^[，。！？、]$/.test(t)||t.endsWith('：')||t.includes('：')?`<span class="dfix">${esc(t)}</span>`:`<button class="dtok" data-k="${k}">${rubyTok(t)}</button>`).join('')}</div>
+        <div class="row" style="margin-top:10px"><button class="btn btn-sun" id="chk">✔️ 確定 Check</button><span id="fb" class="hint" style="font-size:16px"></span></div>
+        <div id="step2" class="hidden" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px">
+          <div class="dexp" id="exp"></div>
+          <div class="hint" style="font-size:16px;margin-top:10px"><b>② 把正確的句子說出來</b> <span class="en">Say the correct sentence.</span> <button class="btn btn-ghost" id="peek" style="padding:4px 10px;font-size:14px">👀 看答案 Show answer</button></div>
+          <div id="ans" class="hidden dans"></div>
+          <div class="speak" id="spk"></div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn btn-ghost" id="pv" ${i===0?'disabled style="opacity:.4"':''}>⬅ 上一題</button><button class="btn btn-sun" id="nx">${i===DETECT.length-1?'完成 Finish 🎉':'下一題 Next ➜'}</button></div>
+      </div>`;
+    $('#bk').onclick=()=>go('home');
+    app.querySelectorAll('[data-j]').forEach(x=>x.onclick=()=>{ i=+x.dataset.j; render(); });
+    app.querySelectorAll('.dtok').forEach(b=>b.onclick=()=>{ if(solved) return; const k=+b.dataset.k; picked.has(k)?picked.delete(k):picked.add(k); b.classList.toggle('on'); });
+    const showStep2=()=>{
+      solved=true; app.querySelectorAll('.dtok').forEach(b=>{ const k=+b.dataset.k; b.classList.toggle('bad', d.bad.includes(k)); b.classList.remove('on'); });
+      $('#exp').innerHTML=`<span class="pill">${DRULE[d.rule][0]} <span class="en">${DRULE[d.rule][1]}</span></span><div style="margin-top:6px;font-size:18px;font-weight:800">${esc(d.why)}</div><div class="en">${esc(d.whyEn)}</div>`;
+      $('#ans').textContent='✅ '+d.fix.join('　或　');
+      $('#step2').classList.remove('hidden');
+      mountSpeak($('#spk'),{target:d.fix[0], targetLabel:'小偵探：'+d.fix[0], level:'LD 小偵探', item:'LD-'+d.id,
+        score:t=>detectScore(d,t)});
+    };
+    $('#peek').onclick=()=>$('#ans').classList.toggle('hidden');
+    $('#chk').onclick=()=>{
+      if(solved) return;
+      if(!picked.size){ $('#fb').textContent='先點一點你覺得有問題的地方。 Tap a part first.'; return; }
+      tries++;
+      const ok=[...picked].every(k=>d.bad.includes(k));
+      if(ok){ $('#fb').innerHTML='🎉 <b style="color:var(--grass)">找到了！</b> <span class="en">You found it!</span>'; showStep2(); }
+      else if(tries<2){ $('#fb').innerHTML='🤔 再想一想… <span class="en">Not quite — try again.</span> 💡 '+esc(DRULE[d.rule][0]); picked.clear(); app.querySelectorAll('.dtok').forEach(b=>b.classList.remove('on')); }
+      else { $('#fb').innerHTML='👀 看看紅色的地方 <span class="en">Look at the red part.</span>'; showStep2(); }
+    };
+    $('#pv').onclick=()=>{ if(i>0){ i--; render(); } };
+    $('#nx').onclick=()=>{ if(i<DETECT.length-1){ i++; render(); } else go('home'); };
+  }
+  render();
+}
+
+/* ---------- 🗂️ 分一分，說理由 ---------- */
+const SORTS = [
+  {id:'ball', q:'哪些是球類運動？', qEn:'Which are ball sports?', bins:[['是球類運動','Ball sports'],['不是球類運動','Not ball sports']],
+   cards:{lanqiu:0, zuqiu:0, wangqiu:0, paiqiu:0, yumao:0, youyong:1, paobu:1, jiaotache:1, huaban:1, tiaogao:1},
+   frame:'＿＿（不）是球類運動，因為＿＿。', frameEn:'___ is (not) a ball sport because ___.', model:'游泳不是球類運動，因為游泳不用球。', need:[/球/]},
+  {id:'hand', q:'用手還是用腳？「打」還是「踢」？', qEn:'Hands or feet? 打 or 踢?', bins:[['用手：打＿＿','Hands: 打'],['用腳：踢＿＿','Feet: 踢']],
+   ids:['lanqiu','zuqiu','wangqiu','paiqiu','yumao','pingpang','bangqiu'], cards:{lanqiu:0, wangqiu:0, paiqiu:0, yumao:0, pingpang:0, bangqiu:0, zuqiu:1}, noVerb:true,
+   frame:'我們說「＿＿」，因為＿＿是用手／用腳的。', frameEn:'We say ___ because it’s played with hands / feet.', model:'我們說「踢足球」，因為足球是用腳踢的。', need:[/手|腳/]},
+  {id:'team', q:'一個人可以做，還是要很多人一起？', qEn:'Alone or with a team?', bins:[['一個人也可以','You can do it alone'],['要很多人一起','You need a team']],
+   cards:{paobu:0, youyong:0, jiaotache:0, huaban:0, pashan:0, lanqiu:1, zuqiu:1, paiqiu:1, bangqiu:1},
+   frame:'＿＿要很多人一起，因為＿＿。', frameEn:'___ needs a team because ___.', model:'打排球要很多人一起，因為一個人不能打比賽。', need:[/人|一起|自己/]},
+  {id:'me', q:'你覺得難還是簡單？（沒有標準答案）', qEn:'Hard or easy for YOU? (No right answer)', bins:[['我覺得很難','Hard for me'],['我覺得很簡單','Easy for me']],
+   cards:{youyong:null, paobu:null, lanqiu:null, zuqiu:null, tiaogao:null, huaban:null, wangqiu:null, jiaotache:null}, open:true,
+   frame:'我覺得＿＿很難／很簡單，因為＿＿。', frameEn:'I think ___ is hard / easy because ___.', model:'我覺得打網球很難，因為網球很小、跑得很快。', need:[/覺得/, /難|簡單|容易/]}
+];
+function sortReasonScore(r, said){
+  const t=norm(said||''); if(!t) return 0;
+  let sc=0;
+  if(/因為/.test(t)) sc+=40;
+  if(SPORTS.some(s=>s.kw.some(k=>t.includes(norm(k))))) sc+=30;
+  if(r.need.every(re=>re.test(t))) sc+=30;
+  return sc;
+}
+function viewLS(){
+  let ri=0;
+  function render(){
+    const r=SORTS[ri]; const ids=Object.keys(r.cards); const place={}; let sel=null, checked=false;
+    const label=id=>{ const s=SP[id]; return r.noVerb? s.hz.slice(1) : s.hz; };  // 「打／踢」那一組只給球名，不能直接看出答案
+    app.innerHTML = `
+      <button class="back" id="bk">← 回首頁 Home</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h2 style="font-size:26px;font-weight:900;margin:0">🗂️ 分一分，說理由 <span class="en" style="font-size:16px">Sort & explain</span></h2><span class="hint">第 ${ri+1} / ${SORTS.length} 組</span></div>
+        <div class="tabs" style="margin-top:8px">${SORTS.map((x,j)=>`<button class="tab ${j===ri?'on':''}" data-r="${j}">${j+1}. ${esc(x.q.replace(/（.*）/,''))}</button>`).join('')}</div>
+        <div style="font-size:22px;font-weight:900;margin-top:10px">${esc(r.q)} <span class="en" style="font-size:16px">${esc(r.qEn)}</span></div>
+        <div class="hint">① 先點一張卡片，再點要放的框。 <span class="en">Tap a card, then tap a box.</span></div>
+        <div class="sbank" id="bank"></div>
+        <div class="sbins">${r.bins.map((b,k)=>`<div class="sbin" data-bin="${k}"><div class="sbh">${esc(b[0])} <span class="en">${esc(b[1])}</span></div><div class="sbc" id="bin${k}"></div></div>`).join('')}</div>
+        <div class="row" style="margin-top:10px"><button class="btn btn-sun" id="chk">✔️ ${r.open?'放好了 Done':'檢查 Check'}</button><span id="fb" class="hint" style="font-size:16px"></span></div>
+        <div id="step2" class="hidden" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px">
+          <div class="hint" style="font-size:16px"><b>② 選一張卡片，說說為什麼放在那裡</b> <span class="en">Pick one card and explain why it goes there.</span></div>
+          <div class="dframe">🧩 ${esc(r.frame)} <span class="en">${esc(r.frameEn)}</span> <button class="btn btn-ghost" id="peek" style="padding:4px 10px;font-size:14px">👀 例句 Example</button></div>
+          <div id="ans" class="hidden dans">${esc(r.model)}</div>
+          <div class="speak" id="spk"></div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn btn-ghost" id="pv" ${ri===0?'disabled style="opacity:.4"':''}>⬅ 上一組</button><button class="btn btn-sun" id="nx">${ri===SORTS.length-1?'完成 Finish 🎉':'下一組 Next ➜'}</button></div>
+      </div>`;
+    const card=id=>`<button class="scard ${sel===id?'on':''} ${checked&&!r.open&&place[id]!=null?(place[id]===r.cards[id]?'ok':'bad'):''}" data-c="${id}">${SP[id].e} ${esc(label(id))}</button>`;
+    const draw=()=>{
+      $('#bank').innerHTML=ids.filter(id=>place[id]==null).map(card).join('') || '<span class="hint">全部放好了！ All placed!</span>';
+      r.bins.forEach((_,k)=>$('#bin'+k).innerHTML=ids.filter(id=>place[id]===k).map(card).join(''));
+      app.querySelectorAll('[data-c]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.c;
+        /* 已選一張卡，又點到框裡的另一張卡：當作放進那個框 */
+        if(sel && sel!==id && place[id]!=null){ place[sel]=place[id]; sel=null; checked=false; $('#fb').textContent=''; draw(); return; }
+        sel = sel===id?null:id; draw(); });
+    };
+    app.querySelectorAll('[data-bin]').forEach(bn=>bn.onclick=()=>{ if(!sel) return; place[sel]=+bn.dataset.bin; sel=null; checked=false; $('#fb').textContent=''; draw(); });
+    $('#bank').onclick=()=>{ if(sel && place[sel]!=null){ delete place[sel]; sel=null; draw(); } };
+    draw();
+    $('#bk').onclick=()=>go('home');
+    app.querySelectorAll('[data-r]').forEach(x=>x.onclick=()=>{ ri=+x.dataset.r; render(); });
+    $('#peek').onclick=()=>$('#ans').classList.toggle('hidden');
+    $('#chk').onclick=()=>{
+      if(ids.some(id=>place[id]==null)){ $('#fb').textContent='還有卡片沒放好。 Place all the cards first.'; return; }
+      checked=true; draw();
+      if(r.open){ $('#fb').innerHTML='👍 每個人的答案都可以不一樣！ <span class="en">Everyone’s answer can be different!</span>'; }
+      else { const wrong=ids.filter(id=>place[id]!==r.cards[id]).length;
+        $('#fb').innerHTML = wrong? `🤔 有 ${wrong} 張放錯了（紅色），想一想再移動。 <span class="en">${wrong} in the wrong box (red).</span>` : '🎉 全部正確！ <span class="en">All correct!</span>';
+        if(wrong) return; }
+      if($('#step2').classList.contains('hidden')){
+        $('#step2').classList.remove('hidden');
+        mountSpeak($('#spk'),{target:r.model, targetLabel:'分一分：'+r.q+'｜'+r.frame, level:'LS 分類', item:'LS-'+r.id, maxMs:15000, score:t=>sortReasonScore(r,t)});
+      }
+    };
+    $('#pv').onclick=()=>{ if(ri>0){ ri--; render(); } };
+    $('#nx').onclick=()=>{ if(ri<SORTS.length-1){ ri++; render(); } else go('home'); };
+  }
+  render();
+}
+
+/* ---------- 👫 我跟你一樣嗎？（兩人一組、文氏圖） ---------- */
+const COMPARE = [
+  {id:'like', q:'你喜歡什麼運動？', qEn:'What sports do you like?', verb:'喜歡', make:s=>s.hz},
+  {id:'can',  q:'你會什麼運動？',   qEn:'What sports can you do?', verb:'會',   make:s=>s.hz},
+  {id:'hard', q:'你覺得什麼運動很難？', qEn:'Which sports do you think are hard?', verb:'覺得', make:s=>s.hz}
+];
+const CMP_SPORTS=['lanqiu','zuqiu','youyong','paobu','wangqiu','yumao','paiqiu','pingpang','jiaotache','huaban','tiaogao','pashan'];
+function cmpSentence(c, kind, a, b){
+  const j=x=>x.map(id=>SP[id].hz).join('、');
+  if(c.id==='hard') return kind==='same' ? `我跟你一樣，我們都覺得${j(a)}很難。` : `我跟你不一樣。我覺得${j(a)}很難，可是你覺得${j(b)}很難。`;
+  return kind==='same' ? `我跟你一樣，我們都${c.verb}${j(a)}。` : `我跟你不一樣。我${c.verb}${j(a)}，可是你${c.verb}${j(b)}。`;
+}
+function cmpScore(kind, said, sports){
+  const t=norm(said||''); if(!t) return 0;
+  let sc=0;
+  const saysDiff=/不一樣/.test(t), saysSame=!saysDiff && /一樣/.test(t);
+  if(kind==='diff' ? saysDiff : saysSame) sc+=40; else if(saysDiff||saysSame) return Math.min(30, sc+20); // 一樣／不一樣說反了
+  if(kind==='same' ? /都/.test(t) : /可是|但是|不過/.test(t)) sc+=20;
+  const hit=sports.filter(id=>SP[id].kw.some(k=>t.includes(norm(k)))).length;
+  sc += sports.length ? Math.round(40*Math.min(1,hit/Math.min(2,sports.length))) : 40;
+  return sc;
+}
+function lcKey(){ return 'sp_lc_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+function viewLC(){
+  const S=Object.assign({partner:'', ci:0, pick:{}}, store.get(lcKey(),{}));
+  const save=()=>store.set(lcKey(),S);
+  const nm=()=>({A:state.user.name, B:S.partner||'（同伴）'});
+  function render(){
+    const c=COMPARE[S.ci]; const P=S.pick[c.id]||(S.pick[c.id]={A:[],B:[]});
+    app.innerHTML = `
+      <button class="back" id="bk">← 回首頁 Home</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h2 style="font-size:26px;font-weight:900;margin:0">👫 我跟你一樣嗎？ <span class="en" style="font-size:16px">Same or different?</span></h2>
+          <span class="who-b">B：<input id="pn" value="${esc(S.partner)}" maxlength="20" placeholder="同伴的名字 Partner's name"></span></div>
+        <div class="tabs" style="margin-top:8px">${COMPARE.map((x,j)=>`<button class="tab ${j===S.ci?'on':''}" data-ci="${j}">${j+1}. ${esc(x.q)}</button>`).join('')}</div>
+        <div style="font-size:22px;font-weight:900;margin-top:10px">${esc(c.q)} <span class="en" style="font-size:16px">${esc(c.qEn)}</span></div>
+        <div class="hint">① A 和 B 各自選 1～3 個。先互相問一問：「${esc(c.q)}」 <span class="en">Ask each other, then each pick 1–3.</span></div>
+        <div class="cmpgrid">${['A','B'].map(w=>`<div class="cmpcol spk-bg-${w}"><div class="row" style="gap:6px"><span class="spk spk-${w}">${w}</span><b>${esc(nm()[w])}</b></div>
+          <div class="cmpchips">${CMP_SPORTS.map(id=>`<button class="cchip ${P[w].includes(id)?'on':''}" data-w="${w}" data-id="${id}">${SP[id].e} ${esc(SP[id].hz)}</button>`).join('')}</div></div>`).join('')}</div>
+        <div id="venn"></div>
+        <div id="talk"></div>
+      </div>`;
+    $('#bk').onclick=()=>go('home');
+    $('#pn').oninput=()=>{ S.partner=cleanName($('#pn').value); save(); clearTimeout(S._t); S._t=setTimeout(()=>{ app.querySelectorAll('.cmpcol b')[1].textContent=nm().B; drawVenn(); },400); };
+    app.querySelectorAll('[data-ci]').forEach(x=>x.onclick=()=>{ S.ci=+x.dataset.ci; save(); render(); });
+    app.querySelectorAll('.cchip').forEach(b=>b.onclick=()=>{ const w=b.dataset.w, id=b.dataset.id, L=P[w];
+      if(L.includes(id)) L.splice(L.indexOf(id),1); else { if(L.length>=3){ toast('最多選 3 個 Pick up to 3'); return; } L.push(id); }
+      save(); b.classList.toggle('on'); drawVenn(); });
+    drawVenn();
+    function drawVenn(){
+      const both=P.A.filter(x=>P.B.includes(x)), onlyA=P.A.filter(x=>!P.B.includes(x)), onlyB=P.B.filter(x=>!P.A.includes(x));
+      if(!P.A.length || !P.B.length){ $('#venn').innerHTML='<div class="hint" style="margin-top:12px">兩個人都選好以後，下面會出現比較圖。 <span class="en">The diagram appears when both have picked.</span></div>'; $('#talk').innerHTML=''; return; }
+      const li=a=>a.map(id=>`<div>${SP[id].e} ${esc(SP[id].hz)}</div>`).join('')||'<div class="hint">—</div>';
+      $('#venn').innerHTML=`<div class="hint" style="margin-top:12px;font-size:16px"><b>② 看一看：哪裡一樣？哪裡不一樣？</b> <span class="en">Look: what’s the same? What’s different?</span></div>
+        <div class="venn"><div class="vc va"><div class="vh">只有 ${esc(nm().A)}<span class="en">Only A</span></div>${li(onlyA)}</div><div class="vc vboth"><div class="vh">兩個人都${esc(c.id==='hard'?'覺得難':c.verb)}<span class="en">Both</span></div>${li(both)}</div><div class="vc vb"><div class="vh">只有 ${esc(nm().B)}<span class="en">Only B</span></div>${li(onlyB)}</div></div>`;
+      if(!S.partner){ $('#talk').innerHTML='<div class="warn" style="margin-top:12px">請先在右上角輸入同伴的名字，才能開始說。 <span class="en">Enter your partner’s name (top right) to start speaking.</span></div>'; return; }
+      const tasks=[];
+      if(both.length) tasks.push({who:'A', kind:'same', sports:both, model:cmpSentence(c,'same',both)});
+      if(onlyA.length||onlyB.length){
+        const a=(onlyA.length?onlyA:P.A).slice(0,2), b=(onlyB.length?onlyB:P.B).slice(0,2);
+        tasks.push({who: both.length?'B':'A', kind:'diff', sports:[...b,...a], model:cmpSentence(c,'diff',b,a), fromB:true});
+        if(!both.length) tasks.push({who:'B', kind:'diff', sports:[...b,...a], model:cmpSentence(c,'diff',b,a)});
+      }
+      // 第一句永遠由 A 說；說「不一樣」時，說話的人用自己的運動當「我」
+      tasks.forEach(tk=>{ if(tk.kind==='diff'){ const mine=(tk.who==='A'?(onlyA.length?onlyA:P.A):(onlyB.length?onlyB:P.B)).slice(0,2), yours=(tk.who==='A'?(onlyB.length?onlyB:P.B):(onlyA.length?onlyA:P.A)).slice(0,2); tk.model=cmpSentence(c,'diff',mine,yours); tk.sports=[...mine,...yours]; } });
+      $('#talk').innerHTML=`<div class="hint" style="margin-top:14px;font-size:16px"><b>③ 輪流說說看</b> <span class="en">Take turns saying it.</span>　🧩 我跟你一樣，我們都… ／ 我跟你不一樣。我…，可是你…</div>`+
+        tasks.map((tk,k)=>`<div class="cmptask spk-bg-${tk.who}"><div class="row" style="gap:8px"><span class="spk spk-${tk.who}">${tk.who}</span><b>${esc(nm()[tk.who])}</b> 說：<span class="pill">${tk.kind==='same'?'一樣的地方 Same':'不一樣的地方 Different'}</span> <button class="btn btn-ghost" data-peek="${k}" style="padding:3px 10px;font-size:14px">👀 例句</button></div>
+          <div class="dans hidden" id="ex${k}">${esc(tk.model)}</div><div class="speak" id="cs${k}"></div></div>`).join('');
+      tasks.forEach((tk,k)=>{
+        $('#talk').querySelector(`[data-peek="${k}"]`).onclick=()=>$('#ex'+k).classList.toggle('hidden');
+        const asUser = tk.who==='A'?null:{name:S.partner||'同伴', cls:state.user.cls, teacher:state.user.teacher};
+        mountSpeak($('#cs'+k),{target:tk.model, targetLabel:`比一比｜${c.q}｜${tk.kind==='same'?'一樣':'不一樣'}：${tk.model}`, level:'LC 比較', item:'LC-'+c.id+'-'+tk.kind, asUser, maxMs:15000,
+          score:t=>cmpScore(tk.kind,t,tk.sports)});
+      });
+      $('#talk').insertAdjacentHTML('beforeend',`<div class="row" style="justify-content:flex-end;margin-top:12px">${S.ci<COMPARE.length-1?`<button class="btn btn-sun" id="nxq">下一題 Next ➜</button>`:`<button class="btn btn-sun" id="nxq">完成 Finish 🎉</button>`}</div>`);
+      $('#nxq').onclick=()=>{ if(S.ci<COMPARE.length-1){ S.ci++; save(); render(); } else go('home'); };
+    }
+  }
+  render();
+}
+
 /* ---------- 老師：測驗批改 ---------- */
 async function postGrade(g){
   if (REMOTE){ const r=await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action:'grade',pin:CONFIG.TEACHER_PIN},g))}); const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed'); return j; }
@@ -2259,13 +2542,19 @@ function catalog(){
   DIALOG.forEach((t,i)=>C['L3-'+i]={L:'L3', g:'L3', label:'文文：'+S_txt(t.bot(ctx)), kind:t.kind==='react'?'react':'dialog'});
   H.push({g:'L4', h:'L4 說一說', zh:'說一段話', en:'Short talk'});
   TOPICS.forEach(t=>C['L4-'+t.id]={L:'L4', g:'L4', label:strip(t.name), kind:'talk'});
-  H.push({g:'L6', h:'L6 對話', zh:'對話工作坊', en:'Dialogue workshop'});
+  H.push({g:'LD', h:'L6 偵探', zh:'小偵探（找規則）', en:'Sentence detective'});
+  DETECT.forEach(x=>C['LD-'+x.id]={L:'LD', g:'LD', label:'小偵探：'+x.fix[0], kind:'fix', rule:x.rule});
+  H.push({g:'LS', h:'L7 分類', zh:'分一分，說理由', en:'Sort & explain'});
+  SORTS.forEach(x=>C['LS-'+x.id]={L:'LS', g:'LS', label:'分一分：'+x.q, kind:'reason'});
+  H.push({g:'LC', h:'L8 比較', zh:'我跟你一樣嗎', en:'Same or different'});
+  COMPARE.forEach(x=>['same','diff'].forEach(k=>C['LC-'+x.id+'-'+k]={L:'LC', g:'LC', label:'比一比：'+x.q+(k==='same'?'（一樣）':'（不一樣）'), kind:'compare'}));
+  H.push({g:'L6', h:'L9 對話', zh:'對話工作坊', en:'Dialogue workshop'});
   Object.entries(TIERS).forEach(([k,v])=>C['L6-'+k]={L:'L6', g:'L6', label:'對話工作坊（'+v.zh+'）', kind:'talk'});
   C['L6-line']={L:'L6', g:null, label:'', kind:'dline'};
-  H.push({g:'L7', h:'L7 測驗', zh:'對話測驗', en:'Dialogue test'});
+  H.push({g:'L7', h:'L10 測驗', zh:'對話測驗', en:'Dialogue test'});
   C['L7-test']={L:'L7', g:'L7', label:'對話測驗', kind:'test'};
   C['L7-line']={L:'L7', g:null, label:'', kind:'dline'};
-  H.push({g:'L8', h:'L8 情境', zh:'情境任務', en:'Real-life missions'});
+  H.push({g:'L8', h:'L11 情境', zh:'情境任務', en:'Real-life missions'});
   SCENES.forEach(x=>C['L8-'+x.id]={L:'L8', g:'L8', label:'情境：'+x.zh, kind:'test'});
   L5.forEach(u=>{
     const g='L5-'+u.id; H.push({g, h:'L5 '+u.name.slice(0,4), zh:'進階閱讀：'+u.name, en:'Reading: '+u.en});
@@ -2311,6 +2600,9 @@ const ISSUE = {
   'pat:invite':{zh:'邀請朋友「一起…好不好」', en:'inviting a friend (一起…好不好)', tip:'練「我們一起去＿＿，好不好？」'},
   'pat:dou':   {zh:'「都」句型', en:'the "both / all" (都) pattern', tip:'練「我和妹妹都喜歡＿＿」：「都」放在動詞前面。'},
   'pat:yiyang':{zh:'「A和B一樣＿＿」句型', en:'the "as … as" (一樣) pattern', tip:'練「我和哥哥一樣高」。'},
+  'deep:fix':  {zh:'小偵探：句子規則還不清楚', en:'noticing grammar rules', tip:'請學生說出「為什麼錯」，例如：籃球用手，所以是「打」；有「什麼」就不用「嗎」。'},
+  'deep:reason':{zh:'說不出分類的理由', en:'explaining reasons for classifying', tip:'用句型框架：「＿＿是／不是＿＿，因為＿＿。」先口頭示範一次。'},
+  'deep:compare':{zh:'比較：一樣／不一樣說不清楚', en:'comparing (一樣／不一樣, 都, 可是)', tip:'先看文氏圖中間（都）和兩邊（可是），再練「我跟你一樣，我們都…／我跟你不一樣。我…，可是你…」。'},
   'word':      {zh:'運動詞語說不出來', en:'saying the sports vocabulary', tip:'先回 Level 1 跟讀詞語，再放進句子。'},
   'incomplete':{zh:'句子說不完整', en:'saying complete sentences', tip:'提醒學生「主語＋動詞＋…」整句說完，不要只說一兩個字。'},
   'dialog':    {zh:'對話接不上（聽不懂問題）', en:'understanding questions in conversation', tip:'先聽文文的問題，用「💡 你可以說」的句子回答；老師可先帶全班練問答。'},
@@ -2358,6 +2650,9 @@ function analyzeRows(rows){
       else if ((m.kind==='dialog'||m.kind==='react') && it.best<100) push(m.kind, '這一題沒接上');
       else if (m.kind==='q' && it.best<60) push('reading:'+m.qtype, `${it.best} 分`);
       else if ((m.kind==='read'||m.kind==='talk') && it.best<60) push('fluency', `${it.best} 分`);
+      else if (m.kind==='fix' && it.best<60) push('deep:fix', `${DRULE[m.rule]?.[0]||''} ${it.best} 分`);
+      else if (m.kind==='reason' && it.best<70) push('deep:reason', it.best<40?'沒有用「因為」說理由':`${it.best} 分`);
+      else if (m.kind==='compare' && it.best<70) push('deep:compare', `${it.best} 分`);
     });
     Object.values(s.heat).forEach(h=>h.avg=Math.round(h.sum/h.c));
     s.types={}; s.issues.forEach(x=>{ (s.types[x.type]=s.types[x.type]||[]).push(x) });
@@ -2496,7 +2791,7 @@ function viewTeacher(arg){
         <div class="card">
           <h3 class="dh">📉 全班最弱的題目 <span class="hint">下一堂課可以重點加強</span></h3>
           ${weakItems.length?weakItems.map(b=>{const m=C[b.id]||{}; const top=Object.entries(b.miss).sort((x,y)=>y[1]-x[1]).slice(0,2);
-            return `<div class="weakrow"><div style="flex:1"><div style="font-weight:800">${esc(m.label||b.id)}</div><div class="hint">${esc(b.id.split('-')[0])} · ${b.c} 位學生${top.length?` · 常漏：${top.map(([f,n])=>`「${esc(f)}」×${n}`).join(' ')}`:''}</div></div>${pill(b.avg)}</div>`}).join('')
+            return `<div class="weakrow"><div style="flex:1"><div style="font-weight:800">${esc(m.label||b.id)}</div><div class="hint">${esc(lvTag(b.id))} · ${b.c} 位學生${top.length?` · 常漏：${top.map(([f,n])=>`「${esc(f)}」×${n}`).join(' ')}`:''}</div></div>${pill(b.avg)}</div>`}).join('')
             : '<div class="hint">至少要有 2 位學生做過同一題才會顯示。</div>'}
         </div>
       </div>`;
@@ -2577,7 +2872,7 @@ function viewTeacher(arg){
         <h3 class="dh">🔎 最弱的題目：目標句 vs. 學生說的 <span class="hint">紅字＝沒說到的部分</span></h3>
         ${weak.length?`<table><thead><tr><th>題目</th><th>目標句（紅字沒說到）</th><th>學生最好的一次</th><th>分數</th><th>錄音</th></tr></thead><tbody>
           ${weak.map(w=>{const m=C[w.item]||{}; const r=s.items[w.item]?.bestRow; const tgt=(m.kind==='pattern'||m.kind==='word'||m.kind==='read')? (m.kind==='read'?(r?.target||''):m.label) : null;
-            return `<tr><td class="hint">${esc(w.item.split('-')[0])} ${esc(ISSUE[w.type]?.zh||'')}</td><td style="font-size:17px">${tgt!=null?diffHTML(tgt,w.said):esc(m.label||'')}</td><td><b>${esc(w.said)||'<span class="hint">（無辨識）</span>'}</b></td><td>${pill(w.best)}</td><td>${r?.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`}).join('')}
+            return `<tr><td class="hint">${esc(lvTag(w.item))} ${esc(ISSUE[w.type]?.zh||'')}</td><td style="font-size:17px">${tgt!=null?diffHTML(tgt,w.said):esc(m.label||'')}</td><td><b>${esc(w.said)||'<span class="hint">（無辨識）</span>'}</b></td><td>${pill(w.best)}</td><td>${r?.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`}).join('')}
           </tbody></table>`:'<div class="hint">沒有低分的題目。</div>'}
       </div>
       <div class="card" style="margin-top:14px">
