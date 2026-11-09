@@ -111,6 +111,20 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.wbank-card{display:flex;align-items:center;gap:14px;width:100%;margin-top:16px;text-align:left;border-radius:24px;padding:16px 20px;color:#fff;background:linear-gradient(135deg,#7c3aed,#f472b6);box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.wbank-card .prog{font-weight:800;font-size:16px;background:rgba(255,255,255,.25);border-radius:999px;padding:4px 12px}
+.wsec{margin-top:12px}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.wcard{position:relative;background:#fff;border:3px solid #e9d5ff;border-radius:18px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:26px;font-weight:900}
+.wcard rt{font-size:13px;font-weight:700;color:#78716c}.wcard .en{font-size:13px;font-weight:700}
+.wcard.done{border-color:#facc15;background:#fefce8}
+.we{font-size:34px}.wstar{position:absolute;top:4px;right:8px;font-size:18px}
+.wwho{margin-top:10px}
+.wbig{text-align:center;font-size:56px;font-weight:900;margin:6px 0}
+.wbig rt{font-size:20px;font-weight:700;color:#78716c}.we2{font-size:70px;line-height:1.1}
+.wstep{border-top:2px dashed var(--line);padding-top:10px;margin-top:12px}
+.wex{font-size:26px;font-weight:900;margin-top:6px}.pyline{font-size:15px;color:#78716c;font-weight:700}
+body.no-py .pyline{visibility:hidden}
 .ld{background:linear-gradient(135deg,#1e3a8a,#3b82f6)}.ls{background:linear-gradient(135deg,#4d7c0f,#84cc16)}.lc{background:linear-gradient(135deg,#be185d,#f472b6)}
 .dsent{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:12px;font-size:28px;font-weight:900}
 .dtok{background:#fff;border:3px solid #e5dccb;border-radius:14px;padding:2px 10px 6px;font-size:28px;font-weight:900;line-height:1.6}
@@ -1116,7 +1130,7 @@ function go(view, arg){
   $('#btnSwitch').classList.toggle('hidden',!showUser);
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+state.user.name;
   window.scrollTo(0,0);
-  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, teacher:viewTeacher, pin:viewPin})[view](arg);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, teacher:viewTeacher, pin:viewPin})[view](arg);
 }
 
 function viewLogin(){
@@ -1181,6 +1195,7 @@ function viewHome(){
       <div id="mtMsg" style="margin-top:8px;font-weight:700"></div>
     </div>
     <div id="asgCard"></div>
+    <button class="wbank-card" data-v="lw"><span style="font-size:44px">⭐</span><div style="flex:1"><b style="font-size:24px">我的詞庫</b> <span class="en">My word bank</span><div style="font-size:15px">你自己想學的運動詞語，還有全班和同學的詞 <span class="en">Words you wanted to learn</span></div></div><span class="prog" id="wprog">${(()=>{ const b=wordBank(); const L=b.mine.length?b.mine:b.cls; return '⭐ '+L.filter(wordDone).length+'/'+L.length; })()}</span></button>
     <div class="stage st-s"><div class="sthead"><span class="stico">🌱</span><div><b>第一階段：學會</b> <span class="en">Surface · Learn it</span><div class="hint">聽懂、說出運動詞語和句型 <span class="en">Hear and say the words and patterns</span></div></div></div>
     <div class="levels">
       <button class="level l1" data-v="l1"><span class="num">LEVEL 1</span><span class="ico">🔤</span><span class="t">詞語暖身</span><span class="d">聽一聽、說一說運動詞語<br><span class="en" style="color:#fff">Listen & say the words</span></span><span class="prog">✅ ${a.done}/${a.total}</span></button>
@@ -1202,7 +1217,7 @@ function viewHome(){
       <button class="level l8" data-v="l8"><span class="num">LEVEL 11 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
-  app.querySelectorAll('.level').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  app.querySelectorAll('.level,.wbank-card').forEach(b=>b.onclick=()=>go(b.dataset.v));
   myAssigns().then(list=>{
     const el=$('#asgCard'); if(!el || !list.length) return;
     const C=catalog(), ts=store.get('sp_ts_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name,{});
@@ -2261,11 +2276,82 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
   $('#home').onclick=()=>go('home'); $('#other').onclick=()=>viewL8(); $('#again').onclick=()=>sceneView(sc.id);
 }
 
+
+/* ============================================================
+   ⭐ 我的詞庫：學生自己想學的運動詞語（老師收集，存在 Google 表格「我的詞庫」）
+   每列：[學生（空白＝全班）, 中文, 拼音, 英文, 圖示, 例句, 例句拼音]
+   ============================================================ */
+const DEFAULT_WORDS = [["Kai", "表情", "biǎo qíng", "facial expression", "😜", "他的表情很奇怪。", "tā de biǎo qíng hěn qí guài."], ["Kai", "奇怪", "qí guài", "weird, strange", "🤪", "我覺得這個運動很奇怪。", "wǒ jué de zhè ge yùn dòng hěn qí guài."], ["Kayla", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Kayla", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Kayla", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Kayla", "站起來", "zhàn qǐ lái", "to stand up", "🧍", "他跌倒了，可是馬上站起來。", "tā dié dǎo le, kě shì mǎ shàng zhàn qǐ lái."], ["Kayla", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Kayla", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Alyna", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Alyna", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Alyna", "坐著", "zuò zhe", "sitting", "🪑", "他坐著看比賽。", "tā zuò zhe kàn bǐ sài."], ["Peony", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Peony", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Peony", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Peony", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["Mila", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["Mila", "女生", "nǚ shēng", "girl", "👧", "我們班的女生都很會打排球。", "wǒ men bān de nǚ shēng dōu hěn huì dǎ pái qiú."], ["Mila", "男生", "nán shēng", "boy", "👦", "男生和女生一起踢足球。", "nán shēng hé nǚ shēng yì qǐ tī zú qiú."], ["Mila", "計畫", "jì huà", "plan", "📝", "我們的計畫是星期六去游泳。", "wǒ men de jì huà shì xīng qí liù qù yóu yǒng."], ["Mila", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["Mila", "擊球", "jí qiú", "to hit the ball", "🏏", "他擊球擊得很好。", "tā jí qiú jí de hěn hǎo."], ["", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["", "跌倒", "dié dǎo", "to fall down", "🤕", "我跑步的時候跌倒了。", "wǒ pǎo bù de shí hou dié dǎo le."], ["", "進球", "jìn qiú", "to score a goal", "⚽", "他踢足球進球了！", "tā tī zú qiú jìn qiú le!"], ["", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["", "開心", "kāi xīn", "happy", "😄", "我覺得他們很開心。", "wǒ jué de tā men hěn kāi xīn."]];
+let WORD_ROWS = store.get('sp_words', null) || DEFAULT_WORDS;
+async function loadWords(){
+  if (!REMOTE) return WORD_ROWS;
+  try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=words`); const j=await r.json(); if(j.ok && Array.isArray(j.rows) && j.rows.length){ WORD_ROWS=j.rows; store.set('sp_words',j.rows); CATALOG=null; } }catch(e){}
+  return WORD_ROWS;
+}
+function wordBank(){
+  const W={}, mine=[], cls=[], others={};
+  const me=state.user?nameKey(state.user.name):'';
+  WORD_ROWS.forEach(r=>{ const [who,zh,py,en,e,ex,exPy]=r; if(!zh) return;
+    const w=W[zh]||(W[zh]={zh,py,en,e:e||'⭐',ex,exPy,owners:[]}); if(!w.ex&&ex){ w.ex=ex; w.exPy=exPy; }
+    const k=nameKey(who||'');
+    if(!k){ if(!cls.includes(zh)) cls.push(zh); }
+    else { if(!w.owners.includes(who)) w.owners.push(who); if(k===me){ if(!mine.includes(zh)) mine.push(zh); } else (others[who]=others[who]||[]).includes(zh)||others[who].push(zh); }
+  });
+  return {W, mine, cls, others};
+}
+function wordDone(zh){ const p=getProg(); return (p['LW-'+zh]??-1)>=60 && (p['LW-'+zh+'-s']??-1)>=60; }
+function viewLW(arg){
+  app.innerHTML='<div class="card">載入中… Loading…</div>';
+  loadWords().then(()=>{ if(arg && arg.zh) return wordPractice(arg.zh, arg.list); renderBank(); });
+  function renderBank(){
+    const {W, mine, cls, others}=wordBank();
+    const card=zh=>{ const w=W[zh]; const done=wordDone(zh); return `<button class="wcard ${done?'done':''}" data-zh="${esc(zh)}"><span class="we">${esc(w.e)}</span><ruby>${esc(zh)}<rt>${esc(w.py)}</rt></ruby><span class="en">${esc(w.en)}</span>${done?'<span class="wstar">⭐</span>':''}</button>`; };
+    const sec=(title,en,list,key)=>`<div class="card wsec"><b style="font-size:20px">${title} <span class="en">${en}</span></b> <span class="hint">${list.filter(wordDone).length}/${list.length} ⭐</span><div class="wgrid">${list.map(card).join('')}</div></div>`;
+    app.innerHTML = `
+      <button class="back" id="bk">← 回首頁 Home</button>
+      <h2 style="font-size:28px;font-weight:900">⭐ 我的詞庫 <span class="en" style="font-size:18px">My word bank</span></h2>
+      <div class="hint">這些是你們自己想學的運動詞語！點一個詞：聽一聽、說一說，再用它說一個句子。 <span class="en">Words you wanted to learn! Tap a word to listen, say it, and use it in a sentence.</span></div>
+      ${mine.length?sec(`🙋 ${esc(state.user.name)} 想學的詞`,'My words',mine,'mine'):`<div class="card wsec"><b style="font-size:20px">🙋 ${esc(state.user.name)} 想學的詞 <span class="en">My words</span></b><div class="hint" style="margin-top:6px">老師還沒有幫你加詞。先看看全班的詞吧！想學什麼詞，可以告訴老師。 <span class="en">No words yet — try the class words, and tell your teacher what you want to learn!</span></div></div>`}
+      ${cls.length?sec('🏫 全班的詞','Class words',cls,'cls'):''}
+      ${Object.keys(others).length?`<div class="card wsec"><b style="font-size:20px">👀 同學想學的詞 <span class="en">Classmates’ words</span></b>
+        ${Object.entries(others).map(([who,list])=>`<div class="wwho"><span class="pill">${esc(who)}</span></div><div class="wgrid">${list.map(card).join('')}</div>`).join('')}</div>`:''}`;
+    $('#bk').onclick=()=>go('home');
+    app.querySelectorAll('[data-zh]').forEach(b=>b.onclick=()=>{ const sec=b.closest('.wsec'); const list=[...sec.querySelectorAll('[data-zh]')].map(x=>x.dataset.zh); wordPractice(b.dataset.zh, list); });
+  }
+  function wordPractice(zh, list){
+    const {W}=wordBank(); const w=W[zh]; if(!w){ return renderBank(); }
+    list = list && list.length ? list : [zh]; const i=list.indexOf(zh);
+    app.innerHTML = `
+      <button class="back" id="bk">← 回到詞庫 Word bank</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><span class="hint">${w.owners.length?'想學這個詞的人：'+w.owners.map(esc).join('、'):'🏫 全班的詞'}</span><span class="hint">${i+1} / ${list.length}</span></div>
+        <div class="wbig"><div class="we2">${esc(w.e)}</div><div><ruby>${esc(zh)}<rt>${esc(w.py)}</rt></ruby></div><div class="en" style="font-size:20px">${esc(w.en)}</div>
+          <div class="row" style="justify-content:center;margin-top:8px"><button class="btn btn-sky" id="say1">🔊 聽 Listen</button><button class="btn btn-ghost" id="say1s">🐢 慢慢聽 Slow</button></div></div>
+        <div class="wstep"><b>① 說說看這個詞 <span class="en">Say the word</span></b><div class="speak" id="sp1"></div></div>
+        ${w.ex?`<div class="wstep"><b>② 跟著說句子 <span class="en">Say the sentence</span></b>
+          <div class="wex"><div class="pyline">${esc(w.exPy||'')}</div><div>${esc(w.ex)} <button class="btn btn-ghost" id="say2" style="padding:4px 10px;font-size:15px">🔊</button></div></div><div class="speak" id="sp2"></div></div>`:''}
+        <div class="wstep"><b>③ 挑戰：用「${esc(zh)}」說一個你自己的句子 <span class="en">Challenge: make your own sentence</span></b>
+          <div class="hint">🧩 可以用：我喜歡… ／ 我覺得…很… ／ …因為… ／ 我們一起…好不好？</div><div class="speak" id="sp3"></div></div>
+        <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn btn-ghost" id="pv" ${i<=0?'disabled style="opacity:.4"':''}>⬅ 上一個</button><button class="btn btn-sun" id="nx">${i>=list.length-1?'回到詞庫 ✔':'下一個 Next ➜'}</button></div>
+      </div>`;
+    $('#bk').onclick=()=>renderBank();
+    $('#say1').onclick=()=>say(zh);
+    $('#say1s').onclick=async()=>{ const o=state.prefs.slow; state.prefs.slow=true; await say(zh); state.prefs.slow=o; };
+    $('#say2') && ($('#say2').onclick=()=>say(w.ex));
+    mountSpeak($('#sp1'),{target:zh, targetLabel:'我的詞庫：'+zh, level:'LW 詞庫', item:'LW-'+zh});
+    if(w.ex) mountSpeak($('#sp2'),{target:w.ex, targetLabel:'我的詞庫句子：'+w.ex, level:'LW 詞庫', item:'LW-'+zh+'-s', maxMs:15000});
+    mountSpeak($('#sp3'),{target:zh, targetLabel:'我的詞庫造句：'+zh, level:'LW 詞庫', item:'LW-'+zh+'-own', maxMs:15000,
+      score:t=>{ const n=norm(fixHomo(t,zh)); if(!n) return 0; return (n.includes(norm(zh))?70:20) + ([...n].length>=[...zh].length+4?30:0); }});
+    $('#pv').onclick=()=>{ if(i>0) wordPractice(list[i-1], list); };
+    $('#nx').onclick=()=>{ if(i<list.length-1) wordPractice(list[i+1], list); else renderBank(); };
+  }
+}
+
 /* ============================================================
    第二階段 Deep 新關卡：🔍 小偵探（找規則）、🗂️ 分一分說理由、👫 我跟你一樣嗎
    內部代號 LD / LS / LC；畫面上的關卡編號見 LVNO
    ============================================================ */
-const LVNO = {L1:1,L2:2,L3:3,L4:4,L5:5,LD:6,LS:7,LC:8,L6:9,L7:10,L8:11};
+const LVNO = {LW:'★',L1:1,L2:2,L3:3,L4:4,L5:5,LD:6,LS:7,LC:8,L6:9,L7:10,L8:11};
 function lvTag(id){ const p=String(id||'').split('-')[0]; return LVNO[p]!=null ? 'L'+LVNO[p] : p; }
 function rubyTok(t){ const i=t.indexOf('|'); if(i<0) return esc(t); return `<ruby>${esc(t.slice(0,i))}<rt>${esc(t.slice(i+1).replace(/_/g,' '))}</rt></ruby>`; }
 const tokHz = t=>t.split('|')[0];
@@ -2553,6 +2639,8 @@ function catalog(){
   DIALOG.forEach((t,i)=>C['L3-'+i]={L:'L3', g:'L3', label:'文文：'+S_txt(t.bot(ctx)), kind:t.kind==='react'?'react':'dialog'});
   H.push({g:'L4', h:'L4 說一說', zh:'說一段話', en:'Short talk'});
   TOPICS.forEach(t=>C['L4-'+t.id]={L:'L4', g:'L4', label:strip(t.name), kind:'talk'});
+  H.push({g:'LW', h:'⭐ 詞庫', zh:'我的詞庫', en:'My word bank'});
+  Object.keys(wordBank().W).forEach(zh=>{ C['LW-'+zh]={L:'LW', g:'LW', label:'詞庫：'+zh, kind:'word'}; C['LW-'+zh+'-s']={L:'LW', g:'LW', label:'詞庫句子：'+zh, kind:'read'}; C['LW-'+zh+'-own']={L:'LW', g:'LW', label:'詞庫造句：'+zh, kind:'talk'}; });
   H.push({g:'LD', h:'L6 偵探', zh:'小偵探（找規則）', en:'Sentence detective'});
   DETECT.forEach(x=>C['LD-'+x.id]={L:'LD', g:'LD', label:'小偵探：'+x.fix[0], kind:'fix', rule:x.rule});
   H.push({g:'LS', h:'L7 分類', zh:'分一分，說理由', en:'Sort & explain'});
@@ -2628,7 +2716,7 @@ const ISSUE = {
 
 
 /* ---------- 三階段落點、可以挑戰、分數變化 ---------- */
-const STAGE_OF = p => (p==='L1'||p==='L2') ? 'S' : (p==='L7'||p==='L8') ? 'T' : 'D';
+const STAGE_OF = p => (p==='L1'||p==='L2'||p==='LW') ? 'S' : (p==='L7'||p==='L8') ? 'T' : 'D';
 function stageOf(s, gradesList){
   const b={S:[],D:[],T:[]};
   Object.values(s.items).forEach(it=>{ if(it.best==null) return; const p=String(it.id).split('-')[0]; if(/-line$/.test(it.id)) return; b[STAGE_OF(p)].push(it.best); });
@@ -2742,6 +2830,7 @@ function openItem(id){
   if ((m=id.match(/^LD-(\w+)$/))) return go('ld',{i:Math.max(0,DETECT.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LS-(\w+)$/))) return go('ls',{ri:Math.max(0,SORTS.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LC-(\w+)/))) return go('lc',{ci:Math.max(0,COMPARE.findIndex(x=>x.id===m[1]))});
+  if ((m=id.match(/^LW-([^-]+)/))) return go('lw',{zh:m[1]});
   if (/^L6-/.test(id)) return go('l6');
   if (/^L7-/.test(id)) return go('l7');
   if ((m=id.match(/^L8-(\w+)$/)) && SCENE[m[1]]) return sceneView(m[1]);
