@@ -132,6 +132,11 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.fbr{ruby-position:under;-webkit-ruby-position:after;margin:0 1px}.fbw{display:inline-block;margin:0 3px;white-space:nowrap}
+.fbr rt{font-size:12px;color:#0e7490;font-weight:700}
+.fbzh{font-size:22px;font-weight:900}.fbsc{font-size:13px;font-weight:800;color:#be123c;background:#ffe4e6;border-radius:999px;padding:1px 8px;margin-left:4px}
+.fbchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.fbchip{background:#fff;border:2px solid #fcd34d;border-radius:12px;padding:2px 10px 4px;font-size:22px;font-weight:900}
+.fbsec li{line-height:2.2}
 .fbmini{display:block;width:100%;text-align:left;font-size:18px;padding:12px 16px;cursor:pointer}
 .fbmodal{position:fixed;inset:0;z-index:90;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}
 .fbbox{background:#fffbeb;border:4px solid #fcd34d;border-radius:26px;max-width:620px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
@@ -1336,10 +1341,10 @@ function viewHome(){
     document.getElementById('fbModal')?.remove();
     const m=document.createElement('div'); m.id='fbModal'; m.className='fbmodal';
     m.innerHTML=`<div class="fbbox"><div style="font-size:44px;text-align:center">💡</div>
-      <h2 style="text-align:center;font-size:26px;font-weight:900;margin:4px 0">${esc(dispName(state.user.name))}，給你的建議 <span class="en" style="font-size:16px">Tips for you</span></h2>
-      <div class="hint" style="text-align:center">根據你最新的練習結果 <span class="en">Based on your latest practice</span></div>
+      <h2 style="text-align:center;font-size:26px;font-weight:900;margin:4px 0">Tips for ${esc(dispName(state.user.name))}</h2>
+      <div class="hint" style="text-align:center">Based on your latest practice</div>
       <div class="fbbody">${fbHTML(t)}</div>
-      <button class="btn btn-sun" id="fbOk" style="width:100%;font-size:20px;margin-top:12px">👍 知道了，開始練習！ <span class="en">OK, let’s go!</span></button></div>`;
+      <button class="btn btn-sun" id="fbOk" style="width:100%;font-size:20px;margin-top:12px">👍 OK, let’s go!</button></div>`;
     document.body.appendChild(m);
     const close=()=>m.remove();
     m.querySelector('#fbOk').onclick=close; m.onclick=e=>{ if(e.target===m) close(); };
@@ -2537,9 +2542,76 @@ function viewLB(arg){
    ============================================================ */
 const DEFAULT_WORDS = [["Kai", "表情", "biǎo qíng", "facial expression", "😜", "他的表情很奇怪。", "tā de biǎo qíng hěn qí guài."], ["Kai", "奇怪", "qí guài", "weird, strange", "🤪", "我覺得這個運動很奇怪。", "wǒ jué de zhè ge yùn dòng hěn qí guài."], ["Kayla", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Kayla", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Kayla", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Kayla", "站起來", "zhàn qǐ lái", "to stand up", "🧍", "他跌倒了，可是馬上站起來。", "tā dié dǎo le, kě shì mǎ shàng zhàn qǐ lái."], ["Kayla", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Kayla", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Alyna", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Alyna", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Alyna", "坐著", "zuò zhe", "sitting", "🪑", "他坐著看比賽。", "tā zuò zhe kàn bǐ sài."], ["Penny", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Penny", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Penny", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Penny", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["Mila", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["Mila", "女生", "nǚ shēng", "girl", "👧", "我們班的女生都很會打排球。", "wǒ men bān de nǚ shēng dōu hěn huì dǎ pái qiú."], ["Mila", "男生", "nán shēng", "boy", "👦", "男生和女生一起踢足球。", "nán shēng hé nǚ shēng yì qǐ tī zú qiú."], ["Mila", "計畫", "jì huà", "plan", "📝", "我們的計畫是星期六去游泳。", "wǒ men de jì huà shì xīng qí liù qù yóu yǒng."], ["Mila", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["Mila", "擊球", "jí qiú", "to hit the ball", "🏏", "他擊球擊得很好。", "tā jí qiú jí de hěn hǎo."], ["", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["", "跌倒", "dié dǎo", "to fall down", "🤕", "我跑步的時候跌倒了。", "wǒ pǎo bù de shí hou dié dǎo le."], ["", "球門", "qiú mén", "goal (the net you score in)", "⚽", "足球場上有兩個球門。", "zú qiú chǎng shàng yǒu liǎng ge qiú mén."], ["", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["", "開心", "kāi xīn", "happy", "😄", "我覺得他們很開心。", "wǒ jué de tā men hěn kāi xīn."]];
 let WORD_ROWS = store.get('sp_words', null) || DEFAULT_WORDS;
-function fbHTML(t){ return t.split(/\n\s*\n/).map(p=>{ const L=p.split('\n'); const head=L[0]; const body=L.slice(1);
-      const inline=head.includes(':') && !body.length ? head.split(/:\s*/) : null;
-      return `<div class="fbsec"><b>${esc(inline?inline[0]:head.replace(/:$/,''))}</b>${inline?` <span class="fbin">${esc(inline.slice(1).join(': '))}</span>`:''}${body.length?'<ul>'+body.reduce((a,line)=>{ if(/^\s+\S/.test(line) && a.length && !/^\s*•/.test(line)){ a[a.length-1]+='<div class="en">'+esc(line.trim())+'</div>'; } else a.push(esc(line.replace(/^\s*•\s*/,''))); return a; },[]).map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`; }).join(''); }
+/* ---------- 給學生的建議：說明用英文，中文詞語下面加拼音 ---------- */
+const PY_SYL = new Set('a ai an ang ao ba bai ban bang bao be bei ben beng ber bi bia bian biang biao bie bin bing biong biu bo bong bou bu bua buai buan buang bue bueng bui bun buo bv bvan bve bvn bü büe ca cai can cang cao ce cei cen ceng cer cha chai chan chang chao che chei chen cheng cher chi chia chian chiang chiao chie chin ching chiong chiu cho chong chou chu chua chuai chuan chuang chue chueng chui chun chuo chv chvan chve chvn chü chüe ci cia cian ciang ciao cie cin cing ciong ciu co cong cou cu cua cuai cuan cuang cue cueng cui cun cuo cv cvan cve cvn cü cüe da dai dan dang dao de dei den deng der di dia dian diang diao die din ding diong diu do dong dou du dua duai duan duang due dueng dui dun duo dv dvan dve dvn dü düe e ei en eng er fa fai fan fang fao fe fei fen feng fer fi fia fian fiang fiao fie fin fing fiong fiu fo fong fou fu fua fuai fuan fuang fue fueng fui fun fuo fv fvan fve fvn fü füe ga gai gan gang gao ge gei gen geng ger gi gia gian giang giao gie gin ging giong giu go gong gou gu gua guai guan guang gue gueng gui gun guo gv gvan gve gvn gü güe ha hai han hang hao he hei hen heng her hi hia hian hiang hiao hie hin hing hiong hiu ho hong hou hu hua huai huan huang hue hueng hui hun huo hv hvan hve hvn hü hüe i ia ian iang iao ie in ing iong iu ja jai jan jang jao je jei jen jeng jer ji jia jian jiang jiao jie jin jing jiong jiu jo jong jou ju jua juai juan juang jue jueng jui jun juo jv jvan jve jvn jü jüe ka kai kan kang kao ke kei ken keng ker ki kia kian kiang kiao kie kin king kiong kiu ko kong kou ku kua kuai kuan kuang kue kueng kui kun kuo kv kvan kve kvn kü küe la lai lan lang lao le lei len leng ler li lia lian liang liao lie lin ling liong liu lo long lou lu lua luai luan luang lue lueng lui lun luo lv lvan lve lvn lü lüe ma mai man mang mao me mei men meng mer mi mia mian miang miao mie min ming miong miu mo mong mou mu mua muai muan muang mue mueng mui mun muo mv mvan mve mvn mü müe na nai nan nang nao ne nei nen neng ner ni nia nian niang niao nie nin ning niong niu no nong nou nu nua nuai nuan nuang nue nueng nui nun nuo nv nvan nve nvn nü nüe o ong ou pa pai pan pang pao pe pei pen peng per pi pia pian piang piao pie pin ping piong piu po pong pou pu pua puai puan puang pue pueng pui pun puo pv pvan pve pvn pü püe qa qai qan qang qao qe qei qen qeng qer qi qia qian qiang qiao qie qin qing qiong qiu qo qong qou qu qua quai quan quang que queng qui qun quo qv qvan qve qvn qü qüe ra rai ran rang rao re rei ren reng rer ri ria rian riang riao rie rin ring riong riu ro rong rou ru rua ruai ruan ruang rue rueng rui run ruo rv rvan rve rvn rü rüe sa sai san sang sao se sei sen seng ser sha shai shan shang shao she shei shen sheng sher shi shia shian shiang shiao shie shin shing shiong shiu sho shong shou shu shua shuai shuan shuang shue shueng shui shun shuo shv shvan shve shvn shü shüe si sia sian siang siao sie sin sing siong siu so song sou su sua suai suan suang sue sueng sui sun suo sv svan sve svn sü süe ta tai tan tang tao te tei ten teng ter ti tia tian tiang tiao tie tin ting tiong tiu to tong tou tu tua tuai tuan tuang tue tueng tui tun tuo tv tvan tve tvn tü tüe u ua uai uan uang ue ueng ui un uo v van ve vn wa wai wan wang wao we wei wen weng wer wi wia wian wiang wiao wie win wing wiong wiu wo wong wou wu wua wuai wuan wuang wue wueng wui wun wuo wv wvan wve wvn wü wüe xa xai xan xang xao xe xei xen xeng xer xi xia xian xiang xiao xie xin xing xiong xiu xo xong xou xu xua xuai xuan xuang xue xueng xui xun xuo xv xvan xve xvn xü xüe ya yai yan yang yao ye yei yen yeng yer yi yia yian yiang yiao yie yin ying yiong yiu yo yong you yu yua yuai yuan yuang yue yueng yui yun yuo yv yvan yve yvn yü yüe za zai zan zang zao ze zei zen zeng zer zha zhai zhan zhang zhao zhe zhei zhen zheng zher zhi zhia zhian zhiang zhiao zhie zhin zhing zhiong zhiu zho zhong zhou zhu zhua zhuai zhuan zhuang zhue zhueng zhui zhun zhuo zhv zhvan zhve zhvn zhü zhüe zi zia zian ziang ziao zie zin zing ziong ziu zo zong zou zu zua zuai zuan zuang zue zueng zui zun zuo zv zvan zve zvn zü züe ü üe'.split(' '));
+const PY_BASE = c => c.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ü/g,'v').toLowerCase();
+/* 把 lánqiú 這種連在一起的拼音切成 n 個音節（lán qiú） */
+function splitPy(py, n){
+  const chunks=String(py).replace(/['’]/g,' ').trim().split(/\s+/).filter(Boolean);
+  const cut=(w,k)=>{ // 把一段切成 k 個音節
+    const b=PY_BASE(w); const memo={};
+    const go=(i,k)=>{ const key=i+','+k; if(key in memo) return memo[key];
+      if(i===b.length) return memo[key]=(k===0?[]:null); if(k===0) return memo[key]=null;
+      for(let L=Math.min(6,b.length-i); L>=1; L--){ if(PY_SYL.has(b.slice(i,i+L))){ const r=go(i+L,k-1); if(r) return memo[key]=[w.slice(i,i+L)].concat(r); } }
+      return memo[key]=null; };
+    return go(0,k); };
+  const all=(ci,left)=>{ if(ci===chunks.length) return left===0?[]:null;
+    for(let k=1;k<=left-(chunks.length-ci-1);k++){ const a=cut(chunks[ci],k); if(a){ const r=all(ci+1,left-k); if(r) return a.concat(r); } }
+    return null; };
+  return all(0,n);
+}
+let PYMAP=null;
+function buildPyMap(){
+  const M={}, CJK=/[㐀-鿿]/, isPy=x=>typeof x==='string' && /[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/i.test(x) && !CJK.test(x);
+  const add=(hz,py)=>{ hz=String(hz||'').trim(); py=String(py||'').replace(/_/g,' ').replace(/[，。！？、,.!?「」]/g,' ').trim(); if(!hz||!py||!CJK.test(hz)) return;
+    const chars=[...hz].filter(c=>CJK.test(c)); if(!chars.length) return;
+    const syl=splitPy(py, chars.length); const w=chars.join('');
+    if(syl && !M[w]) M[w]=syl.join(' ');
+  };
+  const seen=new Set();
+  const walk=(o,d)=>{ if(!o || d>7 || seen.has(o)) return; if(typeof o==='string'){ const i=o.indexOf('|'); if(i>0) add(o.slice(0,i), o.slice(i+1)); return; }
+    if(typeof o!=='object') return; seen.add(o);
+    if(Array.isArray(o)){ if(o.length===2 && typeof o[0]==='string' && isPy(o[1])) add(o[0],o[1]); o.forEach(x=>walk(x,d+1)); return; }
+    if(o.hz && o.py) add(o.hz,o.py);
+    Object.values(o).forEach(x=>walk(x,d+1)); };
+  try{ [SPORTS, VOCAB_SETS, PATTERNS, BLOCKS, DETECT, BUILD, SCENES, L5, TOPICS, DIALOG].forEach(x=>walk(x,0)); }catch(e){}
+  try{ WORD_ROWS.forEach(r=>{ add(r[1],r[2]); }); }catch(e){}
+  // 由長詞拆出單字的拼音（備用）
+  Object.keys(M).forEach(w=>{ const ch=[...w], sy=M[w].split(' '); if(ch.length===sy.length) ch.forEach((c,i)=>{ if(!M[c]) M[c]=sy[i]; }); });
+  return M;
+}
+function pyRuby(text){
+  if(!PYMAP) PYMAP=buildPyMap();
+  const s=[...String(text||'')]; let out='', i=0;
+  while(i<s.length){
+    if(!/[㐀-鿿]/.test(s[i])){ out+=esc(s[i]); i++; continue; }
+    let hit=null;
+    for(let L=Math.min(6,s.length-i); L>=1; L--){ const w=s.slice(i,i+L).join(''); if(PYMAP[w]){ hit=w; break; } }
+    if(hit){ const ch=[...hit], sy=PYMAP[hit].split(' '); out+='<span class="fbw">'+ch.map((c,k)=>`<ruby class="fbr">${esc(c)}<rt>${esc(sy[k]||'')}</rt></ruby>`).join('')+'</span>'; i+=ch.length; }
+    else { out+=esc(s[i]); i++; }
+  }
+  return out;
+}
+/* 把後台的中英文建議，轉成「英文說明＋中文加拼音」 */
+function fbHTML(t){
+  return String(t||'').split(/\n\s*\n/).map(p=>{
+    const L=p.split('\n'); const head=L[0];
+    const m=head.match(/^(\S+)\s+[^A-Za-z]*?([A-Za-z][^:：]*)[:：]?\s*(.*)$/);
+    const icon=m?m[1]:'', title=m?m[2].trim():head, rest=m?m[3]:'';
+    let body='';
+    if(rest){ body=`<div class="fbchips">${rest.split(/[、,，]\s*/).filter(Boolean).map(w=>`<span class="fbchip">${pyRuby(w)}</span>`).join('')}</div>`; }
+    const items=[]; L.slice(1).forEach(line=>{
+      if(/^\s*•/.test(line)) items.push({zh:line.replace(/^\s*•\s*/,''), en:''});
+      else if(line.trim() && items.length) items[items.length-1].en=line.trim();
+    });
+    if(items.length) body+='<ul>'+items.map(x=>{
+      if(x.en) return `<li>${pyRuby(x.en)}</li>`;   // 練習方向：只用英文，裡面的中文加拼音
+      const sc=x.zh.match(/（(\d+)分）$/); const zh=x.zh.replace(/（\d+分）$/,'');
+      return `<li><span class="fbzh">${pyRuby(zh)}</span>${sc?` <span class="fbsc">${sc[1]} pts</span>`:''}</li>`;
+    }).join('')+'</ul>';
+    return `<div class="fbsec"><b>${esc(icon)} ${esc(title)}</b>${body}</div>`;
+  }).join('');
+}
 async function loadFeedbackFor(name, teacher){
   if (!REMOTE) return '';
   try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=feedback&name=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher||'')}`); const j=await r.json(); return j.ok?(j.text||''):''; }catch(e){ return ''; }
