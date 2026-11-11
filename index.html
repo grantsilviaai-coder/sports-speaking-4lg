@@ -2593,7 +2593,7 @@ function pyRuby(text){
   return out;
 }
 /* 把後台的中英文建議，轉成「英文說明＋中文加拼音」 */
-function fbHTML(t){
+function fbHTML(t, showScore){
   return String(t||'').split(/\n\s*\n/).map(p=>{
     const L=p.split('\n'); const head=L[0];
     const m=head.match(/^(\S+)\s+[^A-Za-z]*?([A-Za-z][^:：]*)[:：]?\s*(.*)$/);
@@ -2607,7 +2607,7 @@ function fbHTML(t){
     if(items.length) body+='<ul>'+items.map(x=>{
       if(x.en) return `<li>${pyRuby(x.en)}</li>`;   // 練習方向：只用英文，裡面的中文加拼音
       const sc=x.zh.match(/（(\d+)分）$/); const zh=x.zh.replace(/（\d+分）$/,'');
-      return `<li><span class="fbzh">${pyRuby(zh)}</span>${sc?` <span class="fbsc">${sc[1]} pts</span>`:''}</li>`;
+      return `<li><span class="fbzh">${pyRuby(zh)}</span>${sc&&showScore?` <span class="fbsc">${sc[1]} pts</span>`:''}</li>`;
     }).join('')+'</ul>';
     return `<div class="fbsec"><b>${esc(icon)} ${esc(title)}</b>${body}</div>`;
   }).join('');
@@ -3438,7 +3438,7 @@ function viewTeacher(arg){
         <table style="margin-top:8px"><thead><tr><th>時間</th><th>題目</th><th>學生說的</th><th>分數</th><th>錄音</th></tr></thead><tbody>
         ${s.rows.slice().sort((a,b)=>(+b.time||+b.t)-(+a.time||+a.t)).map(r=>`<tr><td class="hint">${new Date(+r.time||+r.t).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${(C[r.item]?.label && !/^L[67]/.test(r.item)) ? esc(C[r.item].label) : esc(r.target).replace(/\n/g,'<br>')}</td><td><b>${esc(r.transcript)||'<span class="hint">（無辨識）</span>'}</b>${(!r.transcript&&r.diag)?`<div class="hint" style="font-size:12px">⚠️ ${esc(r.diag)}</div>`:''}</td><td>${pill(r.score===''||r.score==null?null:+r.score)}${r.rescored?'<div class="hint" style="font-size:11px">同音字已調整</div>':''}</td><td>${r.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`).join('')}
         </tbody></table></details>`;
-    loadFeedbackFor(s.name, s.teacher).then(t=>{ const el=document.getElementById('stuFbB'); if(!el) return; el.className=''; el.innerHTML = t ? fbHTML(t)+`<button class="btn btn-ghost" id="cpFb" style="margin-top:8px;padding:6px 12px;font-size:14px">📋 複製 Copy</button>` : '<span class="hint">'+(REMOTE?'這位學生還沒有足夠的紀錄。':'（本機模式沒有雲端建議）')+'</span>'; const cb=document.getElementById('cpFb'); if(cb) cb.onclick=()=>{ navigator.clipboard?.writeText(t).then(()=>toast('已複製 Copied')).catch(()=>toast('無法複製')); }; });
+    loadFeedbackFor(s.name, s.teacher).then(t=>{ const el=document.getElementById('stuFbB'); if(!el) return; el.className=''; el.innerHTML = t ? fbHTML(t, true)+`<button class="btn btn-ghost" id="cpFb" style="margin-top:8px;padding:6px 12px;font-size:14px">📋 複製 Copy</button>` : '<span class="hint">'+(REMOTE?'這位學生還沒有足夠的紀錄。':'（本機模式沒有雲端建議）')+'</span>'; const cb=document.getElementById('cpFb'); if(cb) cb.onclick=()=>{ navigator.clipboard?.writeText(t).then(()=>toast('已複製 Copied')).catch(()=>toast('無法複製')); }; });
     $('#ss').onchange=()=>{ tv.student=$('#ss').value; render() };
     $('#cp').onclick=async()=>{ try{ await navigator.clipboard.writeText($('#cm').value); toast('已複製 Copied') }catch(e){ $('#cm').select(); toast('請按 Ctrl+C 複製') } };
     $('#asg') && ($('#asg').onclick=()=>doAssign([s], [...$('#tb').querySelectorAll('.ck input:checked')].map(x=>x.value), '老師指定'));
