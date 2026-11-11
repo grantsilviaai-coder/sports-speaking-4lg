@@ -58,6 +58,16 @@ input,select{font:inherit}
 .top .brand{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px;cursor:pointer}
 .top .brand small{font-family:Nunito;font-weight:600;opacity:.75;font-size:13px}
 .top .sp{flex:1}
+.tiles{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+.tile{position:relative;width:118px;height:118px;border-radius:22px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 rgba(0,0,0,.15);text-align:center;line-height:1.15}
+.tile:active{transform:translateY(3px);box-shadow:none}
+.tile .ti{font-size:38px;line-height:1}.tile b{font-size:16px;margin-top:4px}.tile .en{font-size:12px;color:#fff;opacity:.9}
+.t-mic{background:linear-gradient(135deg,#0f766e,#2dd4bf)}.t-fb{background:linear-gradient(135deg,#b45309,#fbbf24)}.t-wb{background:linear-gradient(135deg,#7c3aed,#f472b6)}
+.tprog{font-size:11px;font-weight:800;background:rgba(255,255,255,.25);border-radius:999px;padding:1px 8px;margin-top:2px}
+.tbadge{position:absolute;top:-6px;right:-6px;background:#e11d48;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:2px 7px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.micsq{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);color:#fff;font-size:20px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px}
+.micsq:hover{background:rgba(255,255,255,.3)}
+.micpop{position:absolute;z-index:70;width:300px;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 12px 30px rgba(0,0,0,.25);border:3px solid #a7f3d0}
 .chip{background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
 .chip.off{opacity:.45;text-decoration:line-through}
 .who{font-weight:800}
@@ -459,6 +469,11 @@ tr.click:hover{background:#fffaf0}
   <span class="chip hidden" id="whoChip"><span class="who" id="whoName"></span><span class="sync" id="syncState"></span></span>
   <button class="chip hidden" id="btnSwitch">換人 Switch</button>
 </div>
+<div class="micpop hidden" id="micPop"><div class="row" style="justify-content:space-between"><b>🎤 麥克風測試 <span class="en">Mic check</span></b><button class="btn btn-ghost" id="micX" style="padding:2px 10px;font-size:14px">✕</button></div>
+  <div class="hint" style="margin-top:4px">按「測試」，說「你好」。 <span class="en">Tap Test and say “你好”.</span></div>
+  <div style="margin-top:8px;height:14px;background:#eee;border-radius:999px;overflow:hidden"><div id="mtBar" style="height:100%;width:0;background:var(--grass);transition:width .06s"></div></div>
+  <div id="mtMsg" style="margin-top:8px;font-weight:700;font-size:15px"></div>
+  <button class="btn btn-sun" id="mt" style="width:100%;margin-top:8px">▶️ 測試 Test</button></div>
 
 <main id="app"></main>
 <div class="toast hidden" id="toast"></div>
@@ -845,6 +860,20 @@ $('#tgPy').onclick=()=>{state.prefs.py=!state.prefs.py;applyPrefs()};
 $('#tgEn').onclick=()=>{state.prefs.en=!state.prefs.en;applyPrefs()};
 $('#tgSlow').onclick=()=>{state.prefs.slow=!state.prefs.slow;applyPrefs()};
 $('#brand').onclick=()=>{ if(state.teacher) return; state.user?go('home'):go('login') };
+
+/* 🎤 右上角的麥克風測試 */
+function openMic(){ const pop=$('#micPop'), t=document.getElementById('tMic'); if(t){ const r=t.getBoundingClientRect(); pop.style.top=(r.bottom+window.scrollY+8)+'px'; pop.style.left=(r.left+window.scrollX)+'px'; } pop.classList.toggle('hidden'); $('#mtMsg').textContent=''; $('#mtBar').style.width='0'; }
+$('#micX').onclick=()=>$('#micPop').classList.add('hidden');
+$('#mt').onclick=async()=>{
+  const msg=$('#mtMsg'); msg.textContent='聽聽看… Listening…';
+  let peak;
+  try{ peak=await micPeak(3000, v=>{ $('#mtBar').style.width=Math.min(100,v*300)+'%' }) }
+  catch(e){ msg.innerHTML='🎙️ 沒有麥克風權限。請按網址列左邊的圖示，允許使用麥克風。 <span class="en">Please allow the microphone.</span>'; return; }
+  const name = esc(micLabel||'');
+  if (peak < 0.02) msg.innerHTML = `❌ 沒有收到聲音（${name}）。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
+  else if (state.virtualMic) msg.innerHTML = `⚠️ 錄音正常（${name}），但 Chrome 預設的麥克風是 EShare，語音辨識可能聽不到。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
+  else msg.innerHTML = `✅ 麥克風正常！ <span class="en">Your mic works!</span> <span class="hint">（${name}）</span>`;
+  };
 $('#btnSwitch').onclick=()=>{ stopAll(); state.user=null; store.set('sp_user',null); go('login') };
 
 /* ---------- text-to-speech ---------- */
@@ -1166,6 +1195,7 @@ function go(view, arg){
   const showUser = !!state.user && !state.teacher && view!=='login';
   $('#whoChip').classList.toggle('hidden',!showUser);
   $('#btnSwitch').classList.toggle('hidden',!showUser);
+  if(!showUser || view!=='home') $('#micPop').classList.add('hidden');
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+dispName(state.user.name);
   window.scrollTo(0,0);
   ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, lb:viewLB, teacher:viewTeacher, pin:viewPin})[view](arg);
@@ -1233,17 +1263,12 @@ function viewHome(){
     <div class="hello">${esc(dispName(state.user.name))}，你好！👋</div>
     <div class="en">Choose a level. 選一個關卡開始練習！</div>
     ${REMOTE?'':'<div class="warn" style="margin-top:12px">💾 目前成績和錄音只存在這台電腦。 <span class="en">Results are saved on this device only.</span></div>'}
-    <div class="card" style="margin-top:14px;padding:14px 18px">
-      <div class="row" style="justify-content:space-between">
-        <div><b>🎤 先測試麥克風 Mic check</b> <span class="hint">按下去，說「你好」。 <span class="en">Tap and say “你好”.</span></span></div>
-        <button class="btn btn-ghost" id="mt">開始測試 Test</button>
-      </div>
-      <div id="mtBarWrap" class="hidden" style="margin-top:10px;height:16px;background:#eee;border-radius:999px;overflow:hidden"><div id="mtBar" style="height:100%;width:0;background:var(--grass);transition:width .06s"></div></div>
-      <div id="mtMsg" style="margin-top:8px;font-weight:700"></div>
+    <div class="tiles">
+      <button class="tile t-mic" id="tMic"><span class="ti">🎤</span><b>麥克風測試</b><span class="en">Mic check</span></button>
+      <button class="tile t-fb" id="tFb"><span class="ti">💡</span><b>給你的建議</b><span class="en">Tips for you</span><span class="tbadge hidden" id="fbBadge">NEW</span></button>
+      <button class="tile t-wb" data-v="lw"><span class="ti">⭐</span><b>我的詞庫</b><span class="en">My words</span><span class="tprog">${(()=>{ const b=wordBank(); const L=b.mine.length?b.mine:b.cls; return '⭐ '+L.filter(wordDone).length+'/'+L.length; })()}</span></button>
     </div>
-    <div id="fbCard"></div>
     <div id="asgCard"></div>
-    <button class="wbank-card" data-v="lw"><span style="font-size:44px">⭐</span><div style="flex:1"><b style="font-size:24px">我的詞庫</b> <span class="en">My word bank</span><div style="font-size:15px">你自己想學的運動詞語，還有全班和同學的詞 <span class="en">Words you wanted to learn</span></div></div><span class="prog" id="wprog">${(()=>{ const b=wordBank(); const L=b.mine.length?b.mine:b.cls; return '⭐ '+L.filter(wordDone).length+'/'+L.length; })()}</span></button>
     <div class="stage st-s"><div class="sthead"><span class="stico">🌱</span><div><b>第一階段：學會</b> <span class="en">Surface · Learn it</span><div class="hint">聽懂、說出運動詞語和句型 <span class="en">Hear and say the words and patterns</span></div></div></div>
     <div class="levels">
       <button class="level l1" data-v="l1"><span class="num">LEVEL 1</span><span class="ico">🔤</span><span class="t">詞語暖身</span><span class="d">聽一聽、說一說運動詞語<br><span class="en" style="color:#fff">Listen & say the words</span></span><span class="prog">✅ ${a.done}/${a.total}</span></button>
@@ -1266,16 +1291,16 @@ function viewHome(){
       <button class="level l8" data-v="l8"><span class="num">LEVEL 12 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
-  app.querySelectorAll('.level,.wbank-card').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  app.querySelectorAll('.level,.t-wb').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  $('#tMic').onclick=openMic;
+  $('#tFb').onclick=()=>{ if(state.fbText) showFb(state.fbText); else toast('先練習幾題，就會有建議喔！ Practice a few items first!'); };
   /* 💡 給你的建議：登入後、每次練習完回到首頁，都跳出最新的回饋 */
   const fbHTML=t=>t.split(/\n\s*\n/).map(p=>{ const L=p.split('\n'); const head=L[0]; const body=L.slice(1);
       const inline=head.includes(':') && !body.length ? head.split(/:\s*/) : null;
       return `<div class="fbsec"><b>${esc(inline?inline[0]:head.replace(/:$/,''))}</b>${inline?` <span class="fbin">${esc(inline.slice(1).join(': '))}</span>`:''}${body.length?'<ul>'+body.reduce((a,line)=>{ if(/^\s+\S/.test(line) && a.length && !/^\s*•/.test(line)){ a[a.length-1]+='<div class="en">'+esc(line.trim())+'</div>'; } else a.push(esc(line.replace(/^\s*•\s*/,''))); return a; },[]).map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`; }).join('');
   const popNow = state.fbLogin || state.fbDirty;
-  loadFeedback().then(t=>{ const el=$('#fbCard'); if(!el || !t) return;
-    state.fbText=t;
-    el.innerHTML=`<button class="card fbcard fbmini" id="fbOpen">💡 <b>給你的建議</b> <span class="en">Tips for you</span> <span class="hint">（點一下打開 Tap to open）</span></button>`;
-    $('#fbOpen').onclick=()=>showFb(t);
+  loadFeedback().then(t=>{ if(!t || !document.getElementById('tFb')) return;
+    state.fbText=t; $('#fbBadge').classList.toggle('hidden',!popNow);
     if(popNow){ state.fbLogin=false; state.fbDirty=false; showFb(t); }
   });
   function showFb(t){
@@ -1299,16 +1324,6 @@ function viewHome(){
       <div class="asglist">${items.map(x=>`<button class="asgitem ${ts[x.id]>=x.t?'done':''}" data-id="${esc(x.id)}">${ts[x.id]>=x.t?'✅':'⬜'} ${esc(C[x.id]?.label?.replace(/^文文：/,'')||x.id)} <span class="hint">${esc(lvTag(x.id))}</span></button>`).join('')}</div></div>`;
     el.querySelectorAll('.asgitem').forEach(b=>b.onclick=()=>openItem(b.dataset.id));
   });
-  $('#mt').onclick=async()=>{
-    const msg=$('#mtMsg'); $('#mtBarWrap').classList.remove('hidden'); msg.textContent='聽聽看… Listening…';
-    let peak;
-    try{ peak=await micPeak(3000, v=>{ $('#mtBar').style.width=Math.min(100,v*300)+'%' }) }
-    catch(e){ msg.innerHTML='🎙️ 沒有麥克風權限。請按網址列左邊的圖示，允許使用麥克風。 <span class="en">Please allow the microphone.</span>'; return; }
-    const name = esc(micLabel||'');
-    if (peak < 0.02) msg.innerHTML = `❌ 沒有收到聲音（${name}）。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
-    else if (state.virtualMic) msg.innerHTML = `⚠️ 錄音正常（${name}），但 Chrome 預設的麥克風是 EShare，語音辨識可能聽不到。<div class="warn" style="margin-top:8px;font-size:15px">${MIC_FIX_HTML}</div>`;
-    else msg.innerHTML = `✅ 麥克風正常！ <span class="en">Your mic works!</span> <span class="hint">（${name}）</span>`;
-  };
 }
 
 /* ---------- LEVEL 1 ---------- */
