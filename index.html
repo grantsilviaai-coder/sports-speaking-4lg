@@ -111,6 +111,16 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.lb{background:linear-gradient(135deg,#0e7490,#22d3ee)}
+.bten{font-size:24px;font-weight:900;background:#eff6ff;border-radius:16px;padding:12px 16px;margin:6px 0}
+.bans{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;min-height:84px;margin-top:10px;padding:10px;border:3px dashed #22d3ee;border-radius:18px;background:#ecfeff}
+.bbank{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;min-height:70px;padding:10px;border-radius:18px;background:#f8f6f0}
+.bblk{background:#fff;border:3px solid #a5f3fc;border-radius:14px;padding:2px 12px 6px;font-size:28px;font-weight:900;line-height:1.6;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.bblk rt{font-size:13px;font-weight:700;color:#78716c}
+.bblk.in{border-color:#0891b2}.bblk.good{border-color:#16a34a;background:#f0fdf4}.bblk.bad{border-color:#dc2626;background:#fee2e2}
+.bblk.bdragging{opacity:.3}.bghost{position:fixed;z-index:80;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.25);transform:scale(1.08)}
+.bend{font-size:28px;font-weight:900;color:#57534e;padding-bottom:6px}.bph{align-self:center}
+.bok{background:#f0fdf4;border-radius:14px;padding:10px 12px}
 .wbank-card{display:flex;align-items:center;gap:14px;width:100%;margin-top:16px;text-align:left;border-radius:24px;padding:16px 20px;color:#fff;background:linear-gradient(135deg,#7c3aed,#f472b6);box-shadow:0 6px 0 rgba(0,0,0,.15)}
 .wbank-card .prog{font-weight:800;font-size:16px;background:rgba(255,255,255,.25);border-radius:999px;padding:4px 12px}
 .wsec{margin-top:12px}
@@ -1130,7 +1140,7 @@ function go(view, arg){
   $('#btnSwitch').classList.toggle('hidden',!showUser);
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+state.user.name;
   window.scrollTo(0,0);
-  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, teacher:viewTeacher, pin:viewPin})[view](arg);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, lb:viewLB, teacher:viewTeacher, pin:viewPin})[view](arg);
 }
 
 function viewLogin(){
@@ -1200,21 +1210,22 @@ function viewHome(){
     <div class="levels">
       <button class="level l1" data-v="l1"><span class="num">LEVEL 1</span><span class="ico">🔤</span><span class="t">詞語暖身</span><span class="d">聽一聽、說一說運動詞語<br><span class="en" style="color:#fff">Listen & say the words</span></span><span class="prog">✅ ${a.done}/${a.total}</span></button>
       <button class="level l2" data-v="l2"><span class="num">LEVEL 2</span><span class="ico">🧩</span><span class="t">句型練習</span><span class="d">用句型回答問題<br><span class="en" style="color:#fff">Answer with sentence patterns</span></span><span class="prog">✅ ${b.done}/${b.total}</span></button>
+      <button class="level lb" data-v="lb"><span class="num">LEVEL 3 · 排句子</span><span class="ico">🧩</span><span class="t">排句子</span><span class="d">看英文，拖拉中文方塊排成句子<br><span class="en" style="color:#fff">Build the sentence</span></span><span class="prog">✅ ${countLevel('LB',BUILD.map(x=>'LB-'+x.id)).done}/${BUILD.length}</span></button>
     </div></div>
     <div class="stage st-d"><div class="sthead"><span class="stico">🌳</span><div><b>第二階段：想通</b> <span class="en">Deep · Connect it</span><div class="hint">知道什麼時候用哪個句型，接住對方的話、說理由 <span class="en">Choose the right pattern, respond, and give reasons</span></div></div></div>
     <div class="levels">
-      <button class="level l3" data-v="l3"><span class="num">LEVEL 3</span><span class="ico">💬</span><span class="t">和文文聊天</span><span class="d">一問一答，練習對話<br><span class="en" style="color:#fff">Chat with Wenwen</span></span><span class="prog">✅ ${c.done}/${c.total}</span></button>
-      <button class="level l4" data-v="l4"><span class="num">LEVEL 4</span><span class="ico">🎤</span><span class="t">我來說一說</span><span class="d">說一段話介紹運動或運動員<br><span class="en" style="color:#fff">Give a short talk</span></span><span class="prog">✅ ${d.done}/${d.total}</span></button>
-      <button class="level l5" data-v="l5"><span class="num">LEVEL 5 · 進階</span><span class="ico">🚀</span><span class="t">進階挑戰</span><span class="d">讀短文和對話，用說的回答問題<br><span class="en" style="color:#fff">Read, think & answer</span></span><span class="prog">✅ ${e5.done}/${e5.total}</span></button>
-      <button class="level ld" data-v="ld"><span class="num">LEVEL 6 · 找規則</span><span class="ico">🔍</span><span class="t">小偵探</span><span class="d">這句話哪裡怪怪的？找出來、說對它<br><span class="en" style="color:#fff">Spot the mistake & fix it</span></span><span class="prog">✅ ${countLevel('LD',DETECT.map(x=>'LD-'+x.id)).done}/${DETECT.length}</span></button>
-      <button class="level ls" data-v="ls"><span class="num">LEVEL 7 · 分類</span><span class="ico">🗂️</span><span class="t">分一分，說理由</span><span class="d">把運動分類，說出為什麼<br><span class="en" style="color:#fff">Sort & explain why</span></span><span class="prog">✅ ${countLevel('LS',SORTS.map(x=>'LS-'+x.id)).done}/${SORTS.length}</span></button>
-      <button class="level lc" data-v="lc"><span class="num">LEVEL 8 · 兩人一組</span><span class="ico">👫</span><span class="t">我跟你一樣嗎？</span><span class="d">比一比：一樣的地方、不一樣的地方<br><span class="en" style="color:#fff">Compare: same or different?</span></span><span class="prog">文氏圖 Venn</span></button>
-      <button class="level l6" data-v="l6"><span class="num">LEVEL 9 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
+      <button class="level l3" data-v="l3"><span class="num">LEVEL 4</span><span class="ico">💬</span><span class="t">和文文聊天</span><span class="d">一問一答，練習對話<br><span class="en" style="color:#fff">Chat with Wenwen</span></span><span class="prog">✅ ${c.done}/${c.total}</span></button>
+      <button class="level l4" data-v="l4"><span class="num">LEVEL 5</span><span class="ico">🎤</span><span class="t">我來說一說</span><span class="d">說一段話介紹運動或運動員<br><span class="en" style="color:#fff">Give a short talk</span></span><span class="prog">✅ ${d.done}/${d.total}</span></button>
+      <button class="level l5" data-v="l5"><span class="num">LEVEL 6 · 進階</span><span class="ico">🚀</span><span class="t">進階挑戰</span><span class="d">讀短文和對話，用說的回答問題<br><span class="en" style="color:#fff">Read, think & answer</span></span><span class="prog">✅ ${e5.done}/${e5.total}</span></button>
+      <button class="level ld" data-v="ld"><span class="num">LEVEL 7 · 找規則</span><span class="ico">🔍</span><span class="t">小偵探</span><span class="d">這句話哪裡怪怪的？找出來、說對它<br><span class="en" style="color:#fff">Spot the mistake & fix it</span></span><span class="prog">✅ ${countLevel('LD',DETECT.map(x=>'LD-'+x.id)).done}/${DETECT.length}</span></button>
+      <button class="level ls" data-v="ls"><span class="num">LEVEL 8 · 分類</span><span class="ico">🗂️</span><span class="t">分一分，說理由</span><span class="d">把運動分類，說出為什麼<br><span class="en" style="color:#fff">Sort & explain why</span></span><span class="prog">✅ ${countLevel('LS',SORTS.map(x=>'LS-'+x.id)).done}/${SORTS.length}</span></button>
+      <button class="level lc" data-v="lc"><span class="num">LEVEL 9 · 兩人一組</span><span class="ico">👫</span><span class="t">我跟你一樣嗎？</span><span class="d">比一比：一樣的地方、不一樣的地方<br><span class="en" style="color:#fff">Compare: same or different?</span></span><span class="prog">文氏圖 Venn</span></button>
+      <button class="level l6" data-v="l6"><span class="num">LEVEL 10 · 兩人一組</span><span class="ico">🧱</span><span class="t">對話工作坊</span><span class="d">用句型方塊組對話，兩個人輪流說<br><span class="en" style="color:#fff">Build & perform a dialogue in pairs</span></span><span class="prog">初階・中階・進階</span></button>
     </div></div>
     <div class="stage st-t"><div class="sthead"><span class="stico">🚀</span><div><b>第三階段：用出來</b> <span class="en">Transfer · Use it</span><div class="hint">在新的情境裡，自己決定要說什麼 <span class="en">Use what you know in new situations</span></div></div></div>
     <div class="levels">
-      <button class="level l7" data-v="l7"><span class="num">LEVEL 10 · 對話測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
-      <button class="level l8" data-v="l8"><span class="num">LEVEL 11 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
+      <button class="level l7" data-v="l7"><span class="num">LEVEL 11 · 對話測驗</span><span class="ico">📝</span><span class="t">對話測驗</span><span class="d">兩個人輪流選，說出自己的對話<br><span class="en" style="color:#fff">Dialogue test</span></span><span class="prog">兩人一組・各自計分</span></button>
+      <button class="level l8" data-v="l8"><span class="num">LEVEL 12 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
   app.querySelectorAll('.level,.wbank-card').forEach(b=>b.onclick=()=>go(b.dataset.v));
@@ -2278,6 +2289,144 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
 
 
 /* ============================================================
+   🧩 排句子：看英文句子，拖拉中文方塊排成完整的句子（學會階段，內部代號 LB）
+   w：進階用的詞語方塊（漢字|拼音）；g：初階時幾個詞併成一塊；x：進階的干擾方塊；alt：其他正確說法
+   ============================================================ */
+const BUILD = [
+  {id:'b1',  en:'What sport do you like?', w:['你|nǐ','喜歡|xǐ_huān','什麼|shén_me','運動|yùn_dòng'], g:[1,1,2], x:['嗎|ma'], end:'？'},
+  {id:'b2',  en:'I like playing basketball.', w:['我|wǒ','喜歡|xǐ_huān','打|dǎ','籃球|lán_qiú'], g:[1,1,2], x:['踢|tī'], end:'。'},
+  {id:'b3',  en:'Can you swim?', w:['你|nǐ','會|huì','游泳|yóu_yǒng','嗎|ma'], g:[1,2,1], x:['什麼|shén_me'], end:'？'},
+  {id:'b4',  en:'I can’t ride a bike.', w:['我|wǒ','不|bú','會|huì','騎|qí','腳踏車|jiǎo_tà_chē'], g:[1,2,2], x:['打|dǎ'], end:'。'},
+  {id:'b5',  en:'He runs very fast.', w:['他|tā','跑|pǎo','得|de','很|hěn','快|kuài'], g:[1,2,2], x:['跑步|pǎo_bù'], end:'。'},
+  {id:'b6',  en:'How well do you play tennis?', w:['你|nǐ','打|dǎ','網球|wǎng_qiú','打|dǎ','得|de','怎麼樣|zěn_me_yàng'], g:[1,2,2,1], x:['嗎|ma'], end:'？'},
+  {id:'b7',  en:'I think surfing is very hard.', w:['我|wǒ','覺得|jué_de','衝浪|chōng_làng','很|hěn','難|nán'], g:[1,1,1,2], x:['得|de'], end:'。'},
+  {id:'b8',  en:'Why do you like swimming?', w:['你|nǐ','為什麼|wèi_shén_me','喜歡|xǐ_huān','游泳|yóu_yǒng'], g:[1,1,2], x:['嗎|ma'], end:'？'},
+  {id:'b9',  en:'Because swimming is very fun.', w:['因為|yīn_wèi','游泳|yóu_yǒng','很|hěn','有趣|yǒu_qù'], g:[1,1,2], x:['喜歡|xǐ_huān'], end:'。'},
+  {id:'b10', en:'Let’s go play soccer together, OK?', w:['我們|wǒ_men','一起|yì_qǐ','去|qù','踢|tī','足球|zú_qiú','好不好|hǎo_bù_hǎo'], g:[1,1,3,1], x:['打|dǎ'], end:'？'},
+  {id:'b11', en:'My younger sister and I both like playing badminton.', w:['我|wǒ','和|hé','妹妹|mèi_mei','都|dōu','喜歡|xǐ_huān','打|dǎ','羽毛球|yǔ_máo_qiú'], g:[3,1,1,2], x:['也|yě'], end:'。', alt:['妹妹和我都喜歡打羽毛球']},
+  {id:'b12', en:'I am as tall as my older brother.', w:['我|wǒ','和|hé','哥哥|gē_ge','一樣|yí_yàng','高|gāo'], g:[3,1,1], x:['很|hěn'], end:'。', alt:['我跟哥哥一樣高']},
+  {id:'b13', en:'I go hiking on Saturday.', w:['我|wǒ','星期六|xīng_qí_liù','去|qù','爬山|pá_shān'], g:[1,1,2], x:['幾|jǐ'], end:'。', alt:['星期六我去爬山']},
+  {id:'b14', en:'Do you want to join the basketball club?', w:['你|nǐ','要不要|yào_bú_yào','參加|cān_jiā','籃球|lán_qiú','社團|shè_tuán'], g:[1,1,1,2], x:['嗎|ma'], end:'？'},
+  {id:'b15', en:'He is a famous athlete.', w:['他|tā','是|shì','有名|yǒu_míng','的|de','運動員|yùn_dòng_yuán'], g:[1,1,2,1], x:['很|hěn'], end:'。'},
+  {id:'b16', en:'I’m different from you.', w:['我|wǒ','跟|gēn','你|nǐ','不|bù','一樣|yí_yàng'], g:[1,2,2], x:['很|hěn'], end:'。'}
+];
+function buildBlocks(item, tier){
+  const words=item.w.map(t=>({hz:t.split('|')[0], py:(t.split('|')[1]||'').replace(/_/g,' ')}));
+  let blocks=[];
+  if (tier==='beg'){ let k=0; item.g.forEach(n=>{ const ws=words.slice(k,k+n); k+=n; blocks.push({hz:ws.map(w=>w.hz).join(''), py:ws.map(w=>w.py).join(' ')}); }); }
+  else { blocks=words.slice(); (item.x||[]).forEach(t=>blocks.push({hz:t.split('|')[0], py:(t.split('|')[1]||'').replace(/_/g,' '), extra:true})); }
+  blocks=blocks.map((b,i)=>Object.assign({k:i},b));
+  // 洗牌（但不要剛好是正確順序）
+  const ans=item.w.map(t=>t.split('|')[0]).join('');
+  for(let n=0;n<8;n++){ for(let i=blocks.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [blocks[i],blocks[j]]=[blocks[j],blocks[i]]; } if(blocks.map(b=>b.hz).join('')!==ans) break; }
+  return blocks;
+}
+function lbKey(){ return 'sp_lb_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+function viewLB(arg){
+  const S=Object.assign({tier:'beg', i:0}, store.get(lbKey(),{}));
+  if(arg && arg.i!=null) S.i=arg.i;
+  const save=()=>store.set(lbKey(),S);
+  function render(){
+    const it=BUILD[S.i], blocks=buildBlocks(it,S.tier), placed=[]; let tries=0, solved=false, firstTry='';
+    const answers=[it.w.map(t=>t.split('|')[0]).join('')].concat(it.alt||[]);
+    const prog=getProg();
+    app.innerHTML = `
+      <button class="back" id="bk">← 回首頁 Home</button>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h2 style="font-size:26px;font-weight:900;margin:0">🧩 排句子 <span class="en" style="font-size:16px">Build the sentence</span></h2>
+          <div class="tabs" style="margin:0"><button class="tab ${S.tier==='beg'?'on':''}" data-tier="beg">⭐ 初階 <span class="en">Phrases</span></button><button class="tab ${S.tier==='adv'?'on':''}" data-tier="adv">⭐⭐ 進階 <span class="en">Words + tricky blocks</span></button></div></div>
+        <div class="dots" style="margin:10px 0">${BUILD.map((x,j)=>`<span class="dot ${prog['LB-'+x.id]!=null?'done':''} ${j===S.i?'cur':''}" data-j="${j}"></span>`).join('')}</div>
+        <div class="bten">🇬🇧 ${esc(it.en)}</div>
+        <div class="hint">把下面的方塊<b>拖上來</b>或<b>點一下</b>，排成中文句子。點上面的方塊可以拿回來。 <span class="en">Drag or tap the blocks to build the sentence. Tap a placed block to take it back.</span>${S.tier==='adv'?' <b style="color:var(--rose)">⚠️ 有 1 個方塊用不到！</b> <span class="en">One block is extra!</span>':''}</div>
+        <div class="bans" id="ans"></div>
+        <div class="bbank" id="bank"></div>
+        <div class="row" style="margin-top:10px"><button class="btn btn-sun" id="chk">✔️ 檢查 Check</button><button class="btn btn-ghost" id="clr">↩️ 重來 Reset</button><span id="fb" class="hint" style="font-size:16px"></span></div>
+        <div id="step2" class="hidden" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px">
+          <div class="bok" id="okline"></div>
+          <div class="hint" style="font-size:16px;margin-top:8px"><b>② 把這個句子說出來</b> <span class="en">Now say the sentence.</span></div>
+          <div class="speak" id="spk"></div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn btn-ghost" id="pv" ${S.i===0?'disabled style="opacity:.4"':''}>⬅ 上一題</button><button class="btn btn-sun" id="nx">${S.i===BUILD.length-1?'完成 Finish 🎉':'下一題 Next ➜'}</button></div>
+      </div>`;
+    const blk=(b,where,idx)=>`<div class="bblk ${where}" data-k="${b.k}" data-where="${where}" ${idx!=null?`data-idx="${idx}"`:''}><ruby>${esc(b.hz)}<rt>${esc(b.py)}</rt></ruby></div>`;
+    const draw=()=>{
+      $('#ans').innerHTML = (placed.length? placed.map((k,i)=>blk(blocks.find(b=>b.k===k),'in',i)).join('') : '<span class="hint bph">把方塊放到這裡 Put blocks here</span>') + `<span class="bend">${esc(it.end)}</span>`;
+      $('#bank').innerHTML = blocks.filter(b=>!placed.includes(b.k)).map(b=>blk(b,'out')).join('') || '<span class="hint">全部放上去了！ All placed!</span>';
+      bindDrag();
+    };
+    const sentence=()=>placed.map(k=>blocks.find(b=>b.k===k).hz).join('');
+    function bindDrag(){
+      app.querySelectorAll('.bblk').forEach(el=>{
+        el.onpointerdown=e=>{
+          if(solved) return; e.preventDefault();
+          const k=+el.dataset.k, from=el.dataset.where, sx=e.clientX, sy=e.clientY; let moved=false, ghost=null;
+          const move=ev=>{
+            if(!moved && Math.hypot(ev.clientX-sx, ev.clientY-sy)<8) return;
+            if(!moved){ moved=true; ghost=el.cloneNode(true); ghost.classList.add('bghost'); document.body.appendChild(ghost); el.classList.add('bdragging'); }
+            ghost.style.left=(ev.clientX-ghost.offsetWidth/2)+'px'; ghost.style.top=(ev.clientY-ghost.offsetHeight/2)+'px';
+          };
+          const up=ev=>{
+            document.removeEventListener('pointermove',move); document.removeEventListener('pointerup',up);
+            if(ghost) ghost.remove();
+            const cur=placed.indexOf(k);
+            if(!moved){ // 點一下：放上去／拿回來
+              if(cur>=0) placed.splice(cur,1); else placed.push(k);
+            } else {
+              const ansBox=$('#ans').getBoundingClientRect();
+              const inAns = ev.clientX>=ansBox.left && ev.clientX<=ansBox.right && ev.clientY>=ansBox.top-20 && ev.clientY<=ansBox.bottom+20;
+              if(cur>=0) placed.splice(cur,1);
+              if(inAns){ // 依照放下的位置插入
+                const items=[...$('#ans').querySelectorAll('.bblk.in')].filter(x=>+x.dataset.k!==k);
+                let at=items.length;
+                for(let i=0;i<items.length;i++){ const r=items[i].getBoundingClientRect(); const rowMid=r.top+r.height/2;
+                  if(ev.clientY < r.top-4){ at=i; break; }
+                  if(Math.abs(ev.clientY-rowMid)<r.height && ev.clientX < r.left+r.width/2){ at=i; break; } }
+                placed.splice(at,0,k);
+              }
+            }
+            $('#fb').textContent=''; draw();
+          };
+          document.addEventListener('pointermove',move); document.addEventListener('pointerup',up);
+        };
+      });
+    }
+    draw();
+    $('#bk').onclick=()=>go('home');
+    app.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{ S.tier=b.dataset.tier; save(); render(); });
+    app.querySelectorAll('[data-j]').forEach(x=>x.onclick=()=>{ S.i=+x.dataset.j; save(); render(); });
+    $('#clr').onclick=()=>{ if(solved) return; placed.length=0; $('#fb').textContent=''; draw(); };
+    $('#chk').onclick=()=>{
+      if(solved) return;
+      if(!placed.length){ $('#fb').textContent='先放方塊。 Place some blocks first.'; return; }
+      tries++; const s=sentence(); if(tries===1) firstTry=s;
+      if(answers.includes(s)){
+        solved=true;
+        $('#fb').innerHTML=`🎉 <b style="color:var(--grass)">${tries===1?'一次就對了！':'對了！'}</b> <span class="en">${tries===1?'Perfect on the first try!':'Correct!'}</span>`;
+        app.querySelectorAll('#ans .bblk').forEach(x=>x.classList.add('good'));
+        const full=s+it.end;
+        $('#okline').innerHTML=`<div class="pyline">${esc(placed.map(k=>blocks.find(b=>b.k===k).py).join(' '))}</div><div style="font-size:28px;font-weight:900">${esc(full)} <button class="btn btn-ghost" id="say" style="padding:4px 10px;font-size:15px">🔊</button></div><div class="en">${esc(it.en)}</div>`;
+        $('#say').onclick=()=>say(full);
+        $('#step2').classList.remove('hidden');
+        saveAttempt({level:'LB 排句子', item:'LB-'+it.id+'-'+S.tier, target:'排句子（'+(S.tier==='beg'?'初階':'進階')+'）：'+answers[0]+it.end, transcript:firstTry, score: tries===1?100:tries===2?70:40, blob:null, mime:'', diag:'tries:'+tries});
+        mountSpeak($('#spk'),{target:full, targetLabel:'排句子：'+full, level:'LB 排句子', item:'LB-'+it.id});
+        return;
+      }
+      // 標出位置不對的方塊
+      const ans=it.w.map(t=>t.split('|')[0]); let pos=0, firstBad=-1;
+      app.querySelectorAll('#ans .bblk').forEach((x,i)=>{ const b=blocks.find(bb=>bb.k===+x.dataset.k); const ok=!b.extra && ans.join('').indexOf(b.hz,pos)===pos; if(ok) pos+=b.hz.length; else if(firstBad<0) firstBad=i; x.classList.toggle('bad',!ok && firstBad===i); });
+      const extraUsed=placed.some(k=>blocks.find(b=>b.k===k).extra);
+      const total=it.w.length - (S.tier==='beg'? it.w.length-it.g.length : 0);
+      $('#fb').innerHTML = (placed.filter(k=>!blocks.find(b=>b.k===k).extra).length<total ? '還有方塊沒放上去。 Some blocks are missing. ' : '')
+        + (extraUsed ? '⚠️ 有一個方塊是多的！ One block doesn’t belong. ' : '')
+        + (tries>=2 && firstBad>=0 ? '👀 看看紅色的方塊，從那裡開始改。 Start fixing from the red block.' : '🤔 再想一想順序。 Check the word order.');
+    };
+    $('#pv').onclick=()=>{ if(S.i>0){ S.i--; save(); render(); } };
+    $('#nx').onclick=()=>{ if(S.i<BUILD.length-1){ S.i++; save(); render(); } else go('home'); };
+  }
+  render();
+}
+
+/* ============================================================
    ⭐ 我的詞庫：學生自己想學的運動詞語（老師收集，存在 Google 表格「我的詞庫」）
    每列：[學生（空白＝全班）, 中文, 拼音, 英文, 圖示, 例句, 例句拼音]
    ============================================================ */
@@ -2351,7 +2500,7 @@ function viewLW(arg){
    第二階段 Deep 新關卡：🔍 小偵探（找規則）、🗂️ 分一分說理由、👫 我跟你一樣嗎
    內部代號 LD / LS / LC；畫面上的關卡編號見 LVNO
    ============================================================ */
-const LVNO = {LW:'★',L1:1,L2:2,L3:3,L4:4,L5:5,LD:6,LS:7,LC:8,L6:9,L7:10,L8:11};
+const LVNO = {LW:'★',L1:1,L2:2,LB:3,L3:4,L4:5,L5:6,LD:7,LS:8,LC:9,L6:10,L7:11,L8:12};
 function lvTag(id){ const p=String(id||'').split('-')[0]; return LVNO[p]!=null ? 'L'+LVNO[p] : p; }
 function rubyTok(t){ const i=t.indexOf('|'); if(i<0) return esc(t); return `<ruby>${esc(t.slice(0,i))}<rt>${esc(t.slice(i+1).replace(/_/g,' '))}</rt></ruby>`; }
 const tokHz = t=>t.split('|')[0];
@@ -2635,28 +2784,30 @@ function catalog(){
     const g='L2-'+p.id; H.push({g, h:p.name.split(' ')[0], zh:'句型：'+strip(p.name), en:'Pattern: '+(PAT_EN[p.id]||p.id), pid:p.id});
     p.items.forEach(it=>{ const lab=S_txt(it.a); const sp=SPORTS.find(s=>lab.includes(s.hz)); C['L2-'+it.id]={L:'L2', g, label:lab, kind:'pattern', pid:p.id, word: sp?sp.hz:null}; });
   });
-  H.push({g:'L3', h:'L3 對話', zh:'和文文對話', en:'Conversation with Wenwen'});
+  H.push({g:'LB', h:'L3 排句子', zh:'排句子', en:'Build the sentence'});
+  BUILD.forEach(x=>{ C['LB-'+x.id]={L:'LB', g:'LB', label:'排句子：'+x.w.map(t=>t.split('|')[0]).join('')+x.end, kind:'read'}; ['beg','adv'].forEach(t=>C['LB-'+x.id+'-'+t]={L:'LB', g:'LB', label:'排句子（'+(t==='beg'?'初階':'進階')+'）：'+x.w.map(t2=>t2.split('|')[0]).join('')+x.end, kind:'order'}); });
+  H.push({g:'L3', h:'L4 對話', zh:'和文文對話', en:'Conversation with Wenwen'});
   DIALOG.forEach((t,i)=>C['L3-'+i]={L:'L3', g:'L3', label:'文文：'+S_txt(t.bot(ctx)), kind:t.kind==='react'?'react':'dialog'});
-  H.push({g:'L4', h:'L4 說一說', zh:'說一段話', en:'Short talk'});
+  H.push({g:'L4', h:'L5 說一說', zh:'說一段話', en:'Short talk'});
   TOPICS.forEach(t=>C['L4-'+t.id]={L:'L4', g:'L4', label:strip(t.name), kind:'talk'});
   H.push({g:'LW', h:'⭐ 詞庫', zh:'我的詞庫', en:'My word bank'});
   Object.keys(wordBank().W).forEach(zh=>{ C['LW-'+zh]={L:'LW', g:'LW', label:'詞庫：'+zh, kind:'word'}; C['LW-'+zh+'-s']={L:'LW', g:'LW', label:'詞庫句子：'+zh, kind:'read'}; C['LW-'+zh+'-own']={L:'LW', g:'LW', label:'詞庫造句：'+zh, kind:'talk'}; });
-  H.push({g:'LD', h:'L6 偵探', zh:'小偵探（找規則）', en:'Sentence detective'});
+  H.push({g:'LD', h:'L7 偵探', zh:'小偵探（找規則）', en:'Sentence detective'});
   DETECT.forEach(x=>C['LD-'+x.id]={L:'LD', g:'LD', label:'小偵探：'+x.fix[0], kind:'fix', rule:x.rule});
-  H.push({g:'LS', h:'L7 分類', zh:'分一分，說理由', en:'Sort & explain'});
+  H.push({g:'LS', h:'L8 分類', zh:'分一分，說理由', en:'Sort & explain'});
   SORTS.forEach(x=>C['LS-'+x.id]={L:'LS', g:'LS', label:'分一分：'+x.q, kind:'reason'});
-  H.push({g:'LC', h:'L8 比較', zh:'我跟你一樣嗎', en:'Same or different'});
+  H.push({g:'LC', h:'L9 比較', zh:'我跟你一樣嗎', en:'Same or different'});
   COMPARE.forEach(x=>['same','diff'].forEach(k=>C['LC-'+x.id+'-'+k]={L:'LC', g:'LC', label:'比一比：'+x.q+(k==='same'?'（一樣）':'（不一樣）'), kind:'compare'}));
-  H.push({g:'L6', h:'L9 對話', zh:'對話工作坊', en:'Dialogue workshop'});
+  H.push({g:'L6', h:'L10 對話', zh:'對話工作坊', en:'Dialogue workshop'});
   Object.entries(TIERS).forEach(([k,v])=>C['L6-'+k]={L:'L6', g:'L6', label:'對話工作坊（'+v.zh+'）', kind:'talk'});
   C['L6-line']={L:'L6', g:null, label:'', kind:'dline'};
-  H.push({g:'L7', h:'L10 測驗', zh:'對話測驗', en:'Dialogue test'});
+  H.push({g:'L7', h:'L11 測驗', zh:'對話測驗', en:'Dialogue test'});
   C['L7-test']={L:'L7', g:'L7', label:'對話測驗', kind:'test'};
   C['L7-line']={L:'L7', g:null, label:'', kind:'dline'};
-  H.push({g:'L8', h:'L11 情境', zh:'情境任務', en:'Real-life missions'});
+  H.push({g:'L8', h:'L12 情境', zh:'情境任務', en:'Real-life missions'});
   SCENES.forEach(x=>C['L8-'+x.id]={L:'L8', g:'L8', label:'情境：'+x.zh, kind:'test'});
   L5.forEach(u=>{
-    const g='L5-'+u.id; H.push({g, h:'L5 '+u.name.slice(0,4), zh:'進階閱讀：'+u.name, en:'Reading: '+u.en});
+    const g='L5-'+u.id; H.push({g, h:'L6 '+u.name.slice(0,4), zh:'進階閱讀：'+u.name, en:'Reading: '+u.en});
     u.words.forEach((w,i)=>C['L5-'+u.id+'-w'+i]={L:'L5', g, label:w[0], kind:'word', word:w[0]});
     u.paras.forEach((p,i)=>C['L5-'+u.id+'-p'+(i+1)]={L:'L5', g, label:'朗讀第 '+(i+1)+(u.dialog?' 句':' 段'), kind:'read'});
     u.qs.forEach((q,i)=>C['L5-'+u.id+'-q'+(i+1)]={L:'L5', g, label:S_txt(q.q), kind:'q', qtype:q.type});
@@ -2699,6 +2850,7 @@ const ISSUE = {
   'pat:invite':{zh:'邀請朋友「一起…好不好」', en:'inviting a friend (一起…好不好)', tip:'練「我們一起去＿＿，好不好？」'},
   'pat:dou':   {zh:'「都」句型', en:'the "both / all" (都) pattern', tip:'練「我和妹妹都喜歡＿＿」：「都」放在動詞前面。'},
   'pat:yiyang':{zh:'「A和B一樣＿＿」句型', en:'the "as … as" (一樣) pattern', tip:'練「我和哥哥一樣高」。'},
+  'order':     {zh:'排句子：詞的順序還不熟', en:'word order', tip:'先讀英文找「誰＋時間＋做什麼」，再對照中文的順序；初階做熟了再換進階（有干擾方塊）。'},
   'deep:fix':  {zh:'小偵探：句子規則還不清楚', en:'noticing grammar rules', tip:'請學生說出「為什麼錯」，例如：籃球用手，所以是「打」；有「什麼」就不用「嗎」。'},
   'deep:reason':{zh:'說不出分類的理由', en:'explaining reasons for classifying', tip:'用句型框架：「＿＿是／不是＿＿，因為＿＿。」先口頭示範一次。'},
   'deep:compare':{zh:'比較：一樣／不一樣說不清楚', en:'comparing (一樣／不一樣, 都, 可是)', tip:'先看文氏圖中間（都）和兩邊（可是），再練「我跟你一樣，我們都…／我跟你不一樣。我…，可是你…」。'},
@@ -2716,7 +2868,7 @@ const ISSUE = {
 
 
 /* ---------- 三階段落點、可以挑戰、分數變化 ---------- */
-const STAGE_OF = p => (p==='L1'||p==='L2'||p==='LW') ? 'S' : (p==='L7'||p==='L8') ? 'T' : 'D';
+const STAGE_OF = p => (p==='L1'||p==='L2'||p==='LB'||p==='LW') ? 'S' : (p==='L7'||p==='L8') ? 'T' : 'D';
 function stageOf(s, gradesList){
   const b={S:[],D:[],T:[]};
   Object.values(s.items).forEach(it=>{ if(it.best==null) return; const p=String(it.id).split('-')[0]; if(/-line$/.test(it.id)) return; b[STAGE_OF(p)].push(it.best); });
@@ -2729,9 +2881,9 @@ function stageOf(s, gradesList){
   const done=new Set(Object.keys(s.items));
   const pick=ids=>ids.filter(id=>!done.has(id));
   let ready=false, why='', next=[], nextZh='';
-  if (stage==='S' && b.S.length>=5 && sA>=90){ ready=true; why=`第 1–2 關平均 ${sA}`; next=pick(['LD-d1','LD-d2','LD-d7','LS-ball','LS-hand','L3-0']); nextZh='想通：小偵探、分一分'; }
-  if (stage==='D' && b.D.length>=5 && dA>=85){ ready=true; why=`第 3–9 關平均 ${dA}`; next=pick(['L7-test','L8-visit','L8-club','L8-reporter']); nextZh='用出來：對話測驗、情境任務'; }
-  if (stage==='T' && tA>=85){ ready=true; why=`第 10–11 關 ${tA}`; next=pick(['L8-visit','L8-club','L8-reporter']); nextZh=next.length?'其他情境任務（計時 90 秒）':'計時 90 秒、換同伴再挑戰'; }
+  if (stage==='S' && b.S.length>=5 && sA>=90){ ready=true; why=`第 1–3 關平均 ${sA}`; next=pick(['LD-d1','LD-d2','LD-d7','LS-ball','LS-hand','L3-0']); nextZh='想通：小偵探、分一分'; }
+  if (stage==='D' && b.D.length>=5 && dA>=85){ ready=true; why=`第 4–10 關平均 ${dA}`; next=pick(['L7-test','L8-visit','L8-club','L8-reporter']); nextZh='用出來：對話測驗、情境任務'; }
+  if (stage==='T' && tA>=85){ ready=true; why=`第 11–12 關 ${tA}`; next=pick(['L8-visit','L8-club','L8-reporter']); nextZh=next.length?'其他情境任務（計時 90 秒）':'計時 90 秒、換同伴再挑戰'; }
   return {stage, sA, dA, tA, sN:b.S.length, dN:b.D.length, tN, ready, why, next, nextZh};
 }
 function growthOf(s){
@@ -2777,6 +2929,7 @@ function analyzeRows(rows){
       else if ((m.kind==='dialog'||m.kind==='react') && it.best<100) push(m.kind, '這一題沒接上');
       else if (m.kind==='q' && it.best<60) push('reading:'+m.qtype, `${it.best} 分`);
       else if ((m.kind==='read'||m.kind==='talk') && it.best<60) push('fluency', `${it.best} 分`);
+      else if (m.kind==='order' && it.best<70) push('order', it.best<=40?'試了三次以上才排對':'試了兩次才排對');
       else if (m.kind==='fix' && it.best<60) push('deep:fix', `${DRULE[m.rule]?.[0]||''} ${it.best} 分`);
       else if (m.kind==='reason' && it.best<70) push('deep:reason', it.best<40?'沒有用「因為」說理由':`${it.best} 分`);
       else if (m.kind==='compare' && it.best<70) push('deep:compare', `${it.best} 分`);
@@ -2830,6 +2983,7 @@ function openItem(id){
   if ((m=id.match(/^LD-(\w+)$/))) return go('ld',{i:Math.max(0,DETECT.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LS-(\w+)$/))) return go('ls',{ri:Math.max(0,SORTS.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LC-(\w+)/))) return go('lc',{ci:Math.max(0,COMPARE.findIndex(x=>x.id===m[1]))});
+  if ((m=id.match(/^LB-(b\d+)/))) return go('lb',{i:Math.max(0,BUILD.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LW-([^-]+)/))) return go('lw',{zh:m[1]});
   if (/^L6-/.test(id)) return go('l6');
   if (/^L7-/.test(id)) return go('l7');
@@ -2934,7 +3088,7 @@ function viewTeacher(arg){
       <div class="card" style="margin-top:12px">
         <b style="font-size:18px">🧭 全班在哪個階段？ <span class="en">Where is the class?</span></b>
         <div class="stbar">${['S','D','T'].map(k=>cnt[k]?`<div class="stseg" data-stg="${k}" style="flex:${cnt[k]};background:${STG[k][3]}">${STG[k][0]} ${STG[k][1]} <b>${cnt[k]}</b></div>`:'').join('')}</div>
-        <div class="hint" style="margin-top:6px">點顏色看名單。判斷方式：學會＝第 1–2 關還沒穩（最高分平均 &lt; 85）；想通＝第 1–2 關已穩，正在練第 3–9 關；用出來＝第 10–11 關平均 ≥ 70（有老師評分時以老師評分為準）。</div>
+        <div class="hint" style="margin-top:6px">點顏色看名單。判斷方式：學會＝第 1–3 關還沒穩（最高分平均 &lt; 85）；想通＝第 1–3 關已穩，正在練第 4–10 關；用出來＝第 11–12 關平均 ≥ 70（有老師評分時以老師評分為準）。</div>
         <div id="stlist" style="margin-top:6px"></div>
       </div>
       ${common.length?`<div class="card" style="margin-top:12px;border:3px solid #fda4af">
