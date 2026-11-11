@@ -29,7 +29,9 @@ const CONFIG = {
   // 舊班級名稱（4A/4B/4C）自動換成各老師的新班級
   LEGACY_CLASSES: ['4A', '4B', '4C', ''],
   // 後台分析不顯示的名字（測試用）
-  EXCLUDE_NAMES: ['測試學生', 's']
+  EXCLUDE_NAMES: ['測試學生', 's'],
+  // 打錯的名字 → 正確的名字（小寫比對）。大小寫不同會自動合併，不用寫在這裡。
+  NAME_ALIASES: { 'alylia': 'Alyvia', 'alyna': 'Alyvia', 'peony': 'Penny' }
 };
 </script>
 <style>
@@ -769,10 +771,17 @@ function scoreQ(q, said){
 }
 
 /* ---------- 老師／名字 ---------- */
-function cleanName(n){ return String(n||'').normalize('NFKC').trim().replace(/\s+/g,' ').replace(/([\u3400-\u9fff])\s+(?=[\u3400-\u9fff])/g,'$1').replace(/[「」『』'＇"“”]+/g,'').trim(); }
+function cleanName(n){
+  let s=String(n||'').normalize('NFKC').trim().replace(/\s+/g,' ').replace(/([\u3400-\u9fff])\s+(?=[\u3400-\u9fff])/g,'$1').replace(/[「」『』'＇"“”]+/g,'').trim();
+  const al=(CONFIG.NAME_ALIASES||{})[s.toLowerCase()]; if(al) s=al;
+  // 英文名字：每個字的第一個字母大寫（alyvia → Alyvia），大小寫不同的紀錄會合在一起
+  return s.replace(/(^|[\s\-])([a-z])/g,(m,a,c)=>a+c.toUpperCase());
+}
 function nameKey(n){ return cleanName(n).toLowerCase(); }
 function teacherOf(r){ return String(r.teacher||'') || CONFIG.LEGACY_TEACHER || ''; }
 function normCls(r){ if(!r) return r; const c=String(r.cls==null?'':r.cls); if((CONFIG.LEGACY_CLASSES||[]).includes(c)){ const t=(CONFIG.TEACHERS||[]).find(x=>x.name===teacherOf(r)); if(t&&t.classes.length===1) r.cls=t.classes[0]; } return r; }
+function migrateCase(u){ try{ ['sp_prog_','sp_ts_','sp_l6_','sp_l7_','sp_l8_','sp_lb_','sp_lc_'].forEach(p=>{ const nk=p+(u.teacher||'')+'_'+(u.cls||'')+'_'+u.name; if(localStorage.getItem(nk)!=null) return;
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k!==nk && k.startsWith(p) && nameKey(k.slice(k.lastIndexOf('_')+1))===nameKey(u.name) && k.slice(0,k.lastIndexOf('_'))===nk.slice(0,nk.lastIndexOf('_'))){ localStorage.setItem(nk, localStorage.getItem(k)); break; } } }); }catch(e){} }
 function migrateCls(u){ try{ ['sp_prog_','sp_ts_','sp_l6_','sp_l7_'].forEach(p=>{ const nk=p+(u.teacher||'')+'_'+(u.cls||'')+'_'+u.name; if(localStorage.getItem(nk)!=null) return; for(const oc of (CONFIG.LEGACY_CLASSES||[])){ const ok=p+(u.teacher||'')+'_'+oc+'_'+u.name; const v=localStorage.getItem(ok); if(v!=null){ localStorage.setItem(nk,v); break; } } }); }catch(e){} }
 function normAll(a){ (a||[]).forEach(normCls); return a||[]; }
 function teacherById(id){ return (CONFIG.TEACHERS||[]).find(t=>t.id===id || t.name===id) || null; }
@@ -792,6 +801,7 @@ const state = {
   prefs: Object.assign({py:true,en:true,slow:false}, store.get('sp_prefs',{})),
   teacher:false
 };
+if (state.user && state.user.name && cleanName(state.user.name)!==state.user.name){ const old=Object.assign({},state.user); state.user.name=cleanName(state.user.name); migrateCase(state.user); store.set('sp_user',state.user); }
 if (state.user && (CONFIG.LEGACY_CLASSES||[]).includes(String(state.user.cls||''))){ normCls(state.user); migrateCls(state.user); store.set('sp_user',state.user); }
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function ruby(tk){
@@ -1175,7 +1185,7 @@ function viewLogin(){
     const teacher=$('#tc')?.value||'';
     if (T.length && !teacher){ toast('請先選老師 Choose your teacher'); return; }
     state.user={name, cls: $('#cl').value, teacher}; state.lastCls=state.user.cls; state.lastTeacher=teacher;
-    store.set('sp_user',state.user); migrateCls(state.user);
+    store.set('sp_user',state.user); migrateCls(state.user); migrateCase(state.user);
     go('home');
   };
   $('#tl').onclick=()=>go('pin');
