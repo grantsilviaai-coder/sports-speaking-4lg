@@ -1295,9 +1295,6 @@ function viewHome(){
   $('#tMic').onclick=openMic;
   $('#tFb').onclick=()=>{ if(state.fbText) showFb(state.fbText); else toast('先練習幾題，就會有建議喔！ Practice a few items first!'); };
   /* 💡 給你的建議：登入後、每次練習完回到首頁，都跳出最新的回饋 */
-  const fbHTML=t=>t.split(/\n\s*\n/).map(p=>{ const L=p.split('\n'); const head=L[0]; const body=L.slice(1);
-      const inline=head.includes(':') && !body.length ? head.split(/:\s*/) : null;
-      return `<div class="fbsec"><b>${esc(inline?inline[0]:head.replace(/:$/,''))}</b>${inline?` <span class="fbin">${esc(inline.slice(1).join(': '))}</span>`:''}${body.length?'<ul>'+body.reduce((a,line)=>{ if(/^\s+\S/.test(line) && a.length && !/^\s*•/.test(line)){ a[a.length-1]+='<div class="en">'+esc(line.trim())+'</div>'; } else a.push(esc(line.replace(/^\s*•\s*/,''))); return a; },[]).map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`; }).join('');
   const popNow = state.fbLogin || state.fbDirty;
   loadFeedback().then(t=>{ if(!t || !document.getElementById('tFb')) return;
     state.fbText=t; $('#fbBadge').classList.toggle('hidden',!popNow);
@@ -2508,6 +2505,13 @@ function viewLB(arg){
    ============================================================ */
 const DEFAULT_WORDS = [["Kai", "表情", "biǎo qíng", "facial expression", "😜", "他的表情很奇怪。", "tā de biǎo qíng hěn qí guài."], ["Kai", "奇怪", "qí guài", "weird, strange", "🤪", "我覺得這個運動很奇怪。", "wǒ jué de zhè ge yùn dòng hěn qí guài."], ["Kayla", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Kayla", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Kayla", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Kayla", "站起來", "zhàn qǐ lái", "to stand up", "🧍", "他跌倒了，可是馬上站起來。", "tā dié dǎo le, kě shì mǎ shàng zhàn qǐ lái."], ["Kayla", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Kayla", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Alyna", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Alyna", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Alyna", "坐著", "zuò zhe", "sitting", "🪑", "他坐著看比賽。", "tā zuò zhe kàn bǐ sài."], ["Penny", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Penny", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Penny", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Penny", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["Mila", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["Mila", "女生", "nǚ shēng", "girl", "👧", "我們班的女生都很會打排球。", "wǒ men bān de nǚ shēng dōu hěn huì dǎ pái qiú."], ["Mila", "男生", "nán shēng", "boy", "👦", "男生和女生一起踢足球。", "nán shēng hé nǚ shēng yì qǐ tī zú qiú."], ["Mila", "計畫", "jì huà", "plan", "📝", "我們的計畫是星期六去游泳。", "wǒ men de jì huà shì xīng qí liù qù yóu yǒng."], ["Mila", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["Mila", "擊球", "jí qiú", "to hit the ball", "🏏", "他擊球擊得很好。", "tā jí qiú jí de hěn hǎo."], ["", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["", "跌倒", "dié dǎo", "to fall down", "🤕", "我跑步的時候跌倒了。", "wǒ pǎo bù de shí hou dié dǎo le."], ["", "球門", "qiú mén", "goal (the net you score in)", "⚽", "足球場上有兩個球門。", "zú qiú chǎng shàng yǒu liǎng ge qiú mén."], ["", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["", "開心", "kāi xīn", "happy", "😄", "我覺得他們很開心。", "wǒ jué de tā men hěn kāi xīn."]];
 let WORD_ROWS = store.get('sp_words', null) || DEFAULT_WORDS;
+function fbHTML(t){ return t.split(/\n\s*\n/).map(p=>{ const L=p.split('\n'); const head=L[0]; const body=L.slice(1);
+      const inline=head.includes(':') && !body.length ? head.split(/:\s*/) : null;
+      return `<div class="fbsec"><b>${esc(inline?inline[0]:head.replace(/:$/,''))}</b>${inline?` <span class="fbin">${esc(inline.slice(1).join(': '))}</span>`:''}${body.length?'<ul>'+body.reduce((a,line)=>{ if(/^\s+\S/.test(line) && a.length && !/^\s*•/.test(line)){ a[a.length-1]+='<div class="en">'+esc(line.trim())+'</div>'; } else a.push(esc(line.replace(/^\s*•\s*/,''))); return a; },[]).map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`; }).join(''); }
+async function loadFeedbackFor(name, teacher){
+  if (!REMOTE) return '';
+  try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=feedback&name=${encodeURIComponent(name)}&teacher=${encodeURIComponent(teacher||'')}`); const j=await r.json(); return j.ok?(j.text||''):''; }catch(e){ return ''; }
+}
 async function loadFeedback(){
   if (!REMOTE || !state.user) return '';
   for(let i=0;i<40 && state.inflight>0;i++) await new Promise(r=>setTimeout(r,150));
@@ -3276,7 +3280,7 @@ function viewTeacher(arg){
     const list=S.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
     if(!tv.student || !list.find(s=>s.key===tv.student)) tv.student=list[0]?.key||null;
     const s=list.find(x=>x.key===tv.student);
-    const sel=`<select id="ss" class="btn btn-ghost" style="padding:10px;min-width:220px">${list.map(x=>`<option value="${esc(x.key)}" ${x.key===tv.student?'selected':''}>${esc(x.name)}（${tv.teacher?'':esc(x.teacher)+' '}${esc(x.cls)}）</option>`).join('')}</select>`;
+    const sel=`<select id="ss" class="btn btn-ghost" style="padding:10px;min-width:220px">${list.map(x=>`<option value="${esc(x.key)}" ${x.key===tv.student?'selected':''}>${esc(dispName(x.name))}（${tv.teacher?'':esc(x.teacher)+' '}${esc(x.cls)}）</option>`).join('')}</select>`;
     if(!s){ $('#tb').innerHTML=`<div class="card">這段時間沒有學生資料。</div>`; return; }
     catalog();
     const groupsDone=HEAT_COLS.filter(c=>s.heat[c.g]);
@@ -3296,6 +3300,7 @@ function viewTeacher(arg){
     $('#tb').innerHTML = `
       <div class="row" style="margin-bottom:12px">${sel}<span class="hint">最後練習：${s.last?new Date(s.last).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</span></div>
       <div class="kpis"><div class="kpi">練習次數<b>${s.n}</b></div><div class="kpi">練過題數<b>${Object.keys(s.items).length}</b></div><div class="kpi">平均分數<b>${s.avg??'—'}</b></div><div class="kpi">沒辨識到<b>${s.unrec}</b></div></div>
+      <div class="card fbcard" id="stuFb" style="margin-top:12px"><b style="font-size:18px">💡 給學生的建議 <span class="en">Feedback shown to the student</span></b> <span class="hint">（學生登入和練習完會看到這段，依最新紀錄計算）</span><div id="stuFbB" class="hint" style="margin-top:6px">載入中… Loading…</div></div>
       <div class="dash2">
         <div class="card">
           <h3 class="dh">💪 強項 Strengths</h3>
@@ -3329,6 +3334,7 @@ function viewTeacher(arg){
         <table style="margin-top:8px"><thead><tr><th>時間</th><th>題目</th><th>學生說的</th><th>分數</th><th>錄音</th></tr></thead><tbody>
         ${s.rows.slice().sort((a,b)=>(+b.time||+b.t)-(+a.time||+a.t)).map(r=>`<tr><td class="hint">${new Date(+r.time||+r.t).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${(C[r.item]?.label && !/^L[67]/.test(r.item)) ? esc(C[r.item].label) : esc(r.target).replace(/\n/g,'<br>')}</td><td><b>${esc(r.transcript)||'<span class="hint">（無辨識）</span>'}</b>${(!r.transcript&&r.diag)?`<div class="hint" style="font-size:12px">⚠️ ${esc(r.diag)}</div>`:''}</td><td>${pill(r.score===''||r.score==null?null:+r.score)}${r.rescored?'<div class="hint" style="font-size:11px">同音字已調整</div>':''}</td><td>${r.fileId?`<button class="btn btn-ghost" style="padding:6px 12px;font-size:15px" data-f="${esc(r.fileId)}">▶️</button>`:''}</td></tr>`).join('')}
         </tbody></table></details>`;
+    loadFeedbackFor(s.name, s.teacher).then(t=>{ const el=document.getElementById('stuFbB'); if(!el) return; el.className=''; el.innerHTML = t ? fbHTML(t)+`<button class="btn btn-ghost" id="cpFb" style="margin-top:8px;padding:6px 12px;font-size:14px">📋 複製 Copy</button>` : '<span class="hint">'+(REMOTE?'這位學生還沒有足夠的紀錄。':'（本機模式沒有雲端建議）')+'</span>'; const cb=document.getElementById('cpFb'); if(cb) cb.onclick=()=>{ navigator.clipboard?.writeText(t).then(()=>toast('已複製 Copied')).catch(()=>toast('無法複製')); }; });
     $('#ss').onchange=()=>{ tv.student=$('#ss').value; render() };
     $('#cp').onclick=async()=>{ try{ await navigator.clipboard.writeText($('#cm').value); toast('已複製 Copied') }catch(e){ $('#cm').select(); toast('請按 Ctrl+C 複製') } };
     $('#asg') && ($('#asg').onclick=()=>doAssign([s], [...$('#tb').querySelectorAll('.ck input:checked')].map(x=>x.value), '老師指定'));
