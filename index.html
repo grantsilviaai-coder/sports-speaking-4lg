@@ -65,6 +65,10 @@ input,select{font:inherit}
 .t-mic{background:linear-gradient(135deg,#0f766e,#2dd4bf)}.t-fb{background:linear-gradient(135deg,#b45309,#fbbf24)}.t-wb{background:linear-gradient(135deg,#7c3aed,#f472b6)}
 .tprog{font-size:11px;font-weight:800;background:rgba(255,255,255,.25);border-radius:999px;padding:1px 8px;margin-top:2px}
 .tbadge{position:absolute;top:-6px;right:-6px;background:#e11d48;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:2px 7px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.vpop{width:320px;max-height:70vh;overflow:auto}
+.vlist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.vitem{text-align:left;background:#f8f6f0;border:2px solid transparent;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:15px}
+.vitem.on{border-color:#16a34a;background:#f0fdf4}
 .micsq{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);color:#fff;font-size:20px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px}
 .micsq:hover{background:rgba(255,255,255,.3)}
 .micpop{position:absolute;z-index:70;width:300px;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 12px 30px rgba(0,0,0,.25);border:3px solid #a7f3d0}
@@ -466,9 +470,11 @@ tr.click:hover{background:#fffaf0}
   <button class="chip" id="tgPy" title="顯示/隱藏拼音">拼音 Pinyin</button>
   <button class="chip" id="tgEn" title="顯示/隱藏英文">English</button>
   <button class="chip" id="tgSlow" title="慢速朗讀">🐢 慢速 Slow</button>
+  <button class="chip" id="tgVoice" title="選擇朗讀的聲音">🔊 聲音 Voice</button>
   <span class="chip hidden" id="whoChip"><span class="who" id="whoName"></span><span class="sync" id="syncState"></span></span>
   <button class="chip hidden" id="btnSwitch">換人 Switch</button>
 </div>
+<div class="micpop vpop hidden" id="voicePop"><div class="row" style="justify-content:space-between"><b>🔊 朗讀的聲音 <span class="en">Voice</span></b><button class="btn btn-ghost" id="vX" style="padding:2px 10px;font-size:14px">✕</button></div><div class="hint" style="margin-top:4px">點一個聲音試聽，選最自然的。每台平板分開記住。 <span class="en">Tap to preview and choose.</span></div><div id="vList" class="vlist"></div></div>
 <div class="micpop hidden" id="micPop"><div class="row" style="justify-content:space-between"><b>🎤 麥克風測試 <span class="en">Mic check</span></b><button class="btn btn-ghost" id="micX" style="padding:2px 10px;font-size:14px">✕</button></div>
   <div class="hint" style="margin-top:4px">按「測試」，說「你好」。 <span class="en">Tap Test and say “你好”.</span></div>
   <div style="margin-top:8px;height:14px;background:#eee;border-radius:999px;overflow:hidden"><div id="mtBar" style="height:100%;width:0;background:var(--grass);transition:width .06s"></div></div>
@@ -862,8 +868,19 @@ $('#tgSlow').onclick=()=>{state.prefs.slow=!state.prefs.slow;applyPrefs()};
 $('#brand').onclick=()=>{ if(state.teacher) return; state.user?go('home'):go('login') };
 
 /* 🎤 右上角的麥克風測試 */
+function openVoice(){
+  const pop=$('#voicePop'); if(!pop.classList.contains('hidden')){ pop.classList.add('hidden'); return; }
+  const b=$('#tgVoice').getBoundingClientRect(); pop.style.top=(b.bottom+window.scrollY+8)+'px'; pop.style.left=Math.max(8, b.right+window.scrollX-320)+'px';
+  const vs=zhVoices();
+  $('#vList').innerHTML = vs.length ? vs.map((v,i)=>`<button class="vitem ${zhVoice&&v.name===zhVoice.name?'on':''}" data-vi="${i}"><b>${esc(v.name)}</b><span class="hint">${esc(v.lang)}${i===0?' · ⭐ 推薦 Recommended':''}</span></button>`).join('')
+    : '<div class="warn">這台裝置沒有中文聲音。 No Chinese voice on this device.</div>';
+  $('#vList').querySelectorAll('[data-vi]').forEach(x=>x.onclick=()=>{ const v=vs[+x.dataset.vi]; state.prefs.voice=v.name; store.set('sp_prefs',state.prefs); zhVoice=v;
+    $('#vList').querySelectorAll('.vitem').forEach(y=>y.classList.toggle('on',y===x)); say('你好！我喜歡打籃球，你呢？'); });
+  pop.classList.remove('hidden');
+}
 function openMic(){ const pop=$('#micPop'), t=document.getElementById('tMic'); if(t){ const r=t.getBoundingClientRect(); pop.style.top=(r.bottom+window.scrollY+8)+'px'; pop.style.left=(r.left+window.scrollX)+'px'; } pop.classList.toggle('hidden'); $('#mtMsg').textContent=''; $('#mtBar').style.width='0'; }
 $('#micX').onclick=()=>$('#micPop').classList.add('hidden');
+$('#tgVoice').onclick=openVoice; $('#vX').onclick=()=>$('#voicePop').classList.add('hidden');
 $('#mt').onclick=async()=>{
   const msg=$('#mtMsg'); msg.textContent='聽聽看… Listening…';
   let peak;
@@ -878,9 +895,24 @@ $('#btnSwitch').onclick=()=>{ stopAll(); state.user=null; store.set('sp_user',nu
 
 /* ---------- text-to-speech ---------- */
 let zhVoice=null;
+/* 選最自然的中文聲音：台灣華語優先；Natural／Neural／Online／加強版 這類高品質聲音加分；不用粵語 */
+function voiceScore(v){
+  const n=v.name||'', l=(v.lang||'').replace('_','-');
+  if(/zh-HK|yue|Cantonese|粵/i.test(l+' '+n)) return -1;
+  if(!/^(zh|cmn)/i.test(l) && !/Chinese|國語|中文|普通話|華語/i.test(n)) return -1;
+  let sc=0;
+  if(/zh-TW|cmn-Hant|Taiwan|臺灣|台灣/i.test(l+' '+n)) sc+=50; else if(/zh-CN|cmn-Hans|Mandarin|普通話/i.test(l+' '+n)) sc+=20;
+  if(/Natural|Neural|Online/i.test(n)) sc+=40;
+  if(/Premium|Enhanced|加強|高品質|高音質/i.test(n)) sc+=30;
+  if(/Google/i.test(n)) sc+=15;
+  if(/HsiaoChen|HsiaoYu|Yating|Meijia|美佳|曉臻|曉雨/i.test(n)) sc+=10;
+  if(v.localService===false) sc+=3;
+  return sc;
+}
+function zhVoices(){ return speechSynthesis.getVoices().filter(v=>voiceScore(v)>=0).sort((a,b)=>voiceScore(b)-voiceScore(a)); }
 function pickVoice(){
-  const vs=speechSynthesis.getVoices();
-  zhVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_]HK/i.test(v.lang)&&false) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+  const vs=zhVoices(); const want=state.prefs.voice;
+  zhVoice = (want && vs.find(v=>v.name===want)) || vs[0] || null;
 }
 if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
 let ttsBusy=false;
