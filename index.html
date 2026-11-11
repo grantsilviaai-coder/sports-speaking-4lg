@@ -118,6 +118,14 @@ h1,h2,h3{margin:0}
 .rubric{margin-top:12px;background:#faf7ff;border:2px solid #e3d8fb;border-radius:14px;padding:12px}
 .rb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed #e3d8fb}
 .rb select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line)}
+.fbmini{display:block;width:100%;text-align:left;font-size:18px;padding:12px 16px;cursor:pointer}
+.fbmodal{position:fixed;inset:0;z-index:90;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.fbbox{background:#fffbeb;border:4px solid #fcd34d;border-radius:26px;max-width:620px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.fbbody{margin-top:8px}
+.fbcard{margin-top:14px;border:3px solid #fde68a;background:#fffbeb}
+.fbsec{margin-top:8px}.fbsec b{font-size:16px}.fbin{font-weight:800;font-size:18px}
+.fbsec ul{margin:4px 0 0;padding-left:22px}.fbsec li{font-size:17px;font-weight:700;margin:3px 0}
+.fbsec li .en{font-size:14px;font-weight:600}
 .lb{background:linear-gradient(135deg,#0e7490,#22d3ee)}
 .bten{font-size:24px;font-weight:900;background:#eff6ff;border-radius:16px;padding:12px 16px;margin:6px 0}
 .bans{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;min-height:84px;margin-top:10px;padding:10px;border:3px dashed #22d3ee;border-radius:18px;background:#ecfeff}
@@ -806,7 +814,8 @@ const store = {
 const state = {
   user: store.get('sp_user', null),
   prefs: Object.assign({py:true,en:true,slow:false}, store.get('sp_prefs',{})),
-  teacher:false
+  teacher:false,
+  fbLogin:true
 };
 if (state.user && state.user.name && cleanName(state.user.name)!==state.user.name){ const old=Object.assign({},state.user); state.user.name=cleanName(state.user.name); migrateCase(state.user); store.set('sp_user',state.user); }
 if (state.user && (CONFIG.LEGACY_CLASSES||[]).includes(String(state.user.cls||''))){ normCls(state.user); migrateCls(state.user); store.set('sp_user',state.user); }
@@ -1057,11 +1066,13 @@ async function saveAttempt({level,item,target,transcript,score,blob,mime,diag,no
   const base={action:'submit', name:U.name, cls:U.cls||'', teacher:U.teacher||'', level, item, target, transcript, score: score==null?'':score, t:Date.now(), diag: diag||''};
   if(!noProgress && !(score==null && !blob)) setBest(item, score);
   if(!noProgress){ const tk='sp_ts_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; const ts=store.get(tk,{}); ts[item]=Date.now(); store.set(tk,ts); }
+  state.fbDirty=true;
   if (REMOTE){
-    setSync('⏳ 上傳中…');
+    setSync('⏳ 上傳中…'); state.inflight=(state.inflight||0)+1;
     const rec = Object.assign({}, base, blob? {audio: await blobToB64(blob), mime}: {});
     try{ await postRecord(rec); setSync('☁️ 已上傳'); }
     catch(e){ pending.push(rec); store.set('sp_pending',pending.slice(-30)); setSync(`⏳ ${pending.length} 筆未上傳`); }
+    finally{ state.inflight=Math.max(0,(state.inflight||0)-1); }
   } else {
     const id='a'+Date.now()+Math.random().toString(36).slice(2,6);
     if (blob){ try{ await idb.put(id,blob) }catch(e){} }
@@ -1149,7 +1160,7 @@ function mountSpeak(el, o){
    VIEWS
    ============================================================ */
 function go(view, arg){
-  stopAll(); document.getElementById('tfloat')?.remove();
+  stopAll(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
   if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
   state.teacher = view==='teacher';
   const showUser = !!state.user && !state.teacher && view!=='login';
@@ -1201,7 +1212,7 @@ function viewLogin(){
     const teacher=$('#tc')?.value||'';
     if (T.length && !teacher){ toast('請先選老師 Choose your teacher'); return; }
     state.user={name, cls: $('#cl').value, teacher}; state.lastCls=state.user.cls; state.lastTeacher=teacher;
-    store.set('sp_user',state.user); migrateCls(state.user); migrateCase(state.user);
+    store.set('sp_user',state.user); migrateCls(state.user); migrateCase(state.user); state.fbLogin=true;
     go('home');
   };
   $('#tl').onclick=()=>go('pin');
@@ -1230,6 +1241,7 @@ function viewHome(){
       <div id="mtBarWrap" class="hidden" style="margin-top:10px;height:16px;background:#eee;border-radius:999px;overflow:hidden"><div id="mtBar" style="height:100%;width:0;background:var(--grass);transition:width .06s"></div></div>
       <div id="mtMsg" style="margin-top:8px;font-weight:700"></div>
     </div>
+    <div id="fbCard"></div>
     <div id="asgCard"></div>
     <button class="wbank-card" data-v="lw"><span style="font-size:44px">⭐</span><div style="flex:1"><b style="font-size:24px">我的詞庫</b> <span class="en">My word bank</span><div style="font-size:15px">你自己想學的運動詞語，還有全班和同學的詞 <span class="en">Words you wanted to learn</span></div></div><span class="prog" id="wprog">${(()=>{ const b=wordBank(); const L=b.mine.length?b.mine:b.cls; return '⭐ '+L.filter(wordDone).length+'/'+L.length; })()}</span></button>
     <div class="stage st-s"><div class="sthead"><span class="stico">🌱</span><div><b>第一階段：學會</b> <span class="en">Surface · Learn it</span><div class="hint">聽懂、說出運動詞語和句型 <span class="en">Hear and say the words and patterns</span></div></div></div>
@@ -1255,6 +1267,29 @@ function viewHome(){
     </div></div>
     `;
   app.querySelectorAll('.level,.wbank-card').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  /* 💡 給你的建議：登入後、每次練習完回到首頁，都跳出最新的回饋 */
+  const fbHTML=t=>t.split(/\n\s*\n/).map(p=>{ const L=p.split('\n'); const head=L[0]; const body=L.slice(1);
+      const inline=head.includes(':') && !body.length ? head.split(/:\s*/) : null;
+      return `<div class="fbsec"><b>${esc(inline?inline[0]:head.replace(/:$/,''))}</b>${inline?` <span class="fbin">${esc(inline.slice(1).join(': '))}</span>`:''}${body.length?'<ul>'+body.reduce((a,line)=>{ if(/^\s+\S/.test(line) && a.length && !/^\s*•/.test(line)){ a[a.length-1]+='<div class="en">'+esc(line.trim())+'</div>'; } else a.push(esc(line.replace(/^\s*•\s*/,''))); return a; },[]).map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}</div>`; }).join('');
+  const popNow = state.fbLogin || state.fbDirty;
+  loadFeedback().then(t=>{ const el=$('#fbCard'); if(!el || !t) return;
+    state.fbText=t;
+    el.innerHTML=`<button class="card fbcard fbmini" id="fbOpen">💡 <b>給你的建議</b> <span class="en">Tips for you</span> <span class="hint">（點一下打開 Tap to open）</span></button>`;
+    $('#fbOpen').onclick=()=>showFb(t);
+    if(popNow){ state.fbLogin=false; state.fbDirty=false; showFb(t); }
+  });
+  function showFb(t){
+    document.getElementById('fbModal')?.remove();
+    const m=document.createElement('div'); m.id='fbModal'; m.className='fbmodal';
+    m.innerHTML=`<div class="fbbox"><div style="font-size:44px;text-align:center">💡</div>
+      <h2 style="text-align:center;font-size:26px;font-weight:900;margin:4px 0">${esc(dispName(state.user.name))}，給你的建議 <span class="en" style="font-size:16px">Tips for you</span></h2>
+      <div class="hint" style="text-align:center">根據你最新的練習結果 <span class="en">Based on your latest practice</span></div>
+      <div class="fbbody">${fbHTML(t)}</div>
+      <button class="btn btn-sun" id="fbOk" style="width:100%;font-size:20px;margin-top:12px">👍 知道了，開始練習！ <span class="en">OK, let’s go!</span></button></div>`;
+    document.body.appendChild(m);
+    const close=()=>m.remove();
+    m.querySelector('#fbOk').onclick=close; m.onclick=e=>{ if(e.target===m) close(); };
+  }
   myAssigns().then(list=>{
     const el=$('#asgCard'); if(!el || !list.length) return;
     const C=catalog(), ts=store.get('sp_ts_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name,{});
@@ -2458,6 +2493,11 @@ function viewLB(arg){
    ============================================================ */
 const DEFAULT_WORDS = [["Kai", "表情", "biǎo qíng", "facial expression", "😜", "他的表情很奇怪。", "tā de biǎo qíng hěn qí guài."], ["Kai", "奇怪", "qí guài", "weird, strange", "🤪", "我覺得這個運動很奇怪。", "wǒ jué de zhè ge yùn dòng hěn qí guài."], ["Kayla", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Kayla", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Kayla", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Kayla", "站起來", "zhàn qǐ lái", "to stand up", "🧍", "他跌倒了，可是馬上站起來。", "tā dié dǎo le, kě shì mǎ shàng zhàn qǐ lái."], ["Kayla", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Kayla", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Alyna", "奧運", "ào yùn", "the Olympics", "🏅", "我想參加奧運。", "wǒ xiǎng cān jiā ào yùn."], ["Alyna", "昏倒", "hūn dǎo", "to faint", "😵", "天氣太熱，他昏倒了。", "tiān qì tài rè, tā hūn dǎo le."], ["Alyna", "坐著", "zuò zhe", "sitting", "🪑", "他坐著看比賽。", "tā zuò zhe kàn bǐ sài."], ["Penny", "球隊", "qiú duì", "team", "👥", "我們的球隊很厲害。", "wǒ men de qiú duì hěn lì hai."], ["Penny", "徽章", "huī zhāng", "badge", "📛", "我有一個奧運徽章。", "wǒ yǒu yí ge ào yùn huī zhāng."], ["Penny", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["Penny", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["Mila", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["Mila", "女生", "nǚ shēng", "girl", "👧", "我們班的女生都很會打排球。", "wǒ men bān de nǚ shēng dōu hěn huì dǎ pái qiú."], ["Mila", "男生", "nán shēng", "boy", "👦", "男生和女生一起踢足球。", "nán shēng hé nǚ shēng yì qǐ tī zú qiú."], ["Mila", "計畫", "jì huà", "plan", "📝", "我們的計畫是星期六去游泳。", "wǒ men de jì huà shì xīng qí liù qù yóu yǒng."], ["Mila", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["Mila", "擊球", "jí qiú", "to hit the ball", "🏏", "他擊球擊得很好。", "tā jí qiú jí de hěn hǎo."], ["", "球場", "qiú chǎng", "court, field", "🏟️", "我們在球場打籃球。", "wǒ men zài qiú chǎng dǎ lán qiú."], ["", "球網", "qiú wǎng", "net", "🥅", "球打到球網了。", "qiú dǎ dào qiú wǎng le."], ["", "球拍", "qiú pāi", "racket", "🏸", "打網球要用球拍。", "dǎ wǎng qiú yào yòng qiú pāi."], ["", "跌倒", "dié dǎo", "to fall down", "🤕", "我跑步的時候跌倒了。", "wǒ pǎo bù de shí hou dié dǎo le."], ["", "球門", "qiú mén", "goal (the net you score in)", "⚽", "足球場上有兩個球門。", "zú qiú chǎng shàng yǒu liǎng ge qiú mén."], ["", "排球", "pái qiú", "volleyball", "🏐", "我喜歡打排球。", "wǒ xǐ huān dǎ pái qiú."], ["", "開心", "kāi xīn", "happy", "😄", "我覺得他們很開心。", "wǒ jué de tā men hěn kāi xīn."]];
 let WORD_ROWS = store.get('sp_words', null) || DEFAULT_WORDS;
+async function loadFeedback(){
+  if (!REMOTE || !state.user) return '';
+  for(let i=0;i<40 && state.inflight>0;i++) await new Promise(r=>setTimeout(r,150));
+  try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=feedback&name=${encodeURIComponent(state.user.name)}&teacher=${encodeURIComponent(state.user.teacher||'')}`); const j=await r.json(); return j.ok? (j.text||'') : ''; }catch(e){ return ''; }
+}
 async function loadWords(){
   if (!REMOTE) return WORD_ROWS;
   try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=words`); const j=await r.json(); if(j.ok && Array.isArray(j.rows) && j.rows.length){ WORD_ROWS=j.rows; store.set('sp_words',j.rows); CATALOG=null; } }catch(e){}
