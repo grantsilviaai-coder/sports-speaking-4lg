@@ -58,6 +58,34 @@ input,select{font:inherit}
 .top .brand{font-weight:900;font-size:20px;display:flex;align-items:center;gap:8px;cursor:pointer}
 .top .brand small{font-family:Nunito;font-weight:600;opacity:.75;font-size:13px}
 .top .sp{flex:1}
+.t-gm{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}
+.g1{background:linear-gradient(135deg,#65a30d,#a3e635)}.g2{background:linear-gradient(135deg,#c2410c,#fb923c)}.g3{background:linear-gradient(135deg,#a21caf,#e879f9)}.g4{background:linear-gradient(135deg,#0f172a,#475569)}
+.gstat{gap:18px;font-size:18px;margin-top:6px}
+.gcard{display:flex;flex-direction:column;align-items:center;gap:2px}
+.gcard .ge{font-size:34px;line-height:1}.gcard .ghz{font-size:22px;font-weight:900}.gcard .ghz rt{font-size:11px;color:#0e7490}.gcard .gen{font-size:13px;font-weight:800;color:#334155;text-align:center}
+.gcard.big .ge{font-size:90px}.gcard.big .ghz{font-size:52px}.gcard.big .ghz rt{font-size:18px}.gcard.big .gen{font-size:28px}
+.gmic{font-size:14px;font-weight:800;padding:4px 10px;border-radius:999px;background:#f1f5f9}.gmic.on{background:#dcfce7;color:#15803d;animation:l7blink 1.2s infinite}
+.moles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px;background:linear-gradient(#bbf7d0,#86efac);border-radius:22px;padding:16px}
+.hole{position:relative;height:150px;overflow:hidden;border-radius:16px}
+.dirt{position:absolute;left:8%;right:8%;bottom:6px;height:34px;border-radius:50%;background:radial-gradient(#7c2d12,#451a03);z-index:2}
+.mole{position:absolute;left:10%;right:10%;bottom:-140px;height:140px;transition:bottom .2s;z-index:1;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.mole.up{bottom:14px}.mole.hit{transform:scale(.9);filter:grayscale(.4)}
+.mface{font-size:34px;line-height:1}.mole .gcard{background:#fff;border:3px solid #a16207;border-radius:14px;padding:4px 8px;margin-top:-4px;min-width:90px}
+.mole .gcard .ge{font-size:26px}
+.flips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.flip{height:118px;border-radius:16px;background:linear-gradient(135deg,#fb923c,#f59e0b);color:#fff;font-size:40px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.flip.open{background:#fff;color:var(--ink);border:3px solid #fdba74}.flip.done{background:#f0fdf4;border-color:#22c55e;opacity:.75}
+.flip .ge{font-size:40px}.flip .ghz{font-size:26px}.flip .ghz rt{font-size:12px;color:#0e7490}.flip .gen{font-size:13px;color:#334155}
+.gask{background:#fff7ed;border:3px solid #fdba74;border-radius:18px;padding:12px;text-align:center}
+.gscore{font-size:90px;font-weight:900;color:#d97706;line-height:1.1}
+.gflash{animation:l7pulse .4s}
+.sboard{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.steam{border-radius:20px;padding:10px;text-align:center;color:#fff;opacity:.6;transition:.2s}.steam.on{opacity:1;transform:scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.st0{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.st1{background:linear-gradient(135deg,#b91c1c,#f87171)}
+.sname{font-size:24px;font-weight:900}.spts{font-size:70px;font-weight:900;line-height:1}.sadj{padding:2px 14px;font-size:18px}
+.cq{margin:14px 0;text-align:center}.ctimer{height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden}#cbar{height:100%;width:100%;background:#f59e0b;transition:width .25s linear}
+.cmsg{text-align:center;font-size:22px;font-weight:900;margin-top:10px}.cans{font-size:40px;margin-top:6px}.cans rt{font-size:16px;color:#0e7490}
+@media (max-width:620px){.flips{grid-template-columns:repeat(3,1fr)}.hole{height:130px}}
 .tiles{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
 .tile{position:relative;width:118px;height:118px;border-radius:22px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 rgba(0,0,0,.15);text-align:center;line-height:1.15}
 .tile:active{transform:translateY(3px);box-shadow:none}
@@ -1225,8 +1253,9 @@ function mountSpeak(el, o){
 /* ============================================================
    VIEWS
    ============================================================ */
+let GTOK=0;
 function go(view, arg){
-  stopAll(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
+  GTOK++; stopAll(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
   if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
   state.teacher = view==='teacher';
   const showUser = !!state.user && !state.teacher && view!=='login';
@@ -1235,7 +1264,7 @@ function go(view, arg){
   if(!showUser || view!=='home') $('#micPop').classList.add('hidden');
   if (showUser) $('#whoName').textContent = (state.user.teacher?state.user.teacher+' ':'')+(state.user.cls?state.user.cls+' · ':'')+dispName(state.user.name);
   window.scrollTo(0,0);
-  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, lb:viewLB, teacher:viewTeacher, pin:viewPin})[view](arg);
+  ({login:viewLogin, home:viewHome, l1:viewL1, l2:viewL2, l3:viewL3, l4:viewL4, l5:viewL5, l6:viewL6, l7:viewL7, l8:viewL8, ld:viewLD, ls:viewLS, lc:viewLC, lw:viewLW, lb:viewLB, games:viewGames, teacher:viewTeacher, pin:viewPin})[view](arg);
 }
 
 function viewLogin(){
@@ -1304,6 +1333,7 @@ function viewHome(){
       <button class="tile t-mic" id="tMic"><span class="ti">🎤</span><b>麥克風測試</b><span class="en">Mic check</span></button>
       <button class="tile t-fb" id="tFb"><span class="ti">💡</span><b>給你的建議</b><span class="en">Tips for you</span><span class="tbadge hidden" id="fbBadge">NEW</span></button>
       <button class="tile t-wb" data-v="lw"><span class="ti">⭐</span><b>我的詞庫</b><span class="en">My words</span><span class="tprog">${(()=>{ const b=wordBank(); const L=b.mine.length?b.mine:b.cls; return '⭐ '+L.filter(wordDone).length+'/'+L.length; })()}</span></button>
+      <button class="tile t-gm" data-v="games"><span class="ti">🎮</span><b>遊戲區</b><span class="en">Games</span></button>
     </div>
     <div id="asgCard"></div>
     <div class="stage st-s"><div class="sthead"><span class="stico">🌱</span><div><b>第一階段：學會</b> <span class="en">Surface · Learn it</span><div class="hint">聽懂、說出運動詞語和句型 <span class="en">Hear and say the words and patterns</span></div></div></div>
@@ -1328,7 +1358,7 @@ function viewHome(){
       <button class="level l8" data-v="l8"><span class="num">LEVEL 12 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
-  app.querySelectorAll('.level,.t-wb').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  app.querySelectorAll('.level,.t-wb,.t-gm').forEach(b=>b.onclick=()=>go(b.dataset.v));
   $('#tMic').onclick=openMic;
   $('#tFb').onclick=()=>{ if(state.fbText) showFb(state.fbText); else toast('先練習幾題，就會有建議喔！ Practice a few items first!'); };
   /* 💡 給你的建議：登入後、每次練習完回到首頁，都跳出最新的回饋 */
@@ -2399,6 +2429,192 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
 
 
 /* ============================================================
+   🎮 遊戲區：用說的打地鼠、說了才翻牌、60 秒快問快答、全班對抗賽
+   詞語來自課本運動詞語＋我的詞庫；所有遊戲都要「說出來」
+   ============================================================ */
+function gamePool(src){
+  const sp=SPORTS.map(s=>({hz:s.hz, py:s.py, en:s.en, e:s.e, kw:s.kw||[]}));
+  let wb=[]; try{ const b=wordBank(); const ids=[...new Set(b.mine.concat(b.cls))]; wb=ids.map(zh=>{ const w=b.W[zh]; return {hz:zh, py:w.py, en:w.en, e:w.e||'⭐', kw:[]}; }); }catch(e){}
+  const all = src==='words' ? wb : src==='all' ? sp.concat(wb.filter(w=>!sp.some(s=>s.hz===w.hz))) : sp;
+  return all.length ? all : sp;
+}
+function saidIt(text, it){ const n=norm(fixHomo(text, it.hz)); return [it.hz].concat(it.kw||[]).some(k=>k && n.includes(norm(k))); }
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+function gKey(){ return 'sp_games_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
+function gameSettings(){ return Object.assign({src:'sports', hint:'easy', teams:['藍隊 Blue','紅隊 Red']}, store.get(gKey(),{})); }
+const GAMES = [
+  {id:'mole',  e:'🔨', zh:'用說的打地鼠', en:'Voice Whack-a-Mole', d:'地鼠舉著運動圖，說出那個詞就打到牠！', den:'Say the word to whack the mole!', cls:'g1'},
+  {id:'flip',  e:'🃏', zh:'說了才翻牌',   en:'Say-to-Match Cards', d:'翻到一對，說出來才算配對成功。', den:'Find a pair, then say it to keep it.', cls:'g2'},
+  {id:'speed', e:'⚡', zh:'60 秒快問快答', en:'60-Second Speed Round', d:'看圖說詞，60 秒內說越多越好！', den:'Say as many words as you can in 60 s!', cls:'g3'},
+  {id:'class', e:'🏆', zh:'全班對抗賽',   en:'Class Battle (projector)', d:'分兩隊輪流用說的答題，有計分板。', den:'Two teams take turns — for the projector.', cls:'g4'}
+];
+function viewGames(){
+  const S=gameSettings(); const save=()=>store.set(gKey(),S);
+  app.innerHTML = `
+    <button class="back" id="bk">← 回首頁 Home</button>
+    <h2 style="font-size:28px;font-weight:900">🎮 遊戲區 <span class="en" style="font-size:18px">Games</span></h2>
+    <div class="hint">每個遊戲都要<b>開口說</b>！ <span class="en">Every game is played by speaking!</span></div>
+    <div class="card" style="margin-top:10px;padding:12px 16px">
+      <div class="row" style="gap:14px;flex-wrap:wrap">
+        <span><b>詞語 Words：</b> ${[['sports','🏀 運動詞語'],['words','⭐ 我的詞庫'],['all','全部 All']].map(([k,l])=>`<button class="tab gsrc ${S.src===k?'on':''}" data-src="${k}">${l}</button>`).join('')}</span>
+        <span><b>提示 Hint：</b> ${[['easy','漢字＋拼音 Chinese + pinyin'],['hard','只有圖＋英文 Picture + English']].map(([k,l])=>`<button class="tab ghint ${S.hint===k?'on':''}" data-hint="${k}">${l}</button>`).join('')}</span>
+      </div>
+      ${SR?'':'<div class="warn" style="margin-top:8px">這個瀏覽器不能語音辨識，遊戲會改成用點的。建議用 Chrome 或 iPad Safari。 <span class="en">No speech recognition here — tap instead.</span></div>'}
+    </div>
+    <div class="levels">${GAMES.map(g=>`<button class="level ${g.cls}" data-g="${g.id}"><span class="num">GAME</span><span class="ico">${g.e}</span><span class="t">${g.zh}</span><span class="d">${g.d}<br><span class="en" style="color:#fff">${g.en}</span></span>${store.get(gKey()+'_best_'+g.id,null)!=null?`<span class="prog">🏅 最高 Best ${store.get(gKey()+'_best_'+g.id)}</span>`:''}</button>`).join('')}</div>`;
+  $('#bk').onclick=()=>go('home');
+  app.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{ S.src=b.dataset.src; save(); viewGames(); });
+  app.querySelectorAll('[data-hint]').forEach(b=>b.onclick=()=>{ S.hint=b.dataset.hint; save(); viewGames(); });
+  app.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>({mole:gMole, flip:gFlip, speed:gSpeed, cls:null, class:gClass})[b.dataset.g](S));
+}
+const gCard=(it,hint,big)=>`<div class="gcard ${big?'big':''}"><div class="ge">${esc(it.e)}</div>${hint==='easy'?`<div class="ghz"><ruby>${esc(it.hz)}<rt>${esc(it.py)}</rt></ruby></div>`:`<div class="gen">${esc(it.en)}</div>`}</div>`;
+function gBest(id,score){ const k=gKey()+'_best_'+id; const b=store.get(k,null); if(b==null||score>b){ store.set(k,score); return true; } return false; }
+function gEnd(id, title, score, detail, again){
+  const isBest=gBest(id,score);
+  app.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:64px">${score>0?'🎉':'💪'}</div>
+    <h2 style="font-size:30px;font-weight:900">${esc(title)}</h2>
+    <div class="gscore">${score}</div>${isBest?'<div class="pill p-good" style="font-size:16px">🏅 新紀錄！ New best!</div>':''}
+    <div class="hint" style="margin-top:8px;font-size:16px">${detail}</div>
+    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn btn-ghost" id="gb">🎮 遊戲區 Games</button><button class="btn btn-sun" id="ga">🔁 再玩一次 Play again</button></div></div>`;
+  $('#gb').onclick=()=>viewGames(); $('#ga').onclick=again;
+}
+/* 一直聽：新說出來的字交給 onWords；回傳 stop() */
+function gListen(ms, onWords, onState){
+  if(!SR){ onState&&onState('off'); return {stop:()=>{}, done:Promise.resolve(null)}; }
+  let last=0;
+  const done=listen({continuous:true, maxMs:ms, onInterim:t=>{ if(t.length<last) last=0; const fresh=t.slice(last); if(fresh && onWords(fresh)) last=t.length; }}).catch(()=>{ onState&&onState('nomic'); return null; });
+  onState&&onState('on');
+  return {stop:()=>{ current&&current(); }, done};
+}
+const micBadge=st=>st==='on'?'<span class="gmic on">🎤 聽你說… Listening</span>':st==='nomic'?'<span class="gmic">🎙️ 沒有麥克風權限</span>':'<span class="gmic">👆 用點的 Tap mode</span>';
+
+/* ---------- 🔨 用說的打地鼠 ---------- */
+function gMole(S){
+  const pool=gamePool(S.src); const DUR=60000, HOLES=9;
+  let hits=0, shown=0, miss=0, active={}, t0=0, timer=null, iv=null, ended=false, L=null; const tok=++GTOK;
+  app.innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b style="font-size:22px">🔨 用說的打地鼠 <span class="en">Voice Whack-a-Mole</span></b><span id="gm"></span></div>
+    <div class="row gstat"><span>⏱️ <b id="gt">60</b>s</span><span>🔨 打到 Hits <b id="gh">0</b></span><button class="btn btn-ghost" id="gx" style="margin-left:auto;padding:6px 12px">⏹ 結束 Stop</button></div>
+    <div class="moles">${Array.from({length:HOLES},(_,i)=>`<div class="hole" data-h="${i}"><div class="mole"></div><div class="dirt"></div></div>`).join('')}</div>
+    <div class="hint" style="text-align:center;margin-top:8px">說出地鼠舉的詞就打到了！ <span class="en">Say the word on the sign!</span> <span id="gheard"></span></div></div>`;
+  const pop=()=>{ if(ended) return; if(tok!==GTOK) return finish(); const free=[...Array(HOLES).keys()].filter(i=>!active[i]); if(!free.length) return;
+    const h=free[Math.floor(Math.random()*free.length)], it=pool[Math.floor(Math.random()*pool.length)];
+    const el=app.querySelector(`[data-h="${h}"] .mole`); if(!el) return;
+    active[h]={it, until:Date.now()+3800}; shown++;
+    el.innerHTML=`<div class="mface">🐹</div>${gCard(it,S.hint)}`; el.classList.add('up'); el.classList.remove('hit');
+    el.onclick=()=>{ if(!SR || L==='tap') whack(h); };
+    setTimeout(()=>{ if(active[h] && active[h].it===it){ delete active[h]; miss++; el.classList.remove('up'); } }, 3800);
+  };
+  const whack=h=>{ const a=active[h]; if(!a) return; delete active[h]; hits++; $('#gh').textContent=hits;
+    const el=app.querySelector(`[data-h="${h}"] .mole`); el.classList.add('hit'); el.querySelector('.mface').textContent='😵'; setTimeout(()=>el.classList.remove('up','hit'),450); };
+  const lis=gListen(DUR, fresh=>{ const sh=$('#gheard'); if(sh) sh.textContent='「'+fresh.slice(-12)+'」';
+      const h=Object.keys(active).find(k=>saidIt(fresh, active[k].it)); if(h!=null){ whack(+h); return true; } return false; },
+    st=>{ L=st==='on'?'voice':'tap'; const m=$('#gm'); if(m) m.innerHTML=micBadge(st); });
+  t0=Date.now(); pop(); iv=setInterval(()=>{ const left=Math.max(0,DUR-(Date.now()-t0)); const g=$('#gt'); if(g) g.textContent=Math.ceil(left/1000); if(!left) finish(); }, 250);
+  timer=setInterval(()=>{ pop(); if(Math.random()<0.4) setTimeout(pop,500); }, 1500);
+  const finish=()=>{ if(ended) return; ended=true; clearInterval(iv); clearInterval(timer); lis.stop(); if(tok!==GTOK) return;
+    const pct=shown?Math.round(100*hits/shown):0;
+    saveAttempt({level:'G 遊戲', item:'G-mole', target:`打地鼠：出現 ${shown} 隻，打到 ${hits} 隻（${S.src}）`, transcript:'', score:pct, blob:null, mime:'', diag:'', noProgress:true});
+    gEnd('mole','打到 '+hits+' 隻！', hits, `出現 ${shown} 隻 · 命中率 ${pct}% <span class="en">${shown} moles · ${pct}% hit</span>`, ()=>gMole(S)); };
+  $('#gx').onclick=finish;
+}
+
+/* ---------- 🃏 說了才翻牌 ---------- */
+function gFlip(S){
+  const items=shuffle(gamePool(S.src)).slice(0,6);
+  const cards=shuffle(items.flatMap((it,i)=>[{p:i,kind:'pic'},{p:i,kind:'word'}]));
+  let open=[], done=new Set(), moves=0, spoken=0, busy=false, t0=Date.now();
+  const face=c=>{ const it=items[c.p]; return c.kind==='pic' ? `<div class="ge">${esc(it.e)}</div><div class="gen">${esc(it.en)}</div>` : `<div class="ghz"><ruby>${esc(it.hz)}<rt>${S.hint==='easy'?esc(it.py):''}</rt></ruby></div>`; };
+  const render=()=>{ app.innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b style="font-size:22px">🃏 說了才翻牌 <span class="en">Say-to-Match</span></b><button class="btn btn-ghost" id="gx" style="padding:6px 12px">⏹ 結束 Stop</button></div>
+      <div class="row gstat"><span>👆 翻牌 Moves <b>${moves}</b></span><span>🗣️ 說對 Said <b>${spoken}</b>/6</span></div>
+      <div class="flips">${cards.map((c,i)=>{ const isOpen=open.includes(i)||done.has(c.p); return `<button class="flip ${isOpen?'open':''} ${done.has(c.p)?'done':''}" data-i="${i}">${isOpen?face(c):'<span class="fq">?</span>'}</button>`; }).join('')}</div>
+      <div id="say" style="margin-top:10px"></div></div>`;
+    $('#gx').onclick=finish;
+    app.querySelectorAll('.flip').forEach(b=>b.onclick=()=>tap(+b.dataset.i)); };
+  const tap=i=>{ if(busy || open.includes(i) || done.has(cards[i].p)) return; open.push(i); render();
+    if(open.length<2) return; moves++;
+    const [a,b]=open;
+    if(cards[a].p===cards[b].p){ busy=true; askSay(items[cards[a].p], ok=>{ busy=false; if(ok){ done.add(cards[a].p); spoken++; } open=[]; render(); if(done.size===items.length) finish(); }); }
+    else { busy=true; setTimeout(()=>{ open=[]; busy=false; render(); }, 900); render(); } };
+  const askSay=(it, cb)=>{ render(); const box=$('#say');
+    box.innerHTML=`<div class="gask"><div style="font-size:20px;font-weight:900">🎉 找到一對！現在說出來： <span class="en">Pair found! Now say it:</span></div>${gCard(it,'easy',true)}<div class="speak" id="gsp"></div><button class="btn btn-ghost" id="gskip" style="margin-top:6px">跳過 Skip</button></div>`;
+    $('#gskip').onclick=()=>{ stopAll(); cb(false); };
+    if(!SR){ box.querySelector('#gsp').innerHTML='<button class="btn btn-sun" id="gok">✅ 我說了 I said it</button>'; $('#gok').onclick=()=>cb(true); return; }
+    mountSpeak($('#gsp'),{target:it.hz, targetLabel:'翻牌：'+it.hz, level:'G 遊戲', item:'G-flip-say', maxMs:6000, score:t=>saidIt(t,it)?100:scoreText(t,it.hz),
+      onDone:(sc)=>{ if(sc>=80) setTimeout(()=>cb(true),600); else { const r=$('#gsp .result'); if(r) r.insertAdjacentHTML('beforeend',' <b>再說一次 Try again!</b>'); } }}); };
+  const finish=()=>{ stopAll(); const sec=Math.round((Date.now()-t0)/1000); const pct=Math.round(100*spoken/items.length);
+    saveAttempt({level:'G 遊戲', item:'G-flip', target:`說了才翻牌：說對 ${spoken}/${items.length}，翻 ${moves} 次，${sec} 秒`, transcript:'', score:pct, blob:null, mime:'', diag:'', noProgress:true});
+    gEnd('flip', `說對 ${spoken} / ${items.length} 對`, spoken, `翻牌 ${moves} 次 · ${sec} 秒 <span class="en">${moves} moves · ${sec} s</span>`, ()=>gFlip(S)); };
+  render();
+}
+
+/* ---------- ⚡ 60 秒快問快答 ---------- */
+function gSpeed(S){
+  let deck=shuffle(gamePool(S.src)), i=0, right=0, skipped=0, ended=false, hintOn=S.hint==='easy', log=[];
+  const DUR=60000; const t0=Date.now(); const tok=++GTOK;
+  const cur=()=>deck[i%deck.length];
+  const render=()=>{ app.innerHTML=`<div class="card" style="text-align:center"><div class="row" style="justify-content:space-between"><b style="font-size:22px">⚡ 60 秒快問快答 <span class="en">Speed Round</span></b><span id="gm"></span></div>
+      <div class="row gstat" style="justify-content:center"><span>⏱️ <b id="gt">60</b>s</span><span>✅ <b id="gr">${right}</b></span><span>⏭️ ${skipped}</span></div>
+      <div id="gq">${gCard(cur(), hintOn?'easy':'hard', true)}</div>
+      <div class="hint" id="gheard" style="min-height:24px;margin-top:6px"></div>
+      <div class="row" style="justify-content:center;margin-top:10px"><button class="btn btn-ghost" id="ghint">💡 提示 Hint</button><button class="btn btn-ghost" id="gskip">⏭️ 跳過 Skip</button>${SR?'':'<button class="btn btn-sun" id="gok">✅ 我說了 Said it</button>'}<button class="btn btn-ghost" id="gx">⏹ 結束 Stop</button></div></div>`;
+    $('#ghint').onclick=()=>{ $('#gq').innerHTML=gCard(cur(),'easy',true); };
+    $('#gskip').onclick=()=>{ skipped++; log.push('⏭️'+cur().hz); i++; render(); };
+    $('#gx').onclick=finish; if($('#gok')) $('#gok').onclick=()=>next(); };
+  const next=()=>{ right++; log.push('✅'+cur().hz); i++; const q=$('#gq'); if(q){ q.classList.add('gflash'); } setTimeout(render,250); };
+  render();
+  const lis=gListen(DUR, fresh=>{ const h=$('#gheard'); if(h) h.textContent='「'+fresh.slice(-14)+'」'; if(saidIt(fresh,cur())){ next(); return true; } return false; },
+    st=>{ const m=$('#gm'); if(m) m.innerHTML=micBadge(st); });
+  const iv=setInterval(()=>{ const left=Math.max(0,DUR-(Date.now()-t0)); if(tok!==GTOK) return finish(); const g=$('#gt'); if(g) g.textContent=Math.ceil(left/1000); if(!left) finish(); }, 250);
+  function finish(){ if(ended) return; ended=true; clearInterval(iv); lis.stop(); if(tok!==GTOK) return;
+    const pct=(right+skipped)?Math.round(100*right/(right+skipped)):0;
+    saveAttempt({level:'G 遊戲', item:'G-speed', target:`快問快答：說對 ${right}、跳過 ${skipped}｜${log.join(' ')}`.slice(0,900), transcript:'', score:pct, blob:null, mime:'', diag:'', noProgress:true});
+    gEnd('speed', `60 秒說對 ${right} 個！`, right, `跳過 ${skipped} 個 <span class="en">${right} correct · ${skipped} skipped</span>`, ()=>gSpeed(S)); }
+}
+
+/* ---------- 🏆 全班對抗賽（投影用） ---------- */
+function gClass(S){
+  const st=Object.assign({mode:'word', rounds:10, sec:10}, store.get(gKey()+'_class',{}));
+  const teams=S.teams.slice(); let score=[0,0], round=0, turn=0, deck=[], timer=null, lis=null, answered=false;
+  const sentDeck=()=>shuffle(BUILD.map(b=>({hz:b.w.map(t=>t.split('|')[0]).join('')+b.end, py:b.w.map(t=>(t.split('|')[1]||'').replace(/_/g,' ')).join(' '), en:b.en, e:'💬', sent:true})));
+  const setup=()=>{ app.innerHTML=`<button class="back" id="bk">← 遊戲區 Games</button><div class="card">
+      <h2 style="font-size:28px;font-weight:900">🏆 全班對抗賽 <span class="en" style="font-size:18px">Class Battle</span></h2>
+      <div class="hint">用教室的電腦或投影。兩隊輪流派人到麥克風前回答，說對了得 1 分。老師也可以按 ＋／－ 調整分數。 <span class="en">Teams take turns at the mic. Say it right to score!</span></div>
+      <div class="row" style="gap:12px;margin-top:12px;flex-wrap:wrap"><label>隊名 1 <input id="t0" value="${esc(teams[0])}" style="width:150px"></label><label>隊名 2 <input id="t1" value="${esc(teams[1])}" style="width:150px"></label></div>
+      <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>題目 Questions：</b>${[['word','🏀 看圖說詞語 Words'],['sent','💬 看英文說句子 Sentences']].map(([k,l])=>`<button class="tab ${st.mode===k?'on':''}" data-m="${k}">${l}</button>`).join('')}</div>
+      <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>回合 Rounds：</b>${[6,10,16].map(n=>`<button class="tab ${st.rounds===n?'on':''}" data-r="${n}">${n}</button>`).join('')}<b style="margin-left:10px">每題 Time：</b>${[10,15,20].map(n=>`<button class="tab ${st.sec===n?'on':''}" data-s="${n}">${n}s</button>`).join('')}</div>
+      <button class="btn btn-sun" id="go" style="width:100%;font-size:22px;margin-top:14px">▶️ 開始比賽 Start</button></div>`;
+    $('#bk').onclick=()=>viewGames();
+    app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.m; store.set(gKey()+'_class',st); setup(); });
+    app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ st.rounds=+b.dataset.r; store.set(gKey()+'_class',st); setup(); });
+    app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ st.sec=+b.dataset.s; store.set(gKey()+'_class',st); setup(); });
+    $('#go').onclick=()=>{ teams[0]=$('#t0').value.trim()||teams[0]; teams[1]=$('#t1').value.trim()||teams[1]; S.teams=teams; store.set(gKey(),S);
+      deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
+  const board=()=>`<div class="sboard">${teams.map((t,k)=>`<div class="steam st${k} ${turn===k?'on':''}"><div class="sname">${esc(t)}</div><div class="spts">${score[k]}</div><div class="row" style="justify-content:center;gap:6px"><button class="btn btn-ghost sadj" data-adj="${k},-1">－</button><button class="btn btn-ghost sadj" data-adj="${k},1">＋</button></div></div>`).join('')}</div>`;
+  const bindAdj=()=>app.querySelectorAll('[data-adj]').forEach(b=>b.onclick=()=>{ const [k,d]=b.dataset.adj.split(',').map(Number); score[k]=Math.max(0,score[k]+d); app.querySelectorAll('.spts')[k].textContent=score[k]; });
+  const play=()=>{ if(round>=st.rounds) return final(); answered=false; const it=deck[round%deck.length]; let left=st.sec;
+    app.innerHTML=`<div class="card gclass">${board()}
+      <div class="hint" style="text-align:center;margin-top:6px">第 ${round+1} / ${st.rounds} 題 · 輪到 <b>${esc(teams[turn])}</b> <span class="en">Round ${round+1} · ${esc(teams[turn])}'s turn</span></div>
+      <div class="cq">${it.sent?`<div class="ge">💬</div><div class="gen" style="font-size:34px">${esc(it.en)}</div>`:gCard(it,S.hint,true)}</div>
+      <div class="ctimer"><div id="cbar"></div></div><div id="cmsg" class="cmsg">🎤 說吧！ Speak now! <span id="cheard"></span></div>
+      <div class="row" style="justify-content:center;margin-top:10px"><button class="btn btn-ghost" id="cok">✅ 算對 Correct</button><button class="btn btn-ghost" id="cno">❌ 沒答對 Wrong</button><button class="btn btn-ghost" id="cend">🏁 結束 End</button></div></div>`;
+    bindAdj();
+    const resolve=ok=>{ if(answered) return; answered=true; clearInterval(timer); lis&&lis.stop(); if(ok){ score[turn]++; } ['#cok','#cno'].forEach(q=>$(q)&&$(q).classList.add('hidden'));
+      $('#cmsg').innerHTML = (ok?`🎉 <b>${esc(teams[turn])} +1！</b>`:'⏰ 時間到 / 沒答對 Time’s up')+`<div class="cans"><ruby>${esc(it.hz)}<rt>${esc(it.py)}</rt></ruby> <button class="btn btn-ghost" id="csay" style="padding:4px 10px">🔊</button></div><button class="btn btn-sun" id="cnext" style="margin-top:8px">下一題 Next ➜</button>`;
+      app.querySelectorAll('.spts')[turn].textContent=score[turn];
+      $('#csay').onclick=()=>say(it.hz); $('#cnext').onclick=()=>{ round++; turn=1-turn; play(); }; };
+    $('#cok').onclick=()=>resolve(true); $('#cno').onclick=()=>resolve(false); $('#cend').onclick=()=>{ clearInterval(timer); lis&&lis.stop(); final(); };
+    lis = gListen(st.sec*1000+500, fresh=>{ const h=$('#cheard'); if(h) h.textContent='「'+fresh.slice(-16)+'」';
+        const ok = it.sent ? scoreText(fresh, it.hz)>=75 : saidIt(fresh,it); if(ok){ resolve(true); return true; } return false; }, ()=>{});
+    const tok=GTOK; timer=setInterval(()=>{ if(tok!==GTOK){ clearInterval(timer); lis&&lis.stop(); return; } left-=0.25; const b=$('#cbar'); if(b) b.style.width=Math.max(0,left/st.sec*100)+'%'; if(left<=0) resolve(false); },250); };
+  const final=()=>{ const w = score[0]===score[1] ? '平手！ It’s a tie!' : `🏆 ${esc(teams[score[0]>score[1]?0:1])} 贏了！ wins!`;
+    app.innerHTML=`<div class="card gclass" style="text-align:center"><div style="font-size:70px">🏆</div><h2 style="font-size:34px;font-weight:900">${w}</h2>${board()}
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="gb">🎮 遊戲區</button><button class="btn btn-sun" id="ga">🔁 再比一場 Rematch</button></div></div>`;
+    app.querySelectorAll('.sadj').forEach(b=>b.remove());
+    $('#gb').onclick=()=>viewGames(); $('#ga').onclick=()=>{ deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
+  setup();
+}
+
+/* ============================================================
    🧩 排句子：看英文句子，拖拉中文方塊排成完整的句子（學會階段，內部代號 LB）
    w：進階用的詞語方塊（漢字|拼音）；g：初階時幾個詞併成一塊；x：進階的干擾方塊；alt：其他正確說法
    ============================================================ */
@@ -2973,6 +3189,8 @@ function catalog(){
     const g='L2-'+p.id; H.push({g, h:p.name.split(' ')[0], zh:'句型：'+strip(p.name), en:'Pattern: '+(PAT_EN[p.id]||p.id), pid:p.id});
     p.items.forEach(it=>{ const lab=S_txt(it.a); const sp=SPORTS.find(s=>lab.includes(s.hz)); C['L2-'+it.id]={L:'L2', g, label:lab, kind:'pattern', pid:p.id, word: sp?sp.hz:null}; });
   });
+  ['mole','flip','speed'].forEach(k=>C['G-'+k]={L:'G', g:null, label:'遊戲：'+({mole:'用說的打地鼠',flip:'說了才翻牌',speed:'60 秒快問快答'})[k], kind:'game'});
+  C['G-flip-say']={L:'G', g:null, label:'遊戲：翻牌說詞語', kind:'game'};
   H.push({g:'LB', h:'L3 排句子', zh:'排句子', en:'Build the sentence'});
   BUILD.forEach(x=>{ C['LB-'+x.id]={L:'LB', g:'LB', label:'排句子：'+x.w.map(t=>t.split('|')[0]).join('')+x.end, kind:'read'}; ['beg','adv'].forEach(t=>C['LB-'+x.id+'-'+t]={L:'LB', g:'LB', label:'排句子（'+(t==='beg'?'初階':'進階')+'）：'+x.w.map(t2=>t2.split('|')[0]).join('')+x.end, kind:'order'}); });
   H.push({g:'L3', h:'L4 對話', zh:'和文文對話', en:'Conversation with Wenwen'});
@@ -3174,6 +3392,7 @@ function openItem(id){
   if ((m=id.match(/^LC-(\w+)/))) return go('lc',{ci:Math.max(0,COMPARE.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LB-(b\d+)/))) return go('lb',{i:Math.max(0,BUILD.findIndex(x=>x.id===m[1]))});
   if ((m=id.match(/^LW-([^-]+)/))) return go('lw',{zh:m[1]});
+  if (/^G-/.test(id)) return go('games');
   if (/^L6-/.test(id)) return go('l6');
   if (/^L7-/.test(id)) return go('l7');
   if ((m=id.match(/^L8-(\w+)$/)) && SCENE[m[1]]) return sceneView(m[1]);
