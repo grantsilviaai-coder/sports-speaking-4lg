@@ -76,6 +76,12 @@ input,select{font:inherit}
 .flip{height:118px;border-radius:16px;background:linear-gradient(135deg,#fb923c,#f59e0b);color:#fff;font-size:40px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.15)}
 .flip.open{background:#fff;color:var(--ink);border:3px solid #fdba74}.flip.done{background:#f0fdf4;border-color:#22c55e;opacity:.75}
 .flip .ge{font-size:40px}.flip .ghz{font-size:26px}.flip .ghz rt{font-size:12px;color:#0e7490}.flip .gen{font-size:13px;color:#334155}
+.howto{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.howto>span{background:#fff7ed;border:2px solid #fdba74;border-radius:12px;padding:6px 10px;font-weight:800;font-size:15px}
+.gask .gcard.big .ge{font-size:70px;line-height:1.15;margin:6px 0}
+.gmsg{font-weight:900;color:#c2410c}.flip{position:relative}.fok{position:absolute;top:4px;right:6px;font-size:18px}
+.gover{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.gover .gask{background:#fff;max-width:520px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.gsayline{font-size:22px;margin-top:10px;color:#15803d;animation:l7blink 1.4s infinite}
 .gask{background:#fff7ed;border:3px solid #fdba74;border-radius:18px;padding:12px;text-align:center}
 .gscore{font-size:90px;font-weight:900;color:#d97706;line-height:1.1}
 .gflash{animation:l7pulse .4s}
@@ -1257,7 +1263,7 @@ function mountSpeak(el, o){
    ============================================================ */
 let GTOK=0;
 function go(view, arg){
-  GTOK++; stopAll(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
+  GTOK++; stopAll(); document.querySelector('.gover')?.remove(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
   if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
   state.teacher = view==='teacher';
   const showUser = !!state.user && !state.teacher && view!=='login';
@@ -2524,29 +2530,43 @@ function gMole(S){
 function gFlip(S){
   const items=shuffle(gamePool(S.src)).slice(0,6);
   const cards=shuffle(items.flatMap((it,i)=>[{p:i,kind:'pic'},{p:i,kind:'word'}]));
-  let open=[], done=new Set(), moves=0, spoken=0, busy=false, t0=Date.now();
+  let open=[], done=new Set(), moves=0, spoken=0, busy=false, t0=Date.now(), msg='', lis=null; const tok=++GTOK;
   const face=c=>{ const it=items[c.p]; return c.kind==='pic' ? `<div class="ge">${esc(it.e)}</div><div class="gen">${esc(it.en)}</div>` : `<div class="ghz"><ruby>${esc(it.hz)}<rt>${S.hint==='easy'?esc(it.py):''}</rt></ruby></div>`; };
-  const render=()=>{ app.innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b style="font-size:22px">🃏 說了才翻牌 <span class="en">Say-to-Match</span></b><button class="btn btn-ghost" id="gx" style="padding:6px 12px">⏹ 結束 Stop</button></div>
-      <div class="row gstat"><span>👆 翻牌 Moves <b>${moves}</b></span><span>🗣️ 說對 Said <b>${spoken}</b>/6</span></div>
-      <div class="flips">${cards.map((c,i)=>{ const isOpen=open.includes(i)||done.has(c.p); return `<button class="flip ${isOpen?'open':''} ${done.has(c.p)?'done':''}" data-i="${i}">${isOpen?face(c):'<span class="fq">?</span>'}</button>`; }).join('')}</div>
-      <div id="say" style="margin-top:10px"></div></div>`;
+  const render=()=>{ if(tok!==GTOK) return; app.innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b style="font-size:22px">🃏 說了才翻牌 <span class="en">Say-to-Match</span></b><button class="btn btn-ghost" id="gx" style="padding:6px 12px">⏹ 結束 Stop</button></div>
+      <div class="howto"><span>① 點兩張牌 <span class="en">Tap 2 cards</span></span><span>② 找圖片和它的中文 <span class="en">Find a picture + its Chinese word</span></span><span>③ 找到一對就大聲說出來 <span class="en">Say the word to keep the pair</span> ✅</span></div>
+      <div class="row gstat"><span>👆 翻牌 Moves <b>${moves}</b></span><span>✅ 配對 Pairs <b>${spoken}</b>/${items.length}</span><span class="gmsg" id="gmsg">${msg}</span></div>
+      <div class="flips">${cards.map((c,i)=>{ const isOpen=open.includes(i)||done.has(c.p); return `<button class="flip ${isOpen?'open':''} ${done.has(c.p)?'done':''}" data-i="${i}">${isOpen?face(c):'<span class="fq">?</span>'}${done.has(c.p)?'<span class="fok">✅</span>':''}</button>`; }).join('')}</div></div>`;
     $('#gx').onclick=finish;
     app.querySelectorAll('.flip').forEach(b=>b.onclick=()=>tap(+b.dataset.i)); };
-  const tap=i=>{ if(busy || open.includes(i) || done.has(cards[i].p)) return; open.push(i); render();
+  const tap=i=>{ if(busy || open.includes(i) || done.has(cards[i].p)) return; open.push(i);
+    msg = open.length===1 ? '👉 再點一張 Tap one more card' : ''; render();
     if(open.length<2) return; moves++;
     const [a,b]=open;
-    if(cards[a].p===cards[b].p){ busy=true; askSay(items[cards[a].p], ok=>{ busy=false; if(ok){ done.add(cards[a].p); spoken++; } open=[]; render(); if(done.size===items.length) finish(); }); }
-    else { busy=true; setTimeout(()=>{ open=[]; busy=false; render(); }, 900); render(); } };
-  const askSay=(it, cb)=>{ render(); const box=$('#say');
-    box.innerHTML=`<div class="gask"><div style="font-size:20px;font-weight:900">🎉 找到一對！現在說出來： <span class="en">Pair found! Now say it:</span></div>${gCard(it,'easy',true)}<div class="speak" id="gsp"></div><button class="btn btn-ghost" id="gskip" style="margin-top:6px">跳過 Skip</button></div>`;
-    $('#gskip').onclick=()=>{ stopAll(); cb(false); };
-    if(!SR){ box.querySelector('#gsp').innerHTML='<button class="btn btn-sun" id="gok">✅ 我說了 I said it</button>'; $('#gok').onclick=()=>cb(true); return; }
-    mountSpeak($('#gsp'),{target:it.hz, targetLabel:'翻牌：'+it.hz, level:'G 遊戲', item:'G-flip-say', maxMs:6000, score:t=>saidIt(t,it)?100:scoreText(t,it.hz),
-      onDone:(sc)=>{ if(sc>=80) setTimeout(()=>cb(true),600); else { const r=$('#gsp .result'); if(r) r.insertAdjacentHTML('beforeend',' <b>再說一次 Try again!</b>'); } }}); };
-  const finish=()=>{ stopAll(); const sec=Math.round((Date.now()-t0)/1000); const pct=Math.round(100*spoken/items.length);
+    if(cards[a].p===cards[b].p){ busy=true; askSay(items[cards[a].p], ok=>{ busy=false; if(ok){ done.add(cards[a].p); spoken++; msg='🎉 配對成功！ Pair kept!'; } else msg='這一對先翻回去，等一下再找 Flipped back — find it again later'; open=[]; render(); if(done.size===items.length) setTimeout(finish,700); }); }
+    else { busy=true; msg='❌ 不是一對，記住位置！ Not a pair — remember where they are!'; render(); setTimeout(()=>{ open=[]; busy=false; msg='👉 點兩張牌 Tap 2 cards'; render(); }, 1500); } };
+  const askSay=(it, cb)=>{
+    const ov=document.createElement('div'); ov.className='gover'; document.body.appendChild(ov);
+    const close=ok=>{ lis&&lis.stop(); lis=null; ov.remove(); cb(ok); };
+    const attempt=()=>{
+      ov.innerHTML=`<div class="gask"><div style="font-size:22px;font-weight:900">🎉 找到一對了！ <span class="en">You found a pair!</span></div>${gCard(it,'easy',true)}
+        <div class="gsayline" id="gsl">${SR?'🎤 <b>現在大聲說出來</b> <span class="en">Now say it out loud!</span>':'說出來以後按下面的按鈕 <span class="en">Say it, then tap the button</span>'}</div>
+        <div class="hint" id="gheard" style="min-height:26px;font-size:18px"></div>
+        <div class="row" style="justify-content:center;margin-top:8px" id="gbtns">${SR?'':'<button class="btn btn-sun" id="gok">✅ 我說了 I said it</button>'}<button class="btn btn-ghost" id="gsk">跳過 Skip</button></div></div>`;
+      ov.querySelector('#gsk').onclick=()=>close(false);
+      if(!SR){ ov.querySelector('#gok').onclick=()=>close(true); return; }
+      let got=false;
+      lis=gListen(8000, fresh=>{ const h=ov.querySelector('#gheard'); if(h) h.textContent='我聽到 I heard：「'+fresh.slice(-14)+'」';
+          if(!got && saidIt(fresh,it)){ got=true; ov.querySelector('#gsl').innerHTML='✅ <b>說對了！</b> <span class="en">Great!</span>'; setTimeout(()=>close(true),800); return true; } return false; },
+        st=>{ if(st==='nomic'){ ov.querySelector('#gsl').innerHTML='🎙️ 沒有麥克風權限 <span class="en">Please allow the microphone</span>'; } });
+      lis.done.then(()=>{ if(got || !ov.isConnected) return; ov.querySelector('#gsl').innerHTML='🤔 沒聽清楚，再說一次 <span class="en">Didn’t catch it — try again</span>';
+        const r=document.createElement('button'); r.className='btn btn-sun'; r.textContent='🎤 再說一次 Try again'; r.onclick=attempt; ov.querySelector('#gbtns').prepend(r); });
+    };
+    attempt();
+  };
+  function finish(){ if(lis){ lis.stop(); lis=null; } document.querySelector('.gover')?.remove(); if(tok!==GTOK) return; const sec=Math.round((Date.now()-t0)/1000); const pct=Math.round(100*spoken/items.length);
     saveAttempt({level:'G 遊戲', item:'G-flip', target:`說了才翻牌：說對 ${spoken}/${items.length}，翻 ${moves} 次，${sec} 秒`, transcript:'', score:pct, blob:null, mime:'', diag:'', noProgress:true});
-    gEnd('flip', `說對 ${spoken} / ${items.length} 對`, spoken, `翻牌 ${moves} 次 · ${sec} 秒 <span class="en">${moves} moves · ${sec} s</span>`, ()=>gFlip(S)); };
-  render();
+    gEnd('flip', `配對成功 ${spoken} / ${items.length} 對`, spoken, `翻牌 ${moves} 次 · ${sec} 秒 <span class="en">${moves} moves · ${sec} s</span>`, ()=>gFlip(S)); }
+  msg='👉 點兩張牌 Tap 2 cards'; render();
 }
 
 /* ---------- ⚡ 60 秒快問快答 ---------- */
