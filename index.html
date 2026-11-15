@@ -1023,7 +1023,7 @@ async function listen(opts={}){
   try{ speechSynthesis.cancel() }catch(e){}
   if (IS_IOS) await new Promise(r=>setTimeout(r,350));
 
-  const useRec = !!window.MediaRecorder && !(state.srOnly && SR);
+  const useRec = !!window.MediaRecorder && !(state.srOnly && SR) && !(opts.noRec && SR);
   let stream=null, recorder=null, chunks=[], mime='', peak=0, meterStop=null;
   if (useRec || !SR){
     stream = await getMic();
@@ -1042,9 +1042,9 @@ async function listen(opts={}){
     }catch(e){}
   }
   return new Promise(resolve=>{
-    let finalText='', interim='', active=true, sr=null, timer, err='';
+    let finalText='', interim='', active=true, sr=null, timer, err='', lastEvt=Date.now(), dog=null;
     const finish=()=>{
-      if(!active) return; active=false; current=null; clearTimeout(timer);
+      if(!active) return; active=false; current=null; clearTimeout(timer); clearInterval(dog);
       try{ sr && sr.abort ? sr.stop() : sr && sr.stop() }catch(e){}
       const done=()=>{
         meterStop && meterStop(); if(stream) releaseMic(stream);
@@ -1064,15 +1064,17 @@ async function listen(opts={}){
     current=finish;
     if (SR){
       const startSR=()=>{
-        sr=new SR(); sr.lang='zh-TW'; sr.interimResults=true; sr.continuous=!!opts.continuous; sr.maxAlternatives=1;
-        sr.onresult=e=>{ interim=''; for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i]; if(r.isFinal) finalText+=r[0].transcript; else interim+=r[0].transcript;} opts.onInterim && opts.onInterim(finalText+interim) };
+        lastEvt=Date.now(); sr=new SR(); sr.lang='zh-TW'; sr.interimResults=true; sr.continuous=!!opts.continuous; sr.maxAlternatives=1;
+        sr.onresult=e=>{ lastEvt=Date.now(); interim=''; for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i]; if(r.isFinal) finalText+=r[0].transcript; else interim+=r[0].transcript;} opts.onInterim && opts.onInterim(finalText+interim) };
         sr.onerror=e=>{ err=e.error||'error'; if(err==='not-allowed'||err==='service-not-allowed'){ toast('語音辨識被封鎖了 Speech recognition blocked'); } };
-        sr.onend=()=>{ if(!active) return;
+        sr.onend=()=>{ lastEvt=Date.now(); if(!active) return;
           if(opts.continuous && err!=='not-allowed' && err!=='service-not-allowed'){ if(finalText||interim){ finalText+=interim; interim=''; } setTimeout(()=>{ if(active){ try{ startSR() }catch(e){ finish() } } },150); }
           else setTimeout(finish,300) };
         try{ sr.start() }catch(e){ err='start-failed'; setTimeout(finish,300) }
       };
       startSR();
+      // 連續聽的時候，辨識有時會「卡住」不再回傳也不結束 → 自動重開
+      if(opts.continuous) dog=setInterval(()=>{ if(!active) return; if(Date.now()-lastEvt>7000){ const old=sr; if(old){ old.onend=null; old.onresult=null; old.onerror=null; try{ old.abort() }catch(e){} } if(interim){ finalText+=interim; interim=''; } setTimeout(()=>{ if(active){ try{ startSR() }catch(e){} } },250); } },1500);
     }
     timer=setTimeout(finish, opts.maxMs || 12000);
   });
@@ -2482,7 +2484,7 @@ function gEnd(id, title, score, detail, again){
 function gListen(ms, onWords, onState){
   if(!SR){ onState&&onState('off'); return {stop:()=>{}, done:Promise.resolve(null)}; }
   let last=0;
-  const done=listen({continuous:true, maxMs:ms, onInterim:t=>{ if(t.length<last) last=0; const fresh=t.slice(last); if(fresh && onWords(fresh)) last=t.length; }}).catch(()=>{ onState&&onState('nomic'); return null; });
+  const done=listen({continuous:true, noRec:true, maxMs:ms, onInterim:t=>{ if(t.length<last) last=0; const fresh=t.slice(last); if(fresh && onWords(fresh)) last=t.length; }}).catch(()=>{ onState&&onState('nomic'); return null; });
   onState&&onState('on');
   return {stop:()=>{ current&&current(); }, done};
 }
@@ -2499,13 +2501,13 @@ function gMole(S){
   const pop=()=>{ if(ended) return; if(tok!==GTOK) return finish(); const free=[...Array(HOLES).keys()].filter(i=>!active[i]); if(!free.length) return;
     const h=free[Math.floor(Math.random()*free.length)], it=pool[Math.floor(Math.random()*pool.length)];
     const el=app.querySelector(`[data-h="${h}"] .mole`); if(!el) return;
-    active[h]={it, until:Date.now()+6000}; shown++;
+    const id=Math.random(); active[h]={it, id}; shown++;
     el.innerHTML=`<div class="mface">🐹</div>${gCard(it,S.hint)}`; el.classList.add('up'); el.classList.remove('hit');
     el.onclick=()=>{ if(!SR || L==='tap') whack(h); };
-    setTimeout(()=>{ if(active[h] && active[h].it===it){ delete active[h]; miss++; el.classList.remove('up'); } }, 6000);
+    setTimeout(()=>{ if(active[h] && active[h].id===id){ delete active[h]; miss++; el.classList.remove('up'); } }, 6000);
   };
   const whack=h=>{ const a=active[h]; if(!a) return; delete active[h]; hits++; $('#gh').textContent=hits;
-    const el=app.querySelector(`[data-h="${h}"] .mole`); el.classList.add('hit'); el.querySelector('.mface').textContent='😵'; setTimeout(()=>el.classList.remove('up','hit'),450); };
+    const el=app.querySelector(`[data-h="${h}"] .mole`); el.classList.add('hit'); el.querySelector('.mface').textContent='😵'; setTimeout(()=>{ if(!active[h]) el.classList.remove('up','hit'); },450); };
   const lis=gListen(DUR, fresh=>{ const sh=$('#gheard'); if(sh) sh.textContent='「'+fresh.slice(-12)+'」';
       const h=Object.keys(active).find(k=>saidIt(fresh, active[k].it)); if(h!=null){ whack(+h); return true; } return false; },
     st=>{ L=st==='on'?'voice':'tap'; const m=$('#gm'); if(m) m.innerHTML=micBadge(st); });
