@@ -2440,16 +2440,18 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
    🎮 遊戲區：用說的打地鼠、說了才翻牌、60 秒快問快答、全班對抗賽
    詞語來自課本運動詞語＋我的詞庫；所有遊戲都要「說出來」
    ============================================================ */
+const GAME_SRC=[['l1','📘 Lesson 1 運動'],['l2','📗 Lesson 2 運動員'],['all','📚 All 全部'],['bank','⭐ 全班的詞庫 Class words']];
 function gamePool(src){
-  const sp=SPORTS.map(s=>({hz:s.hz, py:s.py, en:s.en, e:s.e, kw:s.kw||[]}));
-  let wb=[]; try{ const b=wordBank(); const ids=[...new Set(b.mine.concat(b.cls))]; wb=ids.map(zh=>{ const w=b.W[zh]; return {hz:zh, py:w.py, en:w.en, e:w.e||'⭐', kw:[]}; }); }catch(e){}
-  const all = src==='words' ? wb : src==='all' ? sp.concat(wb.filter(w=>!sp.some(s=>s.hz===w.hz))) : sp;
-  return all.length ? all : sp;
+  const mk=x=>({hz:x.hz, py:x.py, en:x.en, e:x.e, kw:x.kw||[]});
+  const l1=SPORTS.concat(FEEL).map(mk), l2=ATHLETE.map(mk);
+  let bank=[]; try{ const b=wordBank(); bank=Object.keys(b.W).map(zh=>{ const w=b.W[zh]; return {hz:zh, py:w.py||'', en:w.en||'', e:w.e||'⭐', kw:[]}; }); }catch(e){}
+  const all = src==='l2' ? l2 : src==='bank' ? bank : src==='all' ? l1.concat(l2) : l1;
+  return all.length>=6 ? all : l1;
 }
 function saidIt(text, it){ const n=norm(fixHomo(text, it.hz)); return [it.hz].concat(it.kw||[]).some(k=>k && n.includes(norm(k))); }
 const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 function gKey(){ return 'sp_games_'+(state.user.teacher||'')+'_'+(state.user.cls||'')+'_'+state.user.name; }
-function gameSettings(){ return Object.assign({src:'sports', hint:'easy', teams:['藍隊 Blue','紅隊 Red']}, store.get(gKey(),{})); }
+function gameSettings(){ const o=Object.assign({src:'l1', hint:'easy', teams:['藍隊 Blue','紅隊 Red']}, store.get(gKey(),{})); if(!GAME_SRC.some(x=>x[0]===o.src)) o.src=({sports:'l1',words:'bank'})[o.src]||'l1'; return o; }
 const GAMES = [
   {id:'mole',  e:'🔨', zh:'用說的打地鼠', en:'Voice Whack-a-Mole', d:'地鼠舉著運動圖，說出那個詞就打到牠！', den:'Say the word to whack the mole!', cls:'g1'},
   {id:'flip',  e:'🃏', zh:'說了才翻牌',   en:'Say-to-Match Cards', d:'翻到一對，說出來才算配對成功。', den:'Find a pair, then say it to keep it.', cls:'g2'},
@@ -2464,7 +2466,7 @@ function viewGames(){
     <div class="hint">每個遊戲都要<b>開口說</b>！ <span class="en">Every game is played by speaking!</span></div>
     <div class="card" style="margin-top:10px;padding:12px 16px">
       <div class="row" style="gap:14px;flex-wrap:wrap">
-        <span><b>詞語 Words：</b> ${[['sports','🏀 運動詞語'],['words','⭐ 我的詞庫'],['all','全部 All']].map(([k,l])=>`<button class="tab gsrc ${S.src===k?'on':''}" data-src="${k}">${l}</button>`).join('')}</span>
+        <span><b>詞語 Words：</b> ${GAME_SRC.map(([k,l])=>`<button class="tab gsrc ${S.src===k?'on':''}" data-src="${k}">${l}</button>`).join('')}</span>
         <span><b>提示 Hint：</b> ${[['easy','漢字＋拼音 Chinese + pinyin'],['hard','只有圖＋英文 Picture + English']].map(([k,l])=>`<button class="tab ghint ${S.hint===k?'on':''}" data-hint="${k}">${l}</button>`).join('')}</span>
       </div>
       ${SR?'':'<div class="warn" style="margin-top:8px">這個瀏覽器不能語音辨識，遊戲會改成用點的。建議用 Chrome 或 iPad Safari。 <span class="en">No speech recognition here — tap instead.</span></div>'}
@@ -2602,10 +2604,12 @@ function gClass(S){
       <h2 style="font-size:28px;font-weight:900">🏆 全班對抗賽 <span class="en" style="font-size:18px">Class Battle</span></h2>
       <div class="hint">用教室的電腦或投影。兩隊輪流派人到麥克風前回答，說對了得 1 分。老師也可以按 ＋／－ 調整分數。 <span class="en">Teams take turns at the mic. Say it right to score!</span></div>
       <div class="row" style="gap:12px;margin-top:12px;flex-wrap:wrap"><label>隊名 1 <input id="t0" value="${esc(teams[0])}" style="width:150px"></label><label>隊名 2 <input id="t1" value="${esc(teams[1])}" style="width:150px"></label></div>
+      <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>詞語 Words：</b>${GAME_SRC.map(([k,l])=>`<button class="tab ${S.src===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>
       <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>題目 Questions：</b>${[['word','🏀 看圖說詞語 Words'],['sent','💬 看英文說句子 Sentences']].map(([k,l])=>`<button class="tab ${st.mode===k?'on':''}" data-m="${k}">${l}</button>`).join('')}</div>
       <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>回合 Rounds：</b>${[6,10,16].map(n=>`<button class="tab ${st.rounds===n?'on':''}" data-r="${n}">${n}</button>`).join('')}<b style="margin-left:10px">每題 Time：</b>${[10,15,20].map(n=>`<button class="tab ${st.sec===n?'on':''}" data-s="${n}">${n}s</button>`).join('')}</div>
       <button class="btn btn-sun" id="go" style="width:100%;font-size:22px;margin-top:14px">▶️ 開始比賽 Start</button></div>`;
     $('#bk').onclick=()=>viewGames();
+    app.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{ S.src=b.dataset.cs; store.set(gKey(),S); setup(); });
     app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.m; store.set(gKey()+'_class',st); setup(); });
     app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ st.rounds=+b.dataset.r; store.set(gKey()+'_class',st); setup(); });
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ st.sec=+b.dataset.s; store.set(gKey()+'_class',st); setup(); });
