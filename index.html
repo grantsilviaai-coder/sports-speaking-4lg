@@ -2836,8 +2836,11 @@ function pyRuby(text){
 }
 /* 把後台的中英文建議，轉成「英文說明＋中文加拼音」 */
 function fbHTML(t, showScore){
-  return String(t||'').split(/\n\s*\n/).map(p=>{
-    const L=p.split('\n'); const head=L[0];
+  const GAME_RE=/打地鼠|翻牌|快問快答|對抗賽|出現 \d+ 隻|說對 \d+/;
+  const secs=String(t||'').split(/\n\s*\n/).filter(p=>showScore || !/Next steps/i.test(p.split('\n')[0]));
+  const html=secs.map(p=>{
+    const L=p.split('\n').filter(line=>!GAME_RE.test(line)); const head=L[0];
+    if(L.length<2 && !/[:：]\s*\S/.test(head)) return '';
     const m=head.match(/^(\S+)\s+[^A-Za-z]*?([A-Za-z][^:：]*)[:：]?\s*(.*)$/);
     const icon=m?m[1]:'', title=m?m[2].trim():head, rest=m?m[3]:'';
     let body='';
@@ -2853,6 +2856,7 @@ function fbHTML(t, showScore){
     }).join('')+'</ul>';
     return `<div class="fbsec"><b>${esc(icon)} ${esc(title)}</b>${body}</div>`;
   }).join('');
+  return html || (showScore?'':`<div class="fbsec"><b>🌟 Great job!</b><ul><li>No words or sentences to fix right now. Keep practicing!</li></ul></div>`);
 }
 async function loadFeedbackFor(name, teacher){
   if (!REMOTE) return '';
