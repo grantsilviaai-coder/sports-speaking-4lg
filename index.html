@@ -89,6 +89,11 @@ input,select{font:inherit}
 .steam{border-radius:20px;padding:10px;text-align:center;color:#fff;opacity:.6;transition:.2s}.steam.on{opacity:1;transform:scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,.2)}
 .st0{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.st1{background:linear-gradient(135deg,#b91c1c,#f87171)}
 .sname{font-size:24px;font-weight:900}.spts{font-size:70px;font-weight:900;line-height:1}.sadj{padding:2px 14px;font-size:18px}
+.sboard{margin-top:34px}.steam{position:relative}.steam:not(.on){opacity:.4;filter:grayscale(.5)}
+.steam.on{outline:6px solid #facc15;outline-offset:3px}
+.sturn{position:absolute;left:50%;top:-40px;transform:translateX(-50%);background:#facc15;color:#1e293b;font-weight:900;font-size:20px;padding:4px 14px;border-radius:999px;white-space:nowrap;animation:sbounce .9s infinite;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+@keyframes sbounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,6px)}}
+.tturn{padding:1px 8px;border-radius:8px;color:#fff}.tturn.t0{background:#1d4ed8}.tturn.t1{background:#b91c1c}
 .cq{margin:14px 0;text-align:center}.ctimer{height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden}#cbar{height:100%;width:100%;background:#f59e0b;transition:width .25s linear}
 .cmsg{text-align:center;font-size:22px;font-weight:900;margin-top:10px}.cans{font-size:40px;margin-top:6px}.cans rt{font-size:16px;color:#0e7490}
 @media (max-width:620px){.flips{grid-template-columns:repeat(3,1fr)}.hole{height:130px}}
@@ -2615,11 +2620,11 @@ function gClass(S){
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ st.sec=+b.dataset.s; store.set(gKey()+'_class',st); setup(); });
     $('#go').onclick=()=>{ teams[0]=$('#t0').value.trim()||teams[0]; teams[1]=$('#t1').value.trim()||teams[1]; S.teams=teams; store.set(gKey(),S);
       deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
-  const board=()=>`<div class="sboard">${teams.map((t,k)=>`<div class="steam st${k} ${turn===k?'on':''}"><div class="sname">${esc(t)}</div><div class="spts">${score[k]}</div><div class="row" style="justify-content:center;gap:6px"><button class="btn btn-ghost sadj" data-adj="${k},-1">－</button><button class="btn btn-ghost sadj" data-adj="${k},1">＋</button></div></div>`).join('')}</div>`;
+  const board=(fin)=>`<div class="sboard">${teams.map((t,k)=>`<div class="steam st${k} ${!fin&&turn===k?'on':''}">${!fin&&turn===k?'<div class="sturn">⬇️ 輪到你們！ Your turn! ⬇️</div>':''}<div class="sname">${esc(t)}</div><div class="spts">${score[k]}</div><div class="row" style="justify-content:center;gap:6px"><button class="btn btn-ghost sadj" data-adj="${k},-1">－</button><button class="btn btn-ghost sadj" data-adj="${k},1">＋</button></div></div>`).join('')}</div>`;
   const bindAdj=()=>app.querySelectorAll('[data-adj]').forEach(b=>b.onclick=()=>{ const [k,d]=b.dataset.adj.split(',').map(Number); score[k]=Math.max(0,score[k]+d); app.querySelectorAll('.spts')[k].textContent=score[k]; });
   const play=()=>{ if(round>=st.rounds) return final(); answered=false; const it=deck[round%deck.length]; let left=st.sec;
     app.innerHTML=`<div class="card gclass">${board()}
-      <div class="hint" style="text-align:center;margin-top:6px">第 ${round+1} / ${st.rounds} 題 · 輪到 <b>${esc(teams[turn])}</b> <span class="en">Round ${round+1} · ${esc(teams[turn])}'s turn</span></div>
+      <div class="hint" style="text-align:center;margin-top:6px">第 ${round+1} / ${st.rounds} 題 · ${turn===0?'⬅️ ':''}輪到 <b class="tturn t${turn}">${esc(teams[turn])}</b>${turn===1?' ➡️':''} <span class="en">Round ${round+1} · ${esc(teams[turn])}'s turn</span></div>
       <div class="cq">${it.sent?`<div class="ge">💬</div><div class="gen" style="font-size:34px">${esc(it.en)}</div>`:gCard(it,S.hint,true)}</div>
       <div class="ctimer"><div id="cbar"></div></div><div id="cmsg" class="cmsg">🎤 說吧！ Speak now! <span id="cheard"></span></div>
       <div class="row" style="justify-content:center;margin-top:10px"><button class="btn btn-ghost" id="cok">✅ 算對 Correct</button><button class="btn btn-ghost" id="cno">❌ 沒答對 Wrong</button><button class="btn btn-ghost" id="cend">🏁 結束 End</button></div></div>`;
@@ -2633,7 +2638,7 @@ function gClass(S){
         const ok = it.sent ? scoreText(fresh, it.hz)>=75 : saidIt(fresh,it); if(ok){ resolve(true); return true; } return false; }, ()=>{});
     const tok=GTOK; timer=setInterval(()=>{ if(tok!==GTOK){ clearInterval(timer); lis&&lis.stop(); return; } left-=0.25; const b=$('#cbar'); if(b) b.style.width=Math.max(0,left/st.sec*100)+'%'; if(left<=0) resolve(false); },250); };
   const final=()=>{ const w = score[0]===score[1] ? '平手！ It’s a tie!' : `🏆 ${esc(teams[score[0]>score[1]?0:1])} 贏了！ wins!`;
-    app.innerHTML=`<div class="card gclass" style="text-align:center"><div style="font-size:70px">🏆</div><h2 style="font-size:34px;font-weight:900">${w}</h2>${board()}
+    app.innerHTML=`<div class="card gclass" style="text-align:center"><div style="font-size:70px">🏆</div><h2 style="font-size:34px;font-weight:900">${w}</h2>${board(true)}
       <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="gb">🎮 遊戲區</button><button class="btn btn-sun" id="ga">🔁 再比一場 Rematch</button></div></div>`;
     app.querySelectorAll('.sadj').forEach(b=>b.remove());
     $('#gb').onclick=()=>viewGames(); $('#ga').onclick=()=>{ deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
