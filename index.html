@@ -87,7 +87,9 @@ input,select{font:inherit}
 .gflash{animation:l7pulse .4s}
 .sboard{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .steam{border-radius:20px;padding:10px;text-align:center;color:#fff;opacity:.6;transition:.2s}.steam.on{opacity:1;transform:scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,.2)}
-.st0{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.st1{background:linear-gradient(135deg,#b91c1c,#f87171)}
+.st0{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.st1{background:linear-gradient(135deg,#b91c1c,#f87171)}.st2{background:linear-gradient(135deg,#15803d,#4ade80)}
+.sboard.n3{grid-template-columns:1fr 1fr 1fr}.sboard.n3 .sturn{font-size:16px}.tturn.t2{background:#15803d}
+.cright{font-size:30px;color:#15803d;animation:l7pulse .5s}
 .sname{font-size:24px;font-weight:900}.spts{font-size:70px;font-weight:900;line-height:1}.sadj{padding:2px 14px;font-size:18px}
 .sboard{margin-top:34px}.steam{position:relative}.steam:not(.on){opacity:.4;filter:grayscale(.5)}
 .steam.on{outline:6px solid #facc15;outline-offset:3px}
@@ -2602,46 +2604,60 @@ function gSpeed(S){
 
 /* ---------- 🏆 全班對抗賽（投影用） ---------- */
 function gClass(S){
-  const st=Object.assign({mode:'word', rounds:10, sec:10}, store.get(gKey()+'_class',{}));
-  const teams=S.teams.slice(); let score=[0,0], round=0, turn=0, deck=[], timer=null, lis=null, answered=false;
+  const st=Object.assign({mode:'word', per:5, sec:10, n:2}, store.get(gKey()+'_class',{}));
+  const DEF=['藍隊 Blue','紅隊 Red','綠隊 Green'];
+  const teams=DEF.map((d,k)=>(S.teams&&S.teams[k])||d);
+  let score=[], round=0, turn=0, deck=[], timer=null, lis=null, answered=false, auto=null;
+  const N=()=>st.n, total=()=>st.per*st.n;
+  const saveSt=()=>store.set(gKey()+'_class',st);
   const sentDeck=()=>shuffle(BUILD.map(b=>({hz:b.w.map(t=>t.split('|')[0]).join('')+b.end, py:b.w.map(t=>(t.split('|')[1]||'').replace(/_/g,' ')).join(' '), en:b.en, e:'💬', sent:true})));
+  const start=()=>{ deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=Array(N()).fill(0); round=0; turn=0; play(); };
   const setup=()=>{ app.innerHTML=`<button class="back" id="bk">← 遊戲區 Games</button><div class="card">
       <h2 style="font-size:28px;font-weight:900">🏆 全班對抗賽 <span class="en" style="font-size:18px">Class Battle</span></h2>
-      <div class="hint">用教室的電腦或投影。兩隊輪流派人到麥克風前回答，說對了得 1 分。老師也可以按 ＋／－ 調整分數。 <span class="en">Teams take turns at the mic. Say it right to score!</span></div>
-      <div class="row" style="gap:12px;margin-top:12px;flex-wrap:wrap"><label>隊名 1 <input id="t0" value="${esc(teams[0])}" style="width:150px"></label><label>隊名 2 <input id="t1" value="${esc(teams[1])}" style="width:150px"></label></div>
+      <div class="hint">用教室的電腦或投影。各隊輪流派人到麥克風前回答，說對了得 1 分，自動換下一隊。老師也可以按 ＋／－ 調整分數。 <span class="en">Teams take turns at the mic. Say it right to score!</span></div>
+      <div class="row" style="gap:10px;margin-top:12px;flex-wrap:wrap"><b>隊伍 Teams：</b>${[2,3].map(n=>`<button class="tab ${st.n===n?'on':''}" data-n="${n}">${n} 隊 teams</button>`).join('')}</div>
+      <div class="row" style="gap:12px;margin-top:10px;flex-wrap:wrap">${teams.slice(0,N()).map((t,k)=>`<label><span class="tturn t${k}">隊名 ${k+1}</span> <input id="t${k}" value="${esc(t)}" style="width:150px"></label>`).join('')}</div>
       <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>詞語 Words：</b>${GAME_SRC.map(([k,l])=>`<button class="tab ${S.src===k?'on':''}" data-cs="${k}">${l}</button>`).join('')}</div>
       <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>題目 Questions：</b>${[['word','🏀 看圖說詞語 Words'],['sent','💬 看英文說句子 Sentences']].map(([k,l])=>`<button class="tab ${st.mode===k?'on':''}" data-m="${k}">${l}</button>`).join('')}</div>
-      <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>回合 Rounds：</b>${[6,10,16].map(n=>`<button class="tab ${st.rounds===n?'on':''}" data-r="${n}">${n}</button>`).join('')}<b style="margin-left:10px">每題 Time：</b>${[10,15,20].map(n=>`<button class="tab ${st.sec===n?'on':''}" data-s="${n}">${n}s</button>`).join('')}</div>
+      <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><b>每隊幾題 Per team：</b>${[3,5,8].map(n=>`<button class="tab ${st.per===n?'on':''}" data-r="${n}">${n}</button>`).join('')}<span class="hint">（共 ${total()} 題）</span><b style="margin-left:10px">每題 Time：</b>${[10,15,20].map(n=>`<button class="tab ${st.sec===n?'on':''}" data-s="${n}">${n}s</button>`).join('')}</div>
       <button class="btn btn-sun" id="go" style="width:100%;font-size:22px;margin-top:14px">▶️ 開始比賽 Start</button></div>`;
+    const keepNames=()=>{ for(let k=0;k<N();k++){ const i=$('#t'+k); if(i) teams[k]=i.value.trim()||DEF[k]; } S.teams=teams.slice(); store.set(gKey(),S); };
     $('#bk').onclick=()=>viewGames();
-    app.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{ S.src=b.dataset.cs; store.set(gKey(),S); setup(); });
-    app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ st.mode=b.dataset.m; store.set(gKey()+'_class',st); setup(); });
-    app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ st.rounds=+b.dataset.r; store.set(gKey()+'_class',st); setup(); });
-    app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ st.sec=+b.dataset.s; store.set(gKey()+'_class',st); setup(); });
-    $('#go').onclick=()=>{ teams[0]=$('#t0').value.trim()||teams[0]; teams[1]=$('#t1').value.trim()||teams[1]; S.teams=teams; store.set(gKey(),S);
-      deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
-  const board=(fin)=>`<div class="sboard">${teams.map((t,k)=>`<div class="steam st${k} ${!fin&&turn===k?'on':''}">${!fin&&turn===k?'<div class="sturn">⬇️ 輪到你們！ Your turn! ⬇️</div>':''}<div class="sname">${esc(t)}</div><div class="spts">${score[k]}</div><div class="row" style="justify-content:center;gap:6px"><button class="btn btn-ghost sadj" data-adj="${k},-1">－</button><button class="btn btn-ghost sadj" data-adj="${k},1">＋</button></div></div>`).join('')}</div>`;
+    app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ keepNames(); st.n=+b.dataset.n; saveSt(); setup(); });
+    app.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{ keepNames(); S.src=b.dataset.cs; store.set(gKey(),S); setup(); });
+    app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ keepNames(); st.mode=b.dataset.m; saveSt(); setup(); });
+    app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{ keepNames(); st.per=+b.dataset.r; saveSt(); setup(); });
+    app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ keepNames(); st.sec=+b.dataset.s; saveSt(); setup(); });
+    $('#go').onclick=()=>{ keepNames(); start(); }; };
+  const board=(fin)=>`<div class="sboard n${N()}">${teams.slice(0,N()).map((t,k)=>`<div class="steam st${k} ${!fin&&turn===k?'on':''}">${!fin&&turn===k?'<div class="sturn">⬇️ 輪到你們！ Your turn! ⬇️</div>':''}<div class="sname">${esc(t)}</div><div class="spts">${score[k]}</div><div class="row" style="justify-content:center;gap:6px"><button class="btn btn-ghost sadj" data-adj="${k},-1">－</button><button class="btn btn-ghost sadj" data-adj="${k},1">＋</button></div></div>`).join('')}</div>`;
   const bindAdj=()=>app.querySelectorAll('[data-adj]').forEach(b=>b.onclick=()=>{ const [k,d]=b.dataset.adj.split(',').map(Number); score[k]=Math.max(0,score[k]+d); app.querySelectorAll('.spts')[k].textContent=score[k]; });
-  const play=()=>{ if(round>=st.rounds) return final(); answered=false; const it=deck[round%deck.length]; let left=st.sec;
+  const next=()=>{ clearTimeout(auto); round++; turn=(turn+1)%N(); play(); };
+  const play=()=>{ clearTimeout(auto); if(round>=total()) return final(); answered=false; const it=deck[round%deck.length]; let left=st.sec;
     app.innerHTML=`<div class="card gclass">${board()}
-      <div class="hint" style="text-align:center;margin-top:6px">第 ${round+1} / ${st.rounds} 題 · ${turn===0?'⬅️ ':''}輪到 <b class="tturn t${turn}">${esc(teams[turn])}</b>${turn===1?' ➡️':''} <span class="en">Round ${round+1} · ${esc(teams[turn])}'s turn</span></div>
+      <div class="hint" style="text-align:center;margin-top:6px">第 ${round+1} / ${total()} 題 · 輪到 <b class="tturn t${turn}">${esc(teams[turn])}</b> <span class="en">Round ${round+1} · ${esc(teams[turn])}'s turn</span></div>
       <div class="cq">${it.sent?`<div class="ge">💬</div><div class="gen" style="font-size:34px">${esc(it.en)}</div>`:gCard(it,S.hint,true)}</div>
       <div class="ctimer"><div id="cbar"></div></div><div id="cmsg" class="cmsg">🎤 說吧！ Speak now! <span id="cheard"></span></div>
       <div class="row" style="justify-content:center;margin-top:10px"><button class="btn btn-ghost" id="cok">✅ 算對 Correct</button><button class="btn btn-ghost" id="cno">❌ 沒答對 Wrong</button><button class="btn btn-ghost" id="cend">🏁 結束 End</button></div></div>`;
     bindAdj();
     const resolve=ok=>{ if(answered) return; answered=true; clearInterval(timer); lis&&lis.stop(); if(ok){ score[turn]++; } ['#cok','#cno'].forEach(q=>$(q)&&$(q).classList.add('hidden'));
-      $('#cmsg').innerHTML = (ok?`🎉 <b>${esc(teams[turn])} +1！</b>`:'⏰ 時間到 / 沒答對 Time’s up')+`<div class="cans"><ruby>${esc(it.hz)}<rt>${esc(it.py)}</rt></ruby> <button class="btn btn-ghost" id="csay" style="padding:4px 10px">🔊</button></div><button class="btn btn-sun" id="cnext" style="margin-top:8px">下一題 Next ➜</button>`;
+      const nt=teams[(turn+1)%N()], last=round+1>=total();
+      $('#cmsg').innerHTML = (ok?`<div class="cright">✅ 正確！ Correct! <b>${esc(teams[turn])} +1</b></div>`:'⏰ 時間到 / 沒答對 Time’s up')
+        +`<div class="cans"><ruby>${esc(it.hz)}<rt>${esc(it.py)}</rt></ruby> <button class="btn btn-ghost" id="csay" style="padding:4px 10px">🔊</button></div>`
+        +(ok?`<div class="hint" style="font-size:16px">${last?'🏁 看結果… Results…':`➡️ 換 <b>${esc(nt)}</b>… Next team…`}</div>`:`<button class="btn btn-sun" id="cnext" style="margin-top:8px">${last?'🏁 看結果 Results':`下一題 Next ➜ ${esc(nt)}`}</button>`);
       app.querySelectorAll('.spts')[turn].textContent=score[turn];
-      $('#csay').onclick=()=>say(it.hz); $('#cnext').onclick=()=>{ round++; turn=1-turn; play(); }; };
+      $('#csay').onclick=()=>{ clearTimeout(auto); say(it.hz); if(ok) auto=setTimeout(next,3000); };
+      if(ok){ const tk=GTOK; auto=setTimeout(()=>{ if(tk===GTOK) next(); },2200); }
+      else $('#cnext').onclick=next; };
     $('#cok').onclick=()=>resolve(true); $('#cno').onclick=()=>resolve(false); $('#cend').onclick=()=>{ clearInterval(timer); lis&&lis.stop(); final(); };
     lis = gListen(st.sec*1000+500, fresh=>{ const h=$('#cheard'); if(h) h.textContent='「'+fresh.slice(-16)+'」';
         const ok = it.sent ? scoreText(fresh, it.hz)>=75 : saidIt(fresh,it); if(ok){ resolve(true); return true; } return false; }, ()=>{});
     const tok=GTOK; timer=setInterval(()=>{ if(tok!==GTOK){ clearInterval(timer); lis&&lis.stop(); return; } left-=0.25; const b=$('#cbar'); if(b) b.style.width=Math.max(0,left/st.sec*100)+'%'; if(left<=0) resolve(false); },250); };
-  const final=()=>{ const w = score[0]===score[1] ? '平手！ It’s a tie!' : `🏆 ${esc(teams[score[0]>score[1]?0:1])} 贏了！ wins!`;
+  const final=()=>{ clearTimeout(auto); const sc=score.slice(0,N()), mx=Math.max(...sc), win=sc.map((v,k)=>v===mx?k:-1).filter(k=>k>=0);
+    const w = win.length>1 ? `平手！ It’s a tie! ${win.map(k=>esc(teams[k])).join('、')}` : `🏆 ${esc(teams[win[0]])} 贏了！ wins!`;
     app.innerHTML=`<div class="card gclass" style="text-align:center"><div style="font-size:70px">🏆</div><h2 style="font-size:34px;font-weight:900">${w}</h2>${board(true)}
-      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="gb">🎮 遊戲區</button><button class="btn btn-sun" id="ga">🔁 再比一場 Rematch</button></div></div>`;
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn btn-ghost" id="gb">🎮 遊戲區</button><button class="btn btn-ghost" id="gset">⚙️ 改設定 Settings</button><button class="btn btn-sun" id="ga">🔁 再比一場 Rematch</button></div></div>`;
     app.querySelectorAll('.sadj').forEach(b=>b.remove());
-    $('#gb').onclick=()=>viewGames(); $('#ga').onclick=()=>{ deck = st.mode==='sent' ? sentDeck() : shuffle(gamePool(S.src)); score=[0,0]; round=0; turn=0; play(); }; };
+    $('#gb').onclick=()=>viewGames(); $('#gset').onclick=setup; $('#ga').onclick=start; };
   setup();
 }
 
