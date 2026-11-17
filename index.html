@@ -99,6 +99,9 @@ input,select{font:inherit}
 .cq{margin:14px 0;text-align:center}.ctimer{height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden}#cbar{height:100%;width:100%;background:#f59e0b;transition:width .25s linear}
 .cmsg{text-align:center;font-size:22px;font-weight:900;margin-top:10px}.cans{font-size:40px;margin-top:6px}.cans rt{font-size:16px;color:#0e7490}
 @media (max-width:620px){.flips{grid-template-columns:repeat(3,1fr)}.hole{height:130px}}
+.mergebox{margin:12px 0;background:#eff6ff;border:3px dashed #60a5fa;border-radius:18px;padding:12px 16px}
+.mtag{display:inline-block;background:#1d4ed8;color:#fff;font-weight:900;font-size:14px;padding:2px 10px;border-radius:999px;margin-right:8px;vertical-align:middle}
+.mpair{font-size:26px;font-weight:800;margin-top:6px;line-height:2}.mplus{margin-top:6px;font-size:22px;font-weight:900;color:#1d4ed8}
 .tiles{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
 .tile{position:relative;width:118px;height:118px;border-radius:22px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 rgba(0,0,0,.15);text-align:center;line-height:1.15}
 .tile:active{transform:translateY(3px);box-shadow:none}
@@ -694,13 +697,46 @@ function buildPatterns(){
   });
   P.push(inv);
 
-  // ❼ 都 (L2)
+  // ❼ 都 (L2)：10 題。🖼️ 看圖說句子（pic）＋ 🔗 用「都」把兩個句子合成一句（merge）
   const dou = {id:'dou', name:'❼ 都 (L2)', items:[]};
+  const DOU_Q=[W('用','yòng'),W('「都」','「dōu」'),W('把','bǎ'),W('兩個','liǎng ge'),W('句子','jùzi'),W('合成','héchéng'),W('一句','yí jù'),X];
+  const douPic=(id,q,qen,e,tk,en,frame,a,aen)=>dou.items.push({id:'dou-'+id, kind:'pic', q, qen, cue:{e, tk, en}, frame, a, aen});
+  const douMerge=(id,pair,pairEn,_a,_b,a,aen,frame)=>dou.items.push({id:'dou-'+id, kind:'merge', q:DOU_Q, qen:'Combine the two sentences into one with 都 (both / all).',
+      pair, pairEn, cue:{e:'🔗', tk:[W('都','dōu')], en:'both / all'}, frame, a, aen, how:'把兩句合成一句，說出來 Say it as ONE sentence:'});
+  const BA=W('爸爸','bàba'), MA=W('媽媽','māma'), HE=W('和','hé'), DOU=W('都','dōu'), XH=W('喜歡','xǐhuan'), YE=W('也','yě');
+  // 1 🖼️ 妹妹 羽毛球（原本的題目）
   [['妹妹','mèimei','👧','my younger sister','yumao'],['哥哥','gēge','👦','my older brother','bangqiu']].forEach(([h,p,e,en,id])=>{const s=SP[id];
-    dou.items.push({id:'dou-'+id, q:[W('你','nǐ'),W('和','hé'),W(h,p),W('喜歡','xǐhuan'),W('什麼','shénme'),W('運動','yùndòng'),Q], qen:`What sport do you and ${en} like?`,
-      cue:{e:'🙋 '+e+' ❤️ '+s.e, tk:[W('都','dōu'),st(s)], en:'both'}, frame:[W('我','wǒ'),W('和','hé'),W(h,p),'_',W('喜歡','xǐhuan'),'_',D],
-      a:[W('我','wǒ'),W('和','hé'),W(h,p),W('都','dōu'),W('喜歡','xǐhuan'),st(s),D], aen:`${cap(en)} and I both like ${ing(s.en)}.`});
+    douPic(id, [W('你','nǐ'),HE,W(h,p),XH,W('什麼','shénme'),W('運動','yùndòng'),Q], `What sport do you and ${en} like?`,
+      '🙋 '+e+' ❤️ '+s.e, [DOU,st(s)], 'both', [W('我','wǒ'),HE,W(h,p),'_',XH,'_',D],
+      [W('我','wǒ'),HE,W(h,p),DOU,XH,st(s),D], `${cap(en)} and I both like ${ing(s.en)}.`);
   });
+  // 3 🔗 爸爸 媽媽 打排球
+  douMerge('m1', [BA,XH,st(SP.paiqiu),C,MA,YE,XH,st(SP.paiqiu),D], 'Dad likes volleyball. Mom also likes volleyball.',
+    0,0, [BA,HE,MA,DOU,XH,st(SP.paiqiu),D], 'Dad and Mom both like playing volleyball.', [BA,HE,MA,'_','_',D]);
+  // 4 🖼️ 我們 踢足球
+  douPic('women', [W('你們','nǐmen'),XH,W('什麼','shénme'),W('運動','yùndòng'),Q], 'What sport do you (all) like?',
+    '👦👧👦 ❤️ ⚽', [DOU,st(SP.zuqiu)], 'all of us', [W('我們','wǒmen'),'_',XH,'_',D],
+    [W('我們','wǒmen'),DOU,XH,st(SP.zuqiu),D], 'We all like playing soccer.');
+  // 5 🔗 我 好朋友 會游泳
+  douMerge('m2', [W('我','wǒ'),W('會','huì'),st(SP.youyong),C,W('我的','wǒ de'),W('好朋友','hǎo péngyou'),YE,W('會','huì'),st(SP.youyong),D], 'I can swim. My good friend can also swim.',
+    0,0, [W('我','wǒ'),HE,W('我的','wǒ de'),W('好朋友','hǎo péngyou'),DOU,W('會','huì'),st(SP.youyong),D], 'My good friend and I can both swim.', [W('我','wǒ'),HE,W('我的','wǒ de'),W('好朋友','hǎo péngyou'),'_','_',D]);
+  // 6 🖼️ 爸爸媽媽 會騎腳踏車
+  douPic('bama', [W('你的','nǐ de'),BA,MA,W('會','huì'),st(SP.jiaotache),W('嗎','ma'),Q], 'Can your dad and mom ride a bike?',
+    '👨👩 ✅ 🚴', [DOU,W('會','huì'),st(SP.jiaotache)], 'both can', [W('我的','wǒ de'),BA,MA,'_','_',D],
+    [W('我的','wǒ de'),BA,MA,DOU,W('會','huì'),st(SP.jiaotache),D], 'My dad and mom can both ride a bike.');
+  // 7 🔗 哥哥 弟弟 校隊選手
+  douMerge('m3', [W('哥哥','gēge'),W('是','shì'),W('校隊','xiàoduì'),W('的','de'),W('選手','xuǎnshǒu'),C,W('弟弟','dìdi'),YE,W('是','shì'),W('校隊','xiàoduì'),W('的','de'),W('選手','xuǎnshǒu'),D], 'My older brother is on the school team. My younger brother is also on the school team.',
+    0,0, [W('哥哥','gēge'),HE,W('弟弟','dìdi'),DOU,W('是','shì'),W('校隊','xiàoduì'),W('的','de'),W('選手','xuǎnshǒu'),D], 'My older and younger brothers are both players on the school team.', [W('哥哥','gēge'),HE,W('弟弟','dìdi'),'_','_',D]);
+  // 8 🖼️ 他們 很會打網球
+  douPic('tamen', [W('他們','tāmen'),st(SP.wangqiu),W('打得','dǎ de'),W('怎麼樣','zěnmeyàng'),Q], 'How well do they play tennis?',
+    '👦👦 💪 🎾', [DOU,W('很會','hěn huì'),st(SP.wangqiu)], 'both very good at', [W('他們','tāmen'),'_','_',st(SP.wangqiu),D],
+    [W('他們','tāmen'),DOU,W('很會','hěn huì'),st(SP.wangqiu),D], 'They are both very good at tennis.');
+  // 9 🔗 小明 小美 覺得跑步很輕鬆
+  douMerge('m4', [W('小明','Xiǎomíng'),W('覺得','juéde'),st(SP.paobu),W('很','hěn'),W('輕鬆','qīngsōng'),C,W('小美','Xiǎoměi'),YE,W('覺得','juéde'),st(SP.paobu),W('很','hěn'),W('輕鬆','qīngsōng'),D], 'Xiaoming thinks running is easy. Xiaomei also thinks running is easy.',
+    0,0, [W('小明','Xiǎomíng'),HE,W('小美','Xiǎoměi'),DOU,W('覺得','juéde'),st(SP.paobu),W('很','hěn'),W('輕鬆','qīngsōng'),D], 'Xiaoming and Xiaomei both think running is easy.', [W('小明','Xiǎomíng'),HE,W('小美','Xiǎoměi'),'_','_',D]);
+  // 10 🔗 老師 同學們 很喜歡爬山
+  douMerge('m5', [W('老師','lǎoshī'),W('很','hěn'),XH,st(SP.pashan),C,W('同學們','tóngxuémen'),YE,W('很','hěn'),XH,st(SP.pashan),D], 'The teacher really likes hiking. The classmates also really like hiking.',
+    0,0, [W('老師','lǎoshī'),HE,W('同學們','tóngxuémen'),DOU,W('很','hěn'),XH,st(SP.pashan),D], 'The teacher and the classmates all really like hiking.', [W('老師','lǎoshī'),HE,W('同學們','tóngxuémen'),'_','_',D]);
   P.push(dou);
 
   // ❽ 一樣 (L2)
@@ -1453,8 +1489,9 @@ function viewL2(arg){
         <div><div class="q">${ruby(it.q)}</div><div class="en" style="font-size:18px">${esc(it.qen)}</div></div>
         <button class="btn btn-sky" id="lisQ">🔊 聽問題</button>
       </div>
-      <div class="cue"><span class="e">${it.cue.e}</span><span><span class="h">${ruby(it.cue.tk)}</span><br><span class="en">${esc(it.cue.en)}</span></span></div>
-      <div class="hint">用這個句型回答 Answer with this pattern:</div>
+      ${it.kind==='merge'?`<div class="mergebox"><div class="mtag">🔗 合併句子 Combine</div><div class="mpair">${ruby(it.pair)}</div><div class="en" style="font-size:15px">${esc(it.pairEn)}</div><div class="mplus">＋ <span class="h">${ruby(it.cue.tk)}</span> <span class="en">${esc(it.cue.en)}</span> ＝ ？</div></div>`
+        :`<div class="cue">${it.kind==='pic'?'<span class="mtag">🖼️ 看圖說 Look & say</span>':''}<span class="e">${it.cue.e}</span><span><span class="h">${ruby(it.cue.tk)}</span><br><span class="en">${esc(it.cue.en)}</span></span></div>`}
+      <div class="hint">${it.how||'用這個句型回答 Answer with this pattern:'}</div>
       <div class="frame">${ruby(it.frame)}</div>
       <div class="row" style="margin-top:8px"><button class="btn btn-ghost" id="showA">💡 看答案 Show answer</button></div>
       <div class="answer hidden" id="ans">${ruby(it.a)}<div class="en" style="font-size:16px">${esc(it.aen)}</div></div>
@@ -1467,12 +1504,13 @@ function viewL2(arg){
     </div>`;
   $('#bk').onclick=()=>go('home');
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go('l2',{p:+b.dataset.i,i:0}));
-  $('#lisQ').onclick=()=>say(qText);
+  const sayQ=()=>say(it.kind==='merge'? S_txt(it.pair) : qText);
+  $('#lisQ').onclick=sayQ;
   $('#showA').onclick=()=>{ $('#ans').classList.toggle('hidden'); if(!$('#ans').classList.contains('hidden')) say(aText) };
   $('#pv').onclick=()=>{ if(idx>0) go('l2',{p:pIdx,i:idx-1}); else if(pIdx>0) go('l2',{p:pIdx-1,i:PATTERNS[pIdx-1].items.length-1}) };
   $('#nx').onclick=()=>{ if(idx<pat.items.length-1) go('l2',{p:pIdx,i:idx+1}); else if(pIdx<PATTERNS.length-1) go('l2',{p:pIdx+1,i:0}); else { toast('全部完成！All done! 🎉'); go('home') } };
   mountSpeak($('#spk'),{target:aText, level:'L2 句型', item:'L2-'+it.id, maxMs:12000, onDone:()=>{ const d=app.querySelectorAll('.dot')[idx]; d && d.classList.add('done') }});
-  setTimeout(()=>say(qText),250);
+  setTimeout(sayQ,250);
 }
 
 /* ---------- LEVEL 3: chat with 文文 ---------- */
