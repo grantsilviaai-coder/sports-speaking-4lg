@@ -102,6 +102,18 @@ input,select{font:inherit}
 .mergebox{margin:12px 0;background:#eff6ff;border:3px dashed #60a5fa;border-radius:18px;padding:12px 16px}
 .mtag{display:inline-block;background:#1d4ed8;color:#fff;font-weight:900;font-size:14px;padding:2px 10px;border-radius:999px;margin-right:8px;vertical-align:middle}
 .mpair{font-size:26px;font-weight:800;margin-top:6px;line-height:2}.mplus{margin-top:6px;font-size:22px;font-weight:900;color:#1d4ed8}
+.level.locked .prog,.level.locked .tprog{display:none}
+.level.locked,.tile.locked{filter:grayscale(1);opacity:.45;position:relative}
+.lockb{position:absolute;right:10px;bottom:10px;background:#1e293b;color:#fff;font-size:13px;font-weight:800;padding:3px 10px;border-radius:999px}
+.tile .lockb{left:50%;right:auto;transform:translateX(-50%);bottom:-8px;font-size:11px;white-space:nowrap}
+.lvgroup{margin-top:14px;border-radius:16px;padding:10px 14px;background:#f8fafc;border:2px solid #e2e8f0}
+.lvgroup.st-s{border-color:#86efac}.lvgroup.st-d{border-color:#93c5fd}.lvgroup.st-t{border-color:#f9a8d4}.lvgroup.st-g{border-color:#a5b4fc}
+.lvrows{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-top:8px}
+.lvrow{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:8px 12px;cursor:pointer;opacity:.7}
+.lvrow.on{opacity:1;border-color:#22c55e}.lvno{font-weight:900;font-size:18px;min-width:28px;text-align:center}.lvname{flex:1}.lvstate{font-size:13px;font-weight:800;color:#64748b}.lvrow.on .lvstate{color:#15803d}
+.sw{appearance:none;width:52px;height:30px;border-radius:999px;background:#cbd5e1;position:relative;cursor:pointer;transition:.2s;flex:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw:checked{background:#22c55e}.sw:checked::after{left:25px}
 .tiles{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
 .tile{position:relative;width:118px;height:118px;border-radius:22px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 rgba(0,0,0,.15);text-align:center;line-height:1.15}
 .tile:active{transform:translateY(3px);box-shadow:none}
@@ -1306,6 +1318,7 @@ function mountSpeak(el, o){
    ============================================================ */
 let GTOK=0;
 function go(view, arg){
+  if (isClosed(view)){ toast(LOCK_MSG); view='home'; arg=undefined; }
   GTOK++; stopAll(); document.querySelector('.gover')?.remove(); document.getElementById('tfloat')?.remove(); document.getElementById('fbModal')?.remove();
   if (view!=='teacher' && typeof tAuto!=='undefined') clearInterval(tAuto);
   state.teacher = view==='teacher';
@@ -1409,7 +1422,8 @@ function viewHome(){
       <button class="level l8" data-v="l8"><span class="num">LEVEL 12 · 情境任務</span><span class="ico">🌟</span><span class="t">情境任務</span><span class="d">外國朋友・社團招生・小記者<br><span class="en" style="color:#fff">Real-life missions</span></span><span class="prog">3 個情境・兩人一組</span></button>
     </div></div>
     `;
-  app.querySelectorAll('.level,.t-wb,.t-gm').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  app.querySelectorAll('.level,.t-wb,.t-gm').forEach(b=>b.onclick=()=>{ if(isClosed(b.dataset.v)) return toast(LOCK_MSG); go(b.dataset.v); });
+  applyLocks(); loadClosed(state.user.teacher).then(()=>{ if(app.querySelector('.tiles')) applyLocks(); });
   $('#tMic').onclick=openMic;
   $('#tFb').onclick=()=>{ if(state.fbText) showFb(state.fbText); else toast('先練習幾題，就會有建議喔！ Practice a few items first!'); };
   /* 💡 給你的建議：登入後、每次練習完回到首頁，都跳出最新的回饋 */
@@ -2481,6 +2495,54 @@ async function sceneFinish(sc, S, names, res, used, dur, show){
 }
 
 
+
+/* ============================================================
+   ⚙️ 關卡開關：老師在後台打開／關閉關卡（每位老師各自設定）
+   存在 Google 試算表「關卡開關」；沒有後台時存在這台電腦
+   ============================================================ */
+const LEVEL_LIST = [
+  {st:'s', stage:'🌱 第一階段：學會 Surface', v:'l1', no:'1',  zh:'詞語暖身', en:'Word Warm-up'},
+  {st:'s', v:'l2', no:'2',  zh:'句型練習', en:'Sentence Patterns'},
+  {st:'s', v:'lb', no:'3',  zh:'排句子', en:'Build the sentence'},
+  {st:'d', stage:'🌳 第二階段：想通 Deep', v:'l3', no:'4',  zh:'和文文聊天', en:'Chat with Wenwen'},
+  {st:'d', v:'l4', no:'5',  zh:'我來說一說', en:'Give a short talk'},
+  {st:'d', v:'l5', no:'6',  zh:'進階挑戰', en:'Read, think & say'},
+  {st:'d', v:'ld', no:'7',  zh:'小偵探', en:'Sentence Detective'},
+  {st:'d', v:'ls', no:'8',  zh:'分一分，說理由', en:'Sort & explain'},
+  {st:'d', v:'lc', no:'9',  zh:'我跟你一樣嗎？', en:'Same or different?'},
+  {st:'d', v:'l6', no:'10', zh:'對話工作坊', en:'Dialogue Workshop'},
+  {st:'t', stage:'🚀 第三階段：用出來 Transfer', v:'l7', no:'11', zh:'對話測驗', en:'Dialogue Test'},
+  {st:'t', v:'l8', no:'12', zh:'情境任務', en:'Real-life Missions'},
+  {st:'g', stage:'🎮 遊戲區 Games', v:'games', no:'🎮', zh:'整個遊戲區', en:'Whole Games area'},
+  {st:'g', v:'g:mole',  no:'🔨', zh:'用說的打地鼠', en:'Voice Whack-a-Mole'},
+  {st:'g', v:'g:flip',  no:'🃏', zh:'說了才翻牌', en:'Say-to-Match Cards'},
+  {st:'g', v:'g:speed', no:'⚡', zh:'60 秒快問快答', en:'60-Second Speed Round'},
+  {st:'g', v:'g:class', no:'🏆', zh:'全班對抗賽', en:'Class Battle'},
+  {st:'o', stage:'🧰 其他 Others', v:'lw', no:'⭐', zh:'我的詞庫', en:'My words'}
+];
+const LV_VIEWS = new Set(LEVEL_LIST.map(x=>x.v));
+const lvKey = t=>'sp_closed_'+(t||'');
+function closedSet(t){ return new Set(store.get(lvKey(t),[])); }
+async function loadClosed(t){
+  if (!REMOTE) return closedSet(t);
+  try{ const r=await fetch(`${CONFIG.SCRIPT_URL}?action=levels&teacher=${encodeURIComponent(t||'')}`); const j=await r.json(); if(j.ok){ store.set(lvKey(t), j.closed||[]); } }catch(e){}
+  return closedSet(t);
+}
+async function saveClosed(t, list){
+  store.set(lvKey(t), list);
+  if (!REMOTE) return;
+  const r=await fetch(CONFIG.SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'setLevels', pin:CONFIG.TEACHER_PIN, teacher:t||'', closed:list})});
+  const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed');
+}
+function isClosed(v){ return !!(state.user && !state.teacher && LV_VIEWS.has(v) && closedSet(state.user.teacher).has(v)); }
+const LOCK_MSG='🔒 這一關老師還沒開放 This level is not open yet';
+/* 首頁：把關閉的關卡變成 🔒 */
+function applyLocks(){
+  app.querySelectorAll('[data-v]').forEach(b=>{ const v=b.dataset.v; if(!LV_VIEWS.has(v)) return;
+    const lock=isClosed(v); b.classList.toggle('locked',lock); b.querySelector('.lockb')?.remove();
+    if(lock) b.insertAdjacentHTML('beforeend','<span class="lockb">🔒 還沒開放 Not open yet</span>'); });
+  app.querySelectorAll('.stage').forEach(sg=>{ const bs=[...sg.querySelectorAll('.level')]; sg.classList.toggle('allLocked', bs.length>0 && bs.every(b=>b.classList.contains('locked'))); });
+}
 /* ============================================================
    🎮 遊戲區：用說的打地鼠、說了才翻牌、60 秒快問快答、全班對抗賽
    詞語來自課本運動詞語＋我的詞庫；所有遊戲都要「說出來」
@@ -2520,7 +2582,8 @@ function viewGames(){
   $('#bk').onclick=()=>go('home');
   app.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{ S.src=b.dataset.src; save(); viewGames(); });
   app.querySelectorAll('[data-hint]').forEach(b=>b.onclick=()=>{ S.hint=b.dataset.hint; save(); viewGames(); });
-  app.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>({mole:gMole, flip:gFlip, speed:gSpeed, cls:null, class:gClass})[b.dataset.g](S));
+  app.querySelectorAll('[data-g]').forEach(b=>{ const lock=isClosed('g:'+b.dataset.g); if(lock){ b.classList.add('locked'); b.insertAdjacentHTML('beforeend','<span class="lockb">🔒 還沒開放 Not open yet</span>'); }
+    b.onclick=()=>{ if(isClosed('g:'+b.dataset.g)) return toast(LOCK_MSG); ({mole:gMole, flip:gFlip, speed:gSpeed, class:gClass})[b.dataset.g](S); }; });
 }
 const gCard=(it,hint,big)=>`<div class="gcard ${big?'big':''}"><div class="ge">${esc(it.e)}</div>${hint==='easy'?`<div class="ghz"><ruby>${esc(it.hz)}<rt>${esc(it.py)}</rt></ruby></div>`:`<div class="gen">${esc(it.en)}</div>`}</div>`;
 function gBest(id,score){ const k=gKey()+'_best_'+id; const b=store.get(k,null); if(b==null||score>b){ store.set(k,score); return true; } return false; }
@@ -3506,7 +3569,7 @@ function viewTeacher(arg){
       </div>
     </div>
     <div class="tabs" style="margin-top:12px">
-      ${[['today','📋 今日行動 Today'],['overview','🚦 總覽 Overview'],['groups','🧩 分組建議 Groups'],['heat','🗺️ 全班熱力圖 Heatmap'],['student','👤 學生報告 Student'],['tests','📝 測驗批改 Tests']].map(([k,l])=>`<button class="tab ${tv.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
+      ${[['today','📋 今日行動 Today'],['overview','🚦 總覽 Overview'],['groups','🧩 分組建議 Groups'],['heat','🗺️ 全班熱力圖 Heatmap'],['student','👤 學生報告 Student'],['tests','📝 測驗批改 Tests'],['levels','⚙️ 關卡開關 Levels']].map(([k,l])=>`<button class="tab ${tv.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
     </div>
     <div id="tb"><div class="card">載入中… Loading…</div></div>`;
   const fillC=()=>{ const cl=tv.teacher?classesOf(tv.teacher):[...new Set((CONFIG.TEACHERS||[]).flatMap(t=>t.classes).concat(CONFIG.CLASSES||[]))]; $('#fc').innerHTML='<option value="">全部班級</option>'+cl.map(c=>`<option>${esc(c)}</option>`).join(''); if(!cl.includes(tv.cls)) tv.cls=''; $('#fc').value=tv.cls; };
@@ -3543,7 +3606,31 @@ function viewTeacher(arg){
     catch(e){ toast('派題失敗：'+e.message) }
   }
 
+  async function rLevels(){
+    const T=CONFIG.TEACHERS||[];
+    if (T.length && !tv.teacher){
+      $('#tb').innerHTML=`<div class="card"><b style="font-size:20px">⚙️ 關卡開關</b><div class="hint" style="margin:6px 0 10px">每位老師的班級分開設定。請先選老師：</div>
+        <div class="row">${T.map(t=>`<button class="btn btn-sky" data-pt="${esc(t.name)}">🧑‍🏫 ${esc(t.name)}（${esc(t.classes.join('、'))}）</button>`).join('')}</div></div>`;
+      $('#tb').querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{ tv.teacher=b.dataset.pt; $('#ft').value=tv.teacher; fillC(); render(); });
+      return;
+    }
+    const t=tv.teacher; $('#tb').innerHTML='<div class="card">載入中… Loading…</div>';
+    let closed=await loadClosed(t); if(tv.tab!=='levels') return;
+    const draw=()=>{
+      const groups=[]; LEVEL_LIST.forEach(x=>{ if(x.stage) groups.push({st:x.st, name:x.stage, items:[]}); groups[groups.length-1].items.push(x); });
+      $('#tb').innerHTML=`<div class="card"><div class="row" style="justify-content:space-between"><b style="font-size:22px">⚙️ 關卡開關 <span class="en">Open / close levels</span></b><span class="pill p-good">${esc(t)}${classesOf(t).length?' · '+esc(classesOf(t).join('、')):''}</span></div>
+        <div class="hint" style="margin-top:4px">關掉的關卡，學生首頁會顯示 🔒「還沒開放」，點了也進不去。改了馬上存，學生重新整理或回到首頁就會看到。</div>
+        ${groups.map(g=>`<div class="lvgroup st-${g.st}"><div class="row" style="justify-content:space-between"><b style="font-size:18px">${g.name}</b><span><button class="btn btn-ghost lvall" data-g="${g.st}" data-on="1">全部打開</button> <button class="btn btn-ghost lvall" data-g="${g.st}" data-on="0">全部關閉</button></span></div>
+          <div class="lvrows">${g.items.map(x=>{ const on=!closed.has(x.v); return `<label class="lvrow ${on?'on':''}"><span class="lvno">${esc(x.no)}</span><span class="lvname"><b>${esc(x.zh)}</b> <span class="en">${esc(x.en)}</span></span><span class="lvstate">${on?'開放中 Open':'🔒 關閉 Closed'}</span><input type="checkbox" class="sw" data-lv="${x.v}" ${on?'checked':''}></label>`; }).join('')}</div></div>`).join('')}
+      </div>`;
+      const save=async()=>{ try{ await saveClosed(t,[...closed]); toast('✅ 已儲存 Saved'); }catch(e){ toast('儲存失敗：'+e.message); } };
+      $('#tb').querySelectorAll('[data-lv]').forEach(c=>c.onchange=()=>{ if(c.checked) closed.delete(c.dataset.lv); else closed.add(c.dataset.lv); draw(); save(); });
+      $('#tb').querySelectorAll('.lvall').forEach(b=>b.onclick=()=>{ LEVEL_LIST.filter(x=>x.st===b.dataset.g).forEach(x=>{ if(b.dataset.on==='1') closed.delete(x.v); else closed.add(x.v); }); draw(); save(); });
+    };
+    draw();
+  }
   function render(){
+    if (tv.tab==='levels') return rLevels();
     if (tv.tab==='today'){ const d=data(true); return rToday(d.rs,d.S); }
     const {rs,S}=data();
     if (tv.tab==='tests') return rTests(rs,S);
